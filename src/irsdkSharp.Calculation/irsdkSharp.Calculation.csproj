@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>irsdkSharp</PackageId>
+    <PackageId>irsdkSharp.Calculation</PackageId>
     <VersionPrefix>0.0.1</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <IncludeSymbols>true</IncludeSymbols>
@@ -16,8 +16,8 @@
     <Description>C# version of the iRacing SDK</Description>
     <SignAssembly>true</SignAssembly>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
-    <AssemblyName>irsdkSharp</AssemblyName>
-    <RootNamespace>irsdkSharp</RootNamespace>
+    <AssemblyName>irsdkSharp.Calculation</AssemblyName>
+    <RootNamespace>irsdkSharp.Calculation</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -35,9 +35,14 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\irsdkSharp.Serialization\irsdkSharp.Serialization.csproj" />
+  </ItemGroup>
+
   <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
     <ItemGroup>
       <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
     </ItemGroup>
   </Target>
+
 </Project>

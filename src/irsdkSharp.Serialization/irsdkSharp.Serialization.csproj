@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>irsdkSharp</PackageId>
+    <PackageId>irsdkSharp.Serialization</PackageId>
     <VersionPrefix>0.0.1</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <IncludeSymbols>true</IncludeSymbols>
@@ -13,11 +13,11 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Copyright>Slevinth Heaven Ltd 2020</Copyright>
     <PackageProjectUrl>https://github.com/SlevinthHeaven/irsdkSharp</PackageProjectUrl>
-    <Description>C# version of the iRacing SDK</Description>
+    <Description>Serialization Module for irsdkSharp</Description>
     <SignAssembly>true</SignAssembly>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
-    <AssemblyName>irsdkSharp</AssemblyName>
-    <RootNamespace>irsdkSharp</RootNamespace>
+    <AssemblyName>irsdkSharp.Serialization</AssemblyName>
+    <RootNamespace>irsdkSharp.Serialization</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -40,4 +40,14 @@
       <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
     </ItemGroup>
   </Target>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="5.0.0" />
+    <PackageReference Include="YamlDotNet" Version="8.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\irsdkSharp\irsdkSharp.csproj" />
+  </ItemGroup>
+
 </Project>
