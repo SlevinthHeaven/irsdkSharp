@@ -112,6 +112,7 @@ namespace irsdkSharp.ConsoleTest
 
                     // Get the session time (in seconds) of this update
                     var time = (double)sdk.GetData("SessionTime");
+                    var value = sdk.GetData();
 
                     // Raise the TelemetryUpdated event and pass along the lap info and session time
                     //var telArgs = new TelemetryUpdatedEventArgs(new TelemetryInfo(sdk), time);
@@ -142,8 +143,9 @@ namespace irsdkSharp.ConsoleTest
                                 foreach (var car in race.ResultsPositions.Where(x => classes[key].Any(y => y.CarIdx == x.CarIdx)).OrderBy(x => x.ClassPosition))
                                 {
                                     var driver = sessionInfo.DriverInfo.Drivers.Where(x => x.CarIdx == car.CarIdx).FirstOrDefault();
+                                    
                                     var gain = gains[car.CarIdx];
-                                    Console.WriteLine($"{key}: {driver.UserName} - {driver.IRating}({gain})");
+                                    Console.WriteLine($"{key}: {driver.UserName} - {driver.IRating}({gain}) {car.Time}");
                                 }
                             }
                         }

@@ -1,85 +1,74 @@
-﻿using System.IO.MemoryMappedFiles;
+﻿using System;
+using System.Collections.Generic;
+using System.IO.MemoryMappedFiles;
+using System.Linq;
 
 namespace irsdkSharp.Models
 {
     public class IRacingSdkHeader
     {
-        //Header offsets
-        private const int HVerOffset = 0;
-        private const int HStatusOffset = 4;
-        private const int HTickRateOffset = 8;
-        private const int HSesInfoUpdateOffset = 12;
-        private const int HSesInfoLenOffset = 16;
-        private const int HSesInfoOffsetOffset = 20;
-        private const int HNumVarsOffset = 24;
-        private const int HVarHeaderOffsetOffset = 28;
-        private const int HNumBufOffset = 32;
-        private const int HBufLenOffset = 36;
-
-        private readonly MemoryMappedViewAccessor _fileMapView = null;
-        private readonly VarBuf _buffer = null;
-
         public IRacingSdkHeader(MemoryMappedViewAccessor mapView)
         {
-            _fileMapView = mapView;
-            _buffer = new VarBuf(mapView, this);
+            var data = new byte[96];
+            mapView.ReadArray(0, data, 0, data.Length);
+            PopulateHeader(data);
         }
 
-        public int Version
+        public IRacingSdkHeader(Span<byte> span)
         {
-            get { return _fileMapView.ReadInt32(HVerOffset); }
+            PopulateHeader(span);
         }
 
-        public int Status
+        private void PopulateHeader(Span<byte> span)
         {
-            get { return _fileMapView.ReadInt32(HStatusOffset); }
+            Version = BitConverter.ToInt32(span.Slice(0, 4));
+            Status = BitConverter.ToInt32(span.Slice(4, 4));
+            TickRate = BitConverter.ToInt32(span.Slice(8, 4));
+
+            SessionInfoUpdate = BitConverter.ToInt32(span.Slice(12, 4));
+            SessionInfoLength = BitConverter.ToInt32(span.Slice(16, 4));
+            SessionInfoOffset = BitConverter.ToInt32(span.Slice(20, 4));
+
+            VarCount = BitConverter.ToInt32(span.Slice(24, 4));
+            VarHeaderOffset = BitConverter.ToInt32(span.Slice(28, 4));
+
+            BufferCount = BitConverter.ToInt32(span.Slice(32, 4));
+            BufferLength = BitConverter.ToInt32(span.Slice(36, 4));
+
+            Buffers = new List<VarBuf>();
+            for (var i = 0; i < BufferCount; i++)
+            {
+                Buffers.Add(new VarBuf(span.Slice(48 + (1 * 16), 16)));
+            }
         }
 
-        public int TickRate
-        {
-            get { return _fileMapView.ReadInt32(HTickRateOffset); }
-        }
+        public int Version { get; private set; }
 
-        public int SessionInfoUpdate
-        {
-            get { return _fileMapView.ReadInt32(HSesInfoUpdateOffset); }
-        }
+        public int Status { get; private set; }
 
-        public int SessionInfoLength
-        {
-            get { return _fileMapView.ReadInt32(HSesInfoLenOffset); }
-        }
+        public int TickRate { get; private set; }
 
-        public int SessionInfoOffset
-        {
-            get { return _fileMapView.ReadInt32(HSesInfoOffsetOffset); }
-        }
+        public int SessionInfoUpdate { get; private set; }
 
-        public int VarCount
-        {
-            get { return _fileMapView.ReadInt32(HNumVarsOffset); }
-        }
+        public int SessionInfoLength { get; private set; }
 
-        public int VarHeaderOffset
-        {
-            get { return _fileMapView.ReadInt32(HVarHeaderOffsetOffset); }
-        }
+        public int SessionInfoOffset { get; private set; }
 
-        public int BufferCount
-        {
-            get { return _fileMapView.ReadInt32(HNumBufOffset); }
-        }
+        public int VarCount { get; private set; }
 
-        public int BufferLength
-        {
-            get { return _fileMapView.ReadInt32(HBufLenOffset); }
-        }
+        public int VarHeaderOffset { get; private set; }
+
+        public int BufferCount { get; private set; }
+
+        public int BufferLength { get; private set; }
+
+        internal List<VarBuf> Buffers { get; private set; }
 
         public int Buffer
         {
             get
             {
-                return _buffer.OffsetLatest;
+                return Buffers.OrderByDescending(x => x.TickCount).First().BufOffset;
             }
         }
     }

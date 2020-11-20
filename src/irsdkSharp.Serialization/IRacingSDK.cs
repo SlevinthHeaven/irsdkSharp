@@ -1,4 +1,5 @@
-﻿using irsdkSharp.Serialization.Models.Data;
+﻿using irsdkSharp.Models;
+using irsdkSharp.Serialization.Models.Data;
 using irsdkSharp.Serialization.Models.Session;
 using System;
 using System.Collections.Generic;
@@ -21,9 +22,45 @@ namespace irsdkSharp.Serialization
             return null;
         }
 
-        public DataModel GetData()
+        public IRacingDataModel GetData()
         {
-            return new DataModel();
+            if (IsInitialized)
+            {
+                var length = (int)FileMapView.Capacity;
+                var data = new byte[length];
+                FileMapView.ReadArray(0, data, 0, length);
+
+                //Get header
+                var header = new IRacingSdkHeader(data);
+                var headers = GetVarHeaders(header, data);
+
+                //Serialise the string into objects, tada!
+                return IRacingDataModel.Serialize(data[header.Buffer..], headers);
+            }
+            return null;
+        }
+
+        private List<VarHeader> GetVarHeaders(IRacingSdkHeader header, Span<byte> span)
+        {
+            var headers = new List<VarHeader>();
+            for (int i = 0; i < header.VarCount; i++)
+            {
+                int type = BitConverter.ToInt32(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size)));
+                int offset = BitConverter.ToInt32(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarOffsetOffset));
+                int count = BitConverter.ToInt32(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarCountOffset));
+                string nameStr = Encoding.Default
+                    .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarNameOffset, Constants.MaxString))
+                    .TrimEnd(new char[] { '\0' });
+                string descStr = Encoding.Default
+                    .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarDescOffset, Constants.MaxDesc))
+                    .TrimEnd(new char[] { '\0' });
+                string unitStr = Encoding.Default
+                    .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarUnitOffset, Constants.MaxString))
+                    .TrimEnd(new char[] { '\0' });
+                headers.Add(new VarHeader(type, offset, count, nameStr, descStr, unitStr));
+            }
+            return headers;
         }
     }
+
 }

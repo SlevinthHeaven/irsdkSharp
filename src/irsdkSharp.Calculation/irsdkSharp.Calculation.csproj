@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <PackageId>irsdkSharp.Calculation</PackageId>
     <VersionPrefix>0.0.1</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
