@@ -25,13 +25,13 @@ namespace irsdkSharp.Serialization.Models.Data
 
             foreach (var header in headers)
             {
-                var currentProperty = dataModelProperties.FirstOrDefault(x => x.Name.ToLower() == header.Name.ToLower());
-                var carProperty = carModelProperties.FirstOrDefault(x => x.Name.ToLower() == header.Name.ToLower());
-                if (currentProperty != null)
+                var dataModelProperty = dataModelProperties.FirstOrDefault(x => x.Name.ToLower() == header.Name.ToLower());
+                var carModelProperty = carModelProperties.FirstOrDefault(x => x.Name.ToLower() == header.Name.ToLower());
+                if (dataModelProperty != null)
                 {
-                    if (header.Count == 0)
+                    if (header.Count == 1)
                     {
-                        currentProperty.SetValue(model, GetValue(toSerialize, header.Offset, header.Length, header.Type));
+                        dataModelProperty.SetValue(model, GetValue(toSerialize, header.Offset, header.Length, header.Type));
                     }
                     else
                     {
@@ -41,14 +41,14 @@ namespace irsdkSharp.Serialization.Models.Data
                             values[i] = GetValue(toSerialize, header.Offset + ((header.Length / header.Count) * i), (header.Length / header.Count), header.Type);
 
                         }
-                        currentProperty.SetValue(model, values);
+                        // dataModelProperty.SetValue(model, values);
                     }
                 }
-                else if (carProperty != null)
+                else if (carModelProperty != null)
                 {
                     for (int i = 0; i < header.Count; i++)
                     {
-                        carProperty.SetValue(cars[i], GetValue(toSerialize, header.Offset + ((header.Length / header.Count) * i), (header.Length / header.Count), header.Type));
+                        carModelProperty.SetValue(cars[i], GetValue(toSerialize, header.Offset + ((header.Length / header.Count) * i), (header.Length / header.Count), header.Type));
                     }
                 }
                 else

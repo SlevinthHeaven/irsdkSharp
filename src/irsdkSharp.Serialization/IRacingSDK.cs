@@ -35,13 +35,14 @@ namespace irsdkSharp.Serialization
                 var headers = GetVarHeaders(header, data);
 
                 //Serialise the string into objects, tada!
-                return IRacingDataModel.Serialize(data[header.Buffer..], headers);
+                return IRacingDataModel.Serialize(data[header.Buffer..(header.Buffer + header.BufferLength)], headers);
             }
             return null;
         }
 
         private List<VarHeader> GetVarHeaders(IRacingSdkHeader header, Span<byte> span)
         {
+            var nullChar = new char[] { '\0' };
             var headers = new List<VarHeader>();
             for (int i = 0; i < header.VarCount; i++)
             {
@@ -50,13 +51,13 @@ namespace irsdkSharp.Serialization
                 int count = BitConverter.ToInt32(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarCountOffset));
                 string nameStr = Encoding.Default
                     .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarNameOffset, Constants.MaxString))
-                    .TrimEnd(new char[] { '\0' });
+                    .TrimEnd(nullChar);
                 string descStr = Encoding.Default
                     .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarDescOffset, Constants.MaxDesc))
-                    .TrimEnd(new char[] { '\0' });
+                    .TrimEnd(nullChar);
                 string unitStr = Encoding.Default
                     .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarUnitOffset, Constants.MaxString))
-                    .TrimEnd(new char[] { '\0' });
+                    .TrimEnd(nullChar);
                 headers.Add(new VarHeader(type, offset, count, nameStr, descStr, unitStr));
             }
             return headers;
