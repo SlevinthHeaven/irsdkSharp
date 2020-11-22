@@ -127,7 +127,7 @@ namespace irsdkSharp.ConsoleTest
                         // Get the session info string
                         var sessionInfo = sdk.GetSessionInformation(); //.GetSessionInfo();
                         var race = sessionInfo.SessionInfo.Sessions.FirstOrDefault(x => x.SessionType.ToLower() == "race");
-                        if (race != null && race.ResultsLapsComplete >= 0 )
+                        if (race != null && race.ResultsLapsComplete >= 0)
                         {
                             var gains = _rating.CalculateGains(race, sessionInfo.DriverInfo.Drivers);
 
@@ -137,13 +137,13 @@ namespace irsdkSharp.ConsoleTest
                                 .Select(x => (x.CarClassID, x.CarIdx))
                                 .GroupBy(x => x.CarClassID)
                                 .ToDictionary(g => g.Key, g => g.ToList());
-                            
+
                             foreach (var key in classes.Keys)
                             {
                                 foreach (var car in race.ResultsPositions.Where(x => classes[key].Any(y => y.CarIdx == x.CarIdx)).OrderBy(x => x.ClassPosition))
                                 {
                                     var driver = sessionInfo.DriverInfo.Drivers.Where(x => x.CarIdx == car.CarIdx).FirstOrDefault();
-                                    
+
                                     var gain = gains[car.CarIdx];
                                     Console.WriteLine($"{key}: {driver.UserName} - {driver.IRating}({gain}) {car.Time}");
                                 }
