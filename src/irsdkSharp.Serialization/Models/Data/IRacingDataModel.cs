@@ -41,7 +41,6 @@ namespace irsdkSharp.Serialization.Models.Data
                             values[i] = GetValue(toSerialize, header.Offset + ((header.Length / header.Count) * i), (header.Length / header.Count), header.Type);
 
                         }
-                        // dataModelProperty.SetValue(model, values);
                     }
                 }
                 else if (carModelProperty != null)
