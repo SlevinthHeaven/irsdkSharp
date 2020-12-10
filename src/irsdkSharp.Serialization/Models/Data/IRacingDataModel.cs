@@ -20,7 +20,7 @@ namespace irsdkSharp.Serialization.Models.Data
             var cars = new CarModel[64];
             for (var i = 0; i < cars.Length; i++)
             {
-                cars[i] = new CarModel();
+                cars[i] = new CarModel { CarIdx = i };
             }
 
             foreach (var header in headers)
@@ -47,7 +47,7 @@ namespace irsdkSharp.Serialization.Models.Data
                 else if (carModelProperty != null)
                 {
                     for (int i = 0; i < header.Count; i++)
-                    {
+                    { 
                         carModelProperty.SetValue(cars[i], GetValue(toSerialize, header.Offset + ((header.Length / header.Count) * i), (header.Length / header.Count), header.Type));
                     }
                 }
@@ -56,13 +56,13 @@ namespace irsdkSharp.Serialization.Models.Data
                     missing.Add(header);
                 }
             }
-            model.Cars = cars.ToList();
+            
+            model.Cars = cars;
             return new IRacingDataModel
             {
                 Data = model,
                 Missing = missing
             };
-
         }
 
         private static object GetValue(Span<byte> array, int start, int length, VarType type)
