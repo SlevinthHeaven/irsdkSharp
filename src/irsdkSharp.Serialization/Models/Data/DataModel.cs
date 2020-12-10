@@ -8,9 +8,9 @@ namespace irsdkSharp.Serialization.Models.Data
     {
         public DataModel()
         {
-            Cars = new List<CarModel>();
+            Cars = new CarModel[64] ;
         }
-        public List<CarModel> Cars { get; set; }
+        public CarModel[] Cars { get; set; }
         public float AirDensity { get; set; }
         public float AirPressure { get; set; }
         public float AirTemp { get; set; }

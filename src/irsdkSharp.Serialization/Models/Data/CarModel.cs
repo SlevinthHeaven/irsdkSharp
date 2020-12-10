@@ -6,6 +6,7 @@ namespace irsdkSharp.Serialization.Models.Data
 {
     public class CarModel
     {
+        public int CarIdx { get; set; }
         public int CarIdxBestLapNum { get; set; }
         public float CarIdxBestLapTime { get; set; }
         public int CarIdxClassPosition { get; set; }
