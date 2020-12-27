@@ -11,15 +11,14 @@ namespace irsdkSharp.Serialization
     {
         public static IRacingSessionModel GetSerializedSessionInfo(this IRacingSDK racingSDK)
         {
-            if (racingSDK.IsInitialized && racingSDK.Header != null)
-            {
-                byte[] data = new byte[racingSDK.Header.SessionInfoLength];
-                IRacingSDK.GetFileMapView(racingSDK).ReadArray(racingSDK.Header.SessionInfoOffset, data, 0, racingSDK.Header.SessionInfoLength);
+            var sessionInfo = racingSDK.GetSessionInfo();
 
-                //Serialise the string into objects, tada!
-                return IRacingSessionModel.Serialize(Encoding.Default.GetString(data).TrimEnd(new char[] { '\0' }));
+            if (sessionInfo == null)
+            {
+                return null;
             }
-            return null;
+
+            return IRacingSessionModel.Serialize(sessionInfo);
         }
 
         public static IRacingDataModel GetSerializedData(this IRacingSDK racingSDK)

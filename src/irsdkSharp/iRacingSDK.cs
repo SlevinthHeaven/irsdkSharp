@@ -11,6 +11,8 @@ namespace irsdkSharp
 {
     public class IRacingSDK
     {
+        private Encoding encoding;
+
         //VarHeader offsets
         public const int VarOffsetOffset = 4;
         public const int VarCountOffset = 8;
@@ -33,6 +35,13 @@ namespace irsdkSharp
         public IRacingSdkHeader Header = null;
         public Dictionary<string, VarHeader> VarHeaders = new Dictionary<string, VarHeader>();
         //List<CVarHeader> VarHeaders = new List<CVarHeader>();
+
+        public IRacingSDK()
+        {
+            // Register CP1252 encoding
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            encoding = Encoding.GetEncoding(1252);
+        }
 
         public bool Startup()
         {
@@ -69,9 +78,9 @@ namespace irsdkSharp
                 FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarNameOffset), name, 0, Constants.MaxString);
                 FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarDescOffset), desc, 0, Constants.MaxDesc);
                 FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarUnitOffset), unit, 0, Constants.MaxString);
-                string nameStr = Encoding.Default.GetString(name).TrimEnd(new char[] { '\0' });
-                string descStr = Encoding.Default.GetString(desc).TrimEnd(new char[] { '\0' });
-                string unitStr = Encoding.Default.GetString(unit).TrimEnd(new char[] { '\0' });
+                string nameStr = encoding.GetString(name).TrimEnd(new char[] { '\0' });
+                string descStr = encoding.GetString(desc).TrimEnd(new char[] { '\0' });
+                string unitStr = encoding.GetString(unit).TrimEnd(new char[] { '\0' });
                 VarHeaders[nameStr] = new VarHeader(type, offset, count, nameStr, descStr, unitStr);
             }
         }
@@ -88,7 +97,7 @@ namespace irsdkSharp
                     {
                         byte[] data = new byte[count];
                         FileMapView.ReadArray<byte>(Header.Buffer + varOffset, data, 0, count);
-                        return Encoding.Default.GetString(data).TrimEnd(new char[] { '\0' });
+                        return encoding.GetString(data).TrimEnd(new char[] { '\0' });
                     }
                     else if (VarHeaders[name].Type == VarType.irBool)
                     {
@@ -153,7 +162,7 @@ namespace irsdkSharp
             {
                 byte[] data = new byte[Header.SessionInfoLength];
                 FileMapView.ReadArray<byte>(Header.SessionInfoOffset, data, 0, Header.SessionInfoLength);
-                return Encoding.Default.GetString(data).TrimEnd(new char[] { '\0' });
+                return encoding.GetString(data).TrimEnd(new char[] { '\0' });
             }
             return null;
         }
