@@ -25,6 +25,11 @@ namespace irsdkSharp
         MemoryMappedFile iRacingFile;
         protected MemoryMappedViewAccessor FileMapView;
 
+        public static MemoryMappedViewAccessor GetFileMapView(IRacingSDK racingSDK)
+        {
+            return racingSDK.FileMapView;
+        }
+
         public IRacingSdkHeader Header = null;
         public Dictionary<string, VarHeader> VarHeaders = new Dictionary<string, VarHeader>();
         //List<CVarHeader> VarHeaders = new List<CVarHeader>();

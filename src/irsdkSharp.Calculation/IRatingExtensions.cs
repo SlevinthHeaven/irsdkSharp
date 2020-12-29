@@ -1,5 +1,4 @@
-﻿using irsdkSharp.Serialization.Models.Session.DriverInfo;
-using irsdkSharp.Serialization.Models.Session.SessionInfo;
+﻿using irsdkSharp.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,16 +6,26 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace irsdkSharp.Calculation
 {
-    public class IRating
+    public static class IRatingExtensions
     {
-        private readonly double _initialConstant = 1600 / Math.Log(2);
+        private static readonly double _initialConstant = 1600 / Math.Log(2);
               
-        public Dictionary<int, double> CalculateGains(SessionModel sessionModel, List<DriverModel> drivers)
+        public static Dictionary<int, double> CalculateIRatingGains(this IRacingSDK racingSDK)
         {
+            var sessionModel = racingSDK.GetSerializedSessionInfo();
+
+            if(sessionModel == null) return null;
+
+            var raceSession = sessionModel.SessionInfo.Sessions.FirstOrDefault(x => x.SessionType.ToLower() == "race");
+
+            if (raceSession == null && raceSession.ResultsLapsComplete >= 0) return null;
+            
+            var drivers = sessionModel.DriverInfo.Drivers;
+
             var result = new Dictionary<int, double>();
             var classes = drivers
                 .Where(x => x.IsSpectator == 0)
-                .Where(x => x.CarIsPaceCar =="0")
+                .Where(x => x.CarIsPaceCar == "0")
                 .Where(x => x.CarIsAI == "0")
                 .Select(x => x.CarClassID)
                 .GroupBy(x => x)
@@ -34,7 +43,7 @@ namespace irsdkSharp.Calculation
 
                 var fieldSize = driversInClass.Count();
 
-                var dns = sessionModel.ResultsPositions
+                var dns = raceSession.ResultsPositions
                     .Where(x => x.ReasonOutId == 1)
                     .Where(x => driversInClass.Any(y => y.CarIdx == x.CarIdx))
                     .Count();
@@ -71,7 +80,7 @@ namespace irsdkSharp.Calculation
 
                 driversInClass.ForEach(x =>
                 {
-                    var currentPosition = sessionModel.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
+                    var currentPosition = raceSession.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
                     if (currentPosition != null && currentPosition.ReasonOutId != 1)
                     {
                         fudgeFactor.Add(x.CarIdx, ((fieldSize - ((double)dns / 2)) / 2 - ((double)currentPosition.ClassPosition + 1)) / 100);
@@ -80,7 +89,7 @@ namespace irsdkSharp.Calculation
 
                 driversInClass.ForEach(x =>
                 {
-                    var currentPosition = sessionModel.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
+                    var currentPosition = raceSession.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
                     if (currentPosition != null)
                     {
                         if (currentPosition.ReasonOutId != 1)
@@ -92,7 +101,7 @@ namespace irsdkSharp.Calculation
 
                 driversInClass.ForEach(x =>
                 {
-                    var currentPosition = sessionModel.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
+                    var currentPosition = raceSession.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
                     if (currentPosition != null)
                     {
                         if (currentPosition.ReasonOutId == 1)
@@ -109,7 +118,7 @@ namespace irsdkSharp.Calculation
                     //based on current position calculate the change in iRating for those that did not start
                     driversInClass.ForEach(x =>
                     {
-                        var currentPosition = sessionModel.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
+                        var currentPosition = raceSession.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
                         if (currentPosition != null)
                         {
                             if (currentPosition.ReasonOutId == 1)

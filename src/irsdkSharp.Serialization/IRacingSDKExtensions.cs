@@ -7,14 +7,14 @@ using System.Text;
 
 namespace irsdkSharp.Serialization
 {
-    public class IRacingSDK : irsdkSharp.IRacingSDK
+    public static class IRacingSDKExtensions
     {
-        public IRacingSessionModel GetSessionInformation()
+        public static IRacingSessionModel GetSerializedSessionInfo(this IRacingSDK racingSDK)
         {
-            if (IsInitialized && Header != null)
+            if (racingSDK.IsInitialized && racingSDK.Header != null)
             {
-                byte[] data = new byte[Header.SessionInfoLength];
-                FileMapView.ReadArray(Header.SessionInfoOffset, data, 0, Header.SessionInfoLength);
+                byte[] data = new byte[racingSDK.Header.SessionInfoLength];
+                IRacingSDK.GetFileMapView(racingSDK).ReadArray(racingSDK.Header.SessionInfoOffset, data, 0, racingSDK.Header.SessionInfoLength);
 
                 //Serialise the string into objects, tada!
                 return IRacingSessionModel.Serialize(Encoding.Default.GetString(data).TrimEnd(new char[] { '\0' }));
@@ -22,13 +22,13 @@ namespace irsdkSharp.Serialization
             return null;
         }
 
-        public IRacingDataModel GetData()
+        public static IRacingDataModel GetSerializedData(this IRacingSDK racingSDK)
         {
-            if (IsInitialized)
+            if (racingSDK.IsInitialized)
             {
-                var length = (int)FileMapView.Capacity;
+                var length = (int)IRacingSDK.GetFileMapView(racingSDK).Capacity;
                 var data = new byte[length];
-                FileMapView.ReadArray(0, data, 0, length);
+                IRacingSDK.GetFileMapView(racingSDK).ReadArray(0, data, 0, length);
 
                 //Get header
                 var header = new IRacingSdkHeader(data);
@@ -40,23 +40,23 @@ namespace irsdkSharp.Serialization
             return null;
         }
 
-        private List<VarHeader> GetVarHeaders(IRacingSdkHeader header, Span<byte> span)
+        private static List<VarHeader> GetVarHeaders(IRacingSdkHeader header, Span<byte> span)
         {
             var nullChar = new char[] { '\0' };
             var headers = new List<VarHeader>();
             for (int i = 0; i < header.VarCount; i++)
             {
                 int type = BitConverter.ToInt32(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size)));
-                int offset = BitConverter.ToInt32(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarOffsetOffset));
-                int count = BitConverter.ToInt32(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarCountOffset));
+                int offset = BitConverter.ToInt32(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + IRacingSDK.VarOffsetOffset));
+                int count = BitConverter.ToInt32(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + IRacingSDK.VarCountOffset));
                 string nameStr = Encoding.Default
-                    .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarNameOffset, Constants.MaxString))
+                    .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + IRacingSDK.VarNameOffset, Constants.MaxString))
                     .TrimEnd(nullChar);
                 string descStr = Encoding.Default
-                    .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarDescOffset, Constants.MaxDesc))
+                    .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + IRacingSDK.VarDescOffset, Constants.MaxDesc))
                     .TrimEnd(nullChar);
                 string unitStr = Encoding.Default
-                    .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + VarUnitOffset, Constants.MaxString))
+                    .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + IRacingSDK.VarUnitOffset, Constants.MaxString))
                     .TrimEnd(nullChar);
                 headers.Add(new VarHeader(type, offset, count, nameStr, descStr, unitStr));
             }
