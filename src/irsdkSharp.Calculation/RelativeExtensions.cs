@@ -17,7 +17,7 @@ namespace irsdkSharp.Calculation
 
             var dataModel = racingSDK.GetSerializedData();
 
-            if(sessionModel == null) return null;
+            if(dataModel == null) return null;
 
             var relatives = new Dictionary<int, CarRelativeModel>();
 
