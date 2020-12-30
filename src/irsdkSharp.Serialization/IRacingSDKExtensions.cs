@@ -31,7 +31,7 @@ namespace irsdkSharp.Serialization
 
                 //Get header
                 var header = new IRacingSdkHeader(data);
-                var headers = GetVarHeaders(header, data);
+                var headers = GetVarHeaders(racingSDK,header, data);
 
                 //Serialise the string into objects, tada!
                 return IRacingDataModel.Serialize(data[header.Buffer..(header.Buffer + header.BufferLength)], headers);
@@ -39,7 +39,7 @@ namespace irsdkSharp.Serialization
             return null;
         }
 
-        private static List<VarHeader> GetVarHeaders(IRacingSdkHeader header, Span<byte> span)
+        private static List<VarHeader> GetVarHeaders(IRacingSDK racingSDK, IRacingSdkHeader header, Span<byte> span)
         {
             var nullChar = new char[] { '\0' };
             var headers = new List<VarHeader>();
@@ -48,13 +48,13 @@ namespace irsdkSharp.Serialization
                 int type = BitConverter.ToInt32(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size)));
                 int offset = BitConverter.ToInt32(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + IRacingSDK.VarOffsetOffset));
                 int count = BitConverter.ToInt32(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + IRacingSDK.VarCountOffset));
-                string nameStr = Encoding.Default
+                string nameStr = IRacingSDK.GetEncoding(racingSDK)
                     .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + IRacingSDK.VarNameOffset, Constants.MaxString))
                     .TrimEnd(nullChar);
-                string descStr = Encoding.Default
+                string descStr = IRacingSDK.GetEncoding(racingSDK)
                     .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + IRacingSDK.VarDescOffset, Constants.MaxDesc))
                     .TrimEnd(nullChar);
-                string unitStr = Encoding.Default
+                string unitStr = IRacingSDK.GetEncoding(racingSDK)
                     .GetString(span.Slice(header.VarHeaderOffset + (i * VarHeader.Size) + IRacingSDK.VarUnitOffset, Constants.MaxString))
                     .TrimEnd(nullChar);
                 headers.Add(new VarHeader(type, offset, count, nameStr, descStr, unitStr));
