@@ -1,8 +1,8 @@
-﻿using irsdkSharp.Serialization.Models.Session;
+﻿using irsdkSharp.Calculation;
+using irsdkSharp.Serialization;
 using System;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,9 +14,9 @@ namespace irsdkSharp.ConsoleTest
         private static int waitTime;
         private static Thread _looper;
         private static System.Timers.Timer timer;
-        private static Serialization.IRacingSDK sdk;
+        private static IRacingSDK sdk;
         private static bool _IsConnected = false;
-        private static irsdkSharp.Calculation.IRating _rating = new irsdkSharp.Calculation.IRating();
+       // private static irsdkSharp.Calculation.IRating _rating = new irsdkSharp.Calculation.IRating();
 
         private static double _TelemetryUpdateFrequency;
         /// <summary>
@@ -62,7 +62,7 @@ namespace irsdkSharp.ConsoleTest
             //var gains = _rating.CalculateGains(race, model.DriverInfo.Drivers);
 
 
-            sdk = new Serialization.IRacingSDK();
+            sdk = new IRacingSDK();
             ConnectSleepTime = 1000;
             Task.Run(() => Loop());
 
@@ -112,7 +112,7 @@ namespace irsdkSharp.ConsoleTest
 
                     // Get the session time (in seconds) of this update
                     var time = (double)sdk.GetData("SessionTime");
-                    var value = sdk.GetData();
+                    var value = sdk.GetSerializedSessionInfo();
 
                     // Raise the TelemetryUpdated event and pass along the lap info and session time
                     //var telArgs = new TelemetryUpdatedEventArgs(new TelemetryInfo(sdk), time);
@@ -125,14 +125,13 @@ namespace irsdkSharp.ConsoleTest
                         lastUpdate = newUpdate;
 
                         // Get the session info string
-                        var sessionInfo = sdk.GetSessionInformation(); //.GetSessionInfo();
-                        var race = sessionInfo.SessionInfo.Sessions.FirstOrDefault(x => x.SessionType.ToLower() == "race");
-                        if (race != null && race.ResultsLapsComplete >= 0)
+                        var sessionModel = sdk.GetSerializedSessionInfo(); //.GetSessionInfo();
+                        var raceSession = sessionModel.SessionInfo.Sessions.FirstOrDefault(x => x.SessionType.ToLower() == "race");
+                        var gains = sdk.CalculateIRatingGains();
+                        if (gains != null)
                         {
-                            var gains = _rating.CalculateGains(race, sessionInfo.DriverInfo.Drivers);
-
                             Console.Clear();
-                            var classes = sessionInfo.DriverInfo.Drivers
+                            var classes = sessionModel.DriverInfo.Drivers
                                 .Where(x => x.IsSpectator == 0)
                                 .Select(x => (x.CarClassID, x.CarIdx))
                                 .GroupBy(x => x.CarClassID)
@@ -140,9 +139,9 @@ namespace irsdkSharp.ConsoleTest
 
                             foreach (var key in classes.Keys)
                             {
-                                foreach (var car in race.ResultsPositions.Where(x => classes[key].Any(y => y.CarIdx == x.CarIdx)).OrderBy(x => x.ClassPosition))
+                                foreach (var car in raceSession.ResultsPositions.Where(x => classes[key].Any(y => y.CarIdx == x.CarIdx)).OrderBy(x => x.ClassPosition))
                                 {
-                                    var driver = sessionInfo.DriverInfo.Drivers.Where(x => x.CarIdx == car.CarIdx).FirstOrDefault();
+                                    var driver = sessionModel.DriverInfo.Drivers.Where(x => x.CarIdx == car.CarIdx).FirstOrDefault();
 
                                     var gain = gains[car.CarIdx];
                                     Console.WriteLine($"{key}: {driver.UserName} - {driver.IRating}({gain}) {car.Time}");
