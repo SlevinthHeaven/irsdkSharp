@@ -57,6 +57,18 @@ namespace irsdkSharp
                 iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
                 FileMapView = iRacingFile.CreateViewAccessor();
 
+                var hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
+                var are = new AutoResetEvent(false)
+                {
+                    // This is deprecated, need beter option
+                    Handle = hEvent
+                };
+
+                var wh = new WaitHandle[1];
+                wh[0] = are;
+
+                WaitHandle.WaitAny(wh);
+
                 Header = new IRacingSdkHeader(FileMapView);
                 GetVarHeaders();
 
@@ -176,7 +188,11 @@ namespace irsdkSharp
         {
             if (IsInitialized && Header != null)
             {
-                return (Header.Status & 1) > 0;
+                // need to check the header on each update
+                // this may be an issue later with the rest of the header
+                var status = IRacingSdkHeader.GetStatus(FileMapView);
+
+                return (status & 1) > 0;
             }
             return false;
         }
