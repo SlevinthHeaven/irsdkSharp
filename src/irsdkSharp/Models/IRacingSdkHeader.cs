@@ -19,6 +19,13 @@ namespace irsdkSharp.Models
             PopulateHeader(span);
         }
 
+        public static int GetStatus(MemoryMappedViewAccessor mapView)
+        {
+            var data = new byte[96];
+            mapView.ReadArray(0, data, 0, data.Length);
+            return BitConverter.ToInt32(data, 4); 
+        }
+
         private void PopulateHeader(Span<byte> span)
         {
             Version = BitConverter.ToInt32(span.Slice(0, 4));

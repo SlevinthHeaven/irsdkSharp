@@ -18,7 +18,7 @@ namespace irsdkSharp.Calculation
 
             var raceSession = sessionModel.SessionInfo.Sessions.FirstOrDefault(x => x.SessionType.ToLower() == "race");
 
-            if (raceSession == null && raceSession.ResultsLapsComplete >= 0) return null;
+            if (raceSession == null || raceSession.ResultsLapsComplete < 1) return null;
             
             var drivers = sessionModel.DriverInfo.Drivers;
 
