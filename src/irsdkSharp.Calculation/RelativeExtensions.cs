@@ -1,5 +1,7 @@
 ﻿using irsdkSharp.Calculation.Models;
 using irsdkSharp.Serialization;
+using irsdkSharp.Serialization.Models.Data;
+using irsdkSharp.Serialization.Models.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,15 +11,10 @@ namespace irsdkSharp.Calculation
 {
     public static class RelativeExtensions
     {
-        public static Dictionary<int, CarRelativeModel> CalculateRelatives(this IRacingSDK racingSDK)
+        public static Dictionary<int, CarRelativeModel> CalculateRelatives(IRacingDataModel dataModel, IRacingSessionModel sessionModel)
         {
-            var sessionModel = racingSDK.GetSerializedSessionInfo();
-
-            if(sessionModel == null) return null;
-
-            var dataModel = racingSDK.GetSerializedData();
-
-            if(dataModel == null) return null;
+            if (sessionModel == null) return null;
+            if (dataModel == null) return null;
 
             var relatives = new Dictionary<int, CarRelativeModel>();
 
@@ -30,9 +27,10 @@ namespace irsdkSharp.Calculation
             var currentCar = dataModel.Data.Cars[currentCarIdx];
             foreach (var car in dataModel.Data.Cars)
             {
-                if(car.CarIdx == currentCar.CarIdx)
+                if (car.CarIdx == currentCar.CarIdx)
                 {
-                    relatives.Add(car.CarIdx, new CarRelativeModel {
+                    relatives.Add(car.CarIdx, new CarRelativeModel
+                    {
                         Ahead = TimeSpan.FromSeconds(0),
                         Behind = TimeSpan.FromSeconds(0)
                     });
@@ -63,6 +61,19 @@ namespace irsdkSharp.Calculation
             }
 
             return relatives;
+        }
+
+        public static Dictionary<int, CarRelativeModel> CalculateRelatives(this IRacingSDK racingSDK)
+        {
+            var sessionModel = racingSDK.GetSerializedSessionInfo();
+
+            if(sessionModel == null) return null;
+
+            var dataModel = racingSDK.GetSerializedData();
+
+            if(dataModel == null) return null;
+
+            return CalculateRelatives(dataModel, sessionModel);
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using irsdkSharp.Serialization;
+using irsdkSharp.Serialization.Models.Data;
+using irsdkSharp.Serialization.Models.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +12,16 @@ namespace irsdkSharp.Calculation
     {
         private static readonly double _initialConstant = 1600 / Math.Log(2);
               
-        public static Dictionary<int, double> CalculateIRatingGains(this IRacingSDK racingSDK)
+        public static Dictionary<int, double> CalculateIRatingGains(IRacingDataModel dataModel, IRacingSessionModel sessionModel)
         {
-            var sessionModel = racingSDK.GetSerializedSessionInfo();
+            if (sessionModel == null) return null;
 
-            if(sessionModel == null) return null;
+            if (dataModel == null) return null;
 
-            var raceSession = sessionModel.SessionInfo.Sessions.FirstOrDefault(x => x.SessionType.ToLower() == "race");
+            var currentSession = sessionModel.SessionInfo.Sessions.OrderByDescending(x => x.SessionNum).FirstOrDefault();
 
-            if (raceSession == null || raceSession.ResultsLapsComplete < 1) return null;
-            
+            if (currentSession == null) return null;
+
             var drivers = sessionModel.DriverInfo.Drivers;
 
             var result = new Dictionary<int, double>();
@@ -43,7 +45,7 @@ namespace irsdkSharp.Calculation
 
                 var fieldSize = driversInClass.Count();
 
-                var dns = raceSession.ResultsPositions
+                var dns = currentSession.ResultsPositions
                     .Where(x => x.ReasonOutId == 1)
                     .Where(x => driversInClass.Any(y => y.CarIdx == x.CarIdx))
                     .Count();
@@ -66,7 +68,7 @@ namespace irsdkSharp.Calculation
                     driversInClass.ForEach(y =>
                     {
                         probabilities[x.CarIdx].Add(
-                            (1 - exponentials[x.CarIdx]) * exponentials[y.CarIdx] / 
+                            (1 - exponentials[x.CarIdx]) * exponentials[y.CarIdx] /
                             (
                                 (1 - exponentials[y.CarIdx]) * exponentials[x.CarIdx] +
                                 (1 - exponentials[x.CarIdx]) * exponentials[y.CarIdx])
@@ -80,7 +82,7 @@ namespace irsdkSharp.Calculation
 
                 driversInClass.ForEach(x =>
                 {
-                    var currentPosition = raceSession.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
+                    var currentPosition = currentSession.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
                     if (currentPosition != null && currentPosition.ReasonOutId != 1)
                     {
                         fudgeFactor.Add(x.CarIdx, ((fieldSize - ((double)dns / 2)) / 2 - ((double)currentPosition.ClassPosition + 1)) / 100);
@@ -89,7 +91,7 @@ namespace irsdkSharp.Calculation
 
                 driversInClass.ForEach(x =>
                 {
-                    var currentPosition = raceSession.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
+                    var currentPosition = currentSession.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
                     if (currentPosition != null)
                     {
                         if (currentPosition.ReasonOutId != 1)
@@ -101,7 +103,7 @@ namespace irsdkSharp.Calculation
 
                 driversInClass.ForEach(x =>
                 {
-                    var currentPosition = raceSession.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
+                    var currentPosition = currentSession.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
                     if (currentPosition != null)
                     {
                         if (currentPosition.ReasonOutId == 1)
@@ -118,7 +120,7 @@ namespace irsdkSharp.Calculation
                     //based on current position calculate the change in iRating for those that did not start
                     driversInClass.ForEach(x =>
                     {
-                        var currentPosition = raceSession.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
+                        var currentPosition = currentSession.ResultsPositions.Where(y => y.CarIdx == x.CarIdx).FirstOrDefault();
                         if (currentPosition != null)
                         {
                             if (currentPosition.ReasonOutId == 1)
@@ -141,6 +143,15 @@ namespace irsdkSharp.Calculation
             });
 
             return result;
+        }
+
+        public static Dictionary<int, double> CalculateIRatingGains(this IRacingSDK racingSDK)
+        {
+            var sessionModel = racingSDK.GetSerializedSessionInfo();
+
+            var dataModel = racingSDK.GetSerializedData();
+
+            return CalculateIRatingGains(dataModel, sessionModel);
         }
     }
 }
