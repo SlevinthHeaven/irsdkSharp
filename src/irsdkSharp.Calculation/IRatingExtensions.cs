@@ -22,6 +22,8 @@ namespace irsdkSharp.Calculation
 
             if (currentSession == null) return null;
 
+            if (currentSession.ResultsPositions == null) return null;
+
             var drivers = sessionModel.DriverInfo.Drivers;
 
             var result = new Dictionary<int, double>();
