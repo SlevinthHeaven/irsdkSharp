@@ -18,13 +18,17 @@ namespace irsdkSharp.Calculation
 
             var relatives = new Dictionary<int, CarRelativeModel>();
 
-            var currentCarIdx = dataModel.Data.PlayerCarIdx;
-            if (sessionModel.DriverInfo.Drivers[currentCarIdx].IsSpectator != 0)
+            var currentCar = sessionModel.DriverInfo.Drivers.FirstOrDefault(x=> x.CarIdx == dataModel.Data.PlayerCarIdx);
+            if (currentCar == null || currentCar.IsSpectator != 0)
             {
-                currentCarIdx = dataModel.Data.CamCarIdx;
+                currentCar = sessionModel.DriverInfo.Drivers.FirstOrDefault(x => x.CarIdx == dataModel.Data.CamCarIdx);
             }
+            if (currentCar == null || currentCar.IsSpectator != 0)
+            {
+                currentCar = sessionModel.DriverInfo.Drivers.FirstOrDefault(x => x.CarIsPaceCar == "0" && x.CarIsAI == "0");
+            }
+            var currentCarData = dataModel.Data.Cars.FirstOrDefault(x => x.CarIdx == currentCar.CarIdx);
 
-            var currentCar = dataModel.Data.Cars[currentCarIdx];
             foreach (var car in dataModel.Data.Cars)
             {
                 if (car.CarIdx == currentCar.CarIdx)
@@ -35,27 +39,27 @@ namespace irsdkSharp.Calculation
                         Behind = TimeSpan.FromSeconds(0)
                     });
                 }
-                else if (car.CarIdxLapDistPct > currentCar.CarIdxLapDistPct)
+                else if (car.CarIdxLapDistPct > currentCarData.CarIdxLapDistPct)
                 {
                     //time remaining for car (ahead) to finish the lap they are on
                     var remainingThisLap = car.CarIdxLastLapTime * (1 - car.CarIdxLapDistPct);
 
                     relatives.Add(car.CarIdx, new CarRelativeModel
                     {
-                        Ahead = TimeSpan.FromSeconds(car.CarIdxEstTime - currentCar.CarIdxEstTime),
+                        Ahead = TimeSpan.FromSeconds(car.CarIdxEstTime - currentCarData.CarIdxEstTime),
                         //the time the currentCar is into the lap + the remaining time for the car (ahead)
-                        Behind = TimeSpan.FromSeconds(currentCar.CarIdxEstTime + remainingThisLap),
+                        Behind = TimeSpan.FromSeconds(currentCarData.CarIdxEstTime + remainingThisLap),
                     });
                 }
-                else if (car.CarIdxLapDistPct < currentCar.CarIdxLapDistPct)
+                else if (car.CarIdxLapDistPct < currentCarData.CarIdxLapDistPct)
                 {
                     //time remaining for currentCar to finish the lap they are on
-                    var remainingThisLap = currentCar.CarIdxLastLapTime * (1 - currentCar.CarIdxLapDistPct);
+                    var remainingThisLap = currentCarData.CarIdxLastLapTime * (1 - currentCarData.CarIdxLapDistPct);
                     relatives.Add(car.CarIdx, new CarRelativeModel
                     {
                         //the time for the currentCar to finish the lap + the time the car behind is into their current lap.
                         Ahead = TimeSpan.FromSeconds(remainingThisLap + car.CarIdxEstTime),
-                        Behind = TimeSpan.FromSeconds(currentCar.CarIdxEstTime - car.CarIdxEstTime),
+                        Behind = TimeSpan.FromSeconds(currentCarData.CarIdxEstTime - car.CarIdxEstTime),
                     });
                 }
             }

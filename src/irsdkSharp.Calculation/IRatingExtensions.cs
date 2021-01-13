@@ -17,8 +17,8 @@ namespace irsdkSharp.Calculation
             if (sessionModel == null) return null;
 
             if (dataModel == null) return null;
-
-            var currentSession = sessionModel.SessionInfo.Sessions.OrderByDescending(x => x.SessionNum).FirstOrDefault();
+            var currentSessionId = dataModel.Data.SessionNum;
+            var currentSession = sessionModel.SessionInfo.Sessions.Where(x=>x.SessionNum == currentSessionId).FirstOrDefault();
 
             if (currentSession == null) return null;
 
