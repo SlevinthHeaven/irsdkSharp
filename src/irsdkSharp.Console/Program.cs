@@ -110,9 +110,7 @@ namespace irsdkSharp.ConsoleTest
                         _DriverId = (int)sdk.GetData("PlayerCarIdx");
                     }
 
-                    // Get the session time (in seconds) of this update
-                    var time = (double)sdk.GetData("SessionTime");
-                    var value = sdk.GetSerializedSessionInfo();
+                 
 
                     // Raise the TelemetryUpdated event and pass along the lap info and session time
                     //var telArgs = new TelemetryUpdatedEventArgs(new TelemetryInfo(sdk), time);
@@ -124,42 +122,12 @@ namespace irsdkSharp.ConsoleTest
                     {
                         lastUpdate = newUpdate;
 
-                        // Get the session info string
-                        var sessionModel = sdk.GetSerializedSessionInfo(); //.GetSessionInfo();
-                        var raceSession = sessionModel.SessionInfo.Sessions.FirstOrDefault(x => x.SessionType.ToLower() == "race");
-                        var gains = sdk.CalculateIRatingGains();
-                        if (gains != null)
-                        {
-                            Console.Clear();
-                            var classes = sessionModel.DriverInfo.Drivers
-                                .Where(x => x.IsSpectator == 0)
-                                .Select(x => (x.CarClassID, x.CarIdx))
-                                .GroupBy(x => x.CarClassID)
-                                .ToDictionary(g => g.Key, g => g.ToList());
-
-                            foreach (var key in classes.Keys)
-                            {
-                                foreach (var car in raceSession.ResultsPositions.Where(x => classes[key].Any(y => y.CarIdx == x.CarIdx)).OrderBy(x => x.ClassPosition))
-                                {
-                                    var driver = sessionModel.DriverInfo.Drivers.Where(x => x.CarIdx == car.CarIdx).FirstOrDefault();
-
-                                    var gain = gains[car.CarIdx];
-                                    Console.WriteLine($"{key}: {driver.UserName} - {driver.IRating}({gain}) {car.Time}");
-                                }
-                            }
-                        }
-                        // Raise the SessionInfoUpdated event and pass along the session info and session time.
-                        //var sessionArgs = new SessionInfoUpdatedEventArgs(sessionInfo, time);
-                        //this.RaiseEvent(OnSessionInfoUpdated, sessionArgs);
                     }
 
 
                 }
                 else if (_hasConnected)
                 {
-                    // We have already been initialized before, so the sim is closing
-                    //this.RaiseEvent(OnDisconnected, EventArgs.Empty);
-
                     sdk.Shutdown();
                     _DriverId = -1;
                     lastUpdate = -1;

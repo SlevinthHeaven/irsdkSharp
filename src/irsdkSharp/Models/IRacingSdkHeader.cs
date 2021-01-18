@@ -7,75 +7,49 @@ namespace irsdkSharp.Models
 {
     public class IRacingSdkHeader
     {
+        private readonly MemoryMappedViewAccessor _mapView;
         public IRacingSdkHeader(MemoryMappedViewAccessor mapView)
         {
-            var data = new byte[96];
-            mapView.ReadArray(0, data, 0, data.Length);
-            PopulateHeader(data);
+            _mapView = mapView;
         }
 
-        public IRacingSdkHeader(Span<byte> span)
+        public int Version => _mapView.ReadInt32(0);
+
+        public int Status => _mapView.ReadInt32(4);
+
+        public int TickRate => _mapView.ReadInt32(8);
+
+        public int SessionInfoUpdate => _mapView.ReadInt32(12);
+
+        public int SessionInfoLength => _mapView.ReadInt32(16);
+
+        public int SessionInfoOffset => _mapView.ReadInt32(20);
+
+        public int VarCount => _mapView.ReadInt32(24);
+
+        public int VarHeaderOffset => _mapView.ReadInt32(28);
+
+        public int BufferCount => _mapView.ReadInt32(32);
+
+        public int BufferLength => _mapView.ReadInt32(36);
+
+        internal List<VarBuf> Buffers()
         {
-            PopulateHeader(span);
-        }
-
-        public static int GetStatus(MemoryMappedViewAccessor mapView)
-        {
-            var data = new byte[96];
-            mapView.ReadArray(0, data, 0, data.Length);
-            return BitConverter.ToInt32(data, 4); 
-        }
-
-        private void PopulateHeader(Span<byte> span)
-        {
-            Version = BitConverter.ToInt32(span.Slice(0, 4));
-            Status = BitConverter.ToInt32(span.Slice(4, 4));
-            TickRate = BitConverter.ToInt32(span.Slice(8, 4));
-
-            SessionInfoUpdate = BitConverter.ToInt32(span.Slice(12, 4));
-            SessionInfoLength = BitConverter.ToInt32(span.Slice(16, 4));
-            SessionInfoOffset = BitConverter.ToInt32(span.Slice(20, 4));
-
-            VarCount = BitConverter.ToInt32(span.Slice(24, 4));
-            VarHeaderOffset = BitConverter.ToInt32(span.Slice(28, 4));
-
-            BufferCount = BitConverter.ToInt32(span.Slice(32, 4));
-            BufferLength = BitConverter.ToInt32(span.Slice(36, 4));
-
-            Buffers = new List<VarBuf>();
+            var Buffers = new List<VarBuf>();
             for (var i = 0; i < BufferCount; i++)
             {
-                Buffers.Add(new VarBuf(span.Slice(48 + (1 * 16), 16)));
+                var bufferArray = new byte[16];
+                _mapView.ReadArray(48 + (1 * 16), bufferArray, 0, 16);
+                Buffers.Add(new VarBuf(bufferArray));
             }
+            return Buffers;
         }
-
-        public int Version { get; private set; }
-
-        public int Status { get; private set; }
-
-        public int TickRate { get; private set; }
-
-        public int SessionInfoUpdate { get; private set; }
-
-        public int SessionInfoLength { get; private set; }
-
-        public int SessionInfoOffset { get; private set; }
-
-        public int VarCount { get; private set; }
-
-        public int VarHeaderOffset { get; private set; }
-
-        public int BufferCount { get; private set; }
-
-        public int BufferLength { get; private set; }
-
-        internal List<VarBuf> Buffers { get; private set; }
 
         public int Buffer
         {
             get
             {
-                return Buffers.OrderByDescending(x => x.TickCount).First().BufOffset;
+                return Buffers().OrderByDescending(x => x.TickCount).First().BufOffset;
             }
         }
     }

@@ -6,6 +6,7 @@ using irsdkSharp.Enums;
 using irsdkSharp.Models;
 using System.Threading;
 using System.Text;
+using System.Linq;
 
 namespace irsdkSharp
 {
@@ -32,14 +33,9 @@ namespace irsdkSharp
             return racingSDK.FileMapView;
         }
         
-        public static Encoding GetEncoding(IRacingSDK racingSDK)
-        {
-            return racingSDK._encoding;
-        }
-
         public IRacingSdkHeader Header = null;
-        public Dictionary<string, VarHeader> VarHeaders = new Dictionary<string, VarHeader>();
-        //List<CVarHeader> VarHeaders = new List<CVarHeader>();
+
+        public List<VarHeader> VarHeaders = new List<VarHeader>();
 
         public IRacingSDK()
         {
@@ -98,25 +94,30 @@ namespace irsdkSharp
                 string nameStr = _encoding.GetString(name).TrimEnd(new char[] { '\0' });
                 string descStr = _encoding.GetString(desc).TrimEnd(new char[] { '\0' });
                 string unitStr = _encoding.GetString(unit).TrimEnd(new char[] { '\0' });
-                VarHeaders[nameStr] = new VarHeader(type, offset, count, nameStr, descStr, unitStr);
+                VarHeaders.Add(new VarHeader(type, offset, count, nameStr, descStr, unitStr));
             }
         }
 
         public object GetData(string name)
         {
-            if (IsInitialized && Header != null)
+            if (!IsInitialized || Header == null) return null;
+
+            var requestedHeader = VarHeaders.FirstOrDefault(h => h.Name == name);
+
+            if (requestedHeader == null) return null;
+
+            int varOffset = requestedHeader.Offset;
+            int count = requestedHeader.Count;
+
+            switch (requestedHeader.Type)
             {
-                if (VarHeaders.ContainsKey(name))
-                {
-                    int varOffset = VarHeaders[name].Offset;
-                    int count = VarHeaders[name].Count;
-                    if (VarHeaders[name].Type == VarType.irChar)
+                case VarType.irChar:
                     {
                         byte[] data = new byte[count];
                         FileMapView.ReadArray<byte>(Header.Buffer + varOffset, data, 0, count);
                         return _encoding.GetString(data).TrimEnd(new char[] { '\0' });
                     }
-                    else if (VarHeaders[name].Type == VarType.irBool)
+                case VarType.irBool:
                     {
                         if (count > 1)
                         {
@@ -129,7 +130,8 @@ namespace irsdkSharp
                             return FileMapView.ReadBoolean(Header.Buffer + varOffset);
                         }
                     }
-                    else if (VarHeaders[name].Type == VarType.irInt || VarHeaders[name].Type == VarType.irBitField)
+                case VarType.irInt:
+                case VarType.irBitField:
                     {
                         if (count > 1)
                         {
@@ -142,7 +144,7 @@ namespace irsdkSharp
                             return FileMapView.ReadInt32(Header.Buffer + varOffset);
                         }
                     }
-                    else if (VarHeaders[name].Type == VarType.irFloat)
+                case VarType.irFloat:
                     {
                         if (count > 1)
                         {
@@ -155,7 +157,7 @@ namespace irsdkSharp
                             return FileMapView.ReadSingle(Header.Buffer + varOffset);
                         }
                     }
-                    else if (VarHeaders[name].Type == VarType.irDouble)
+                case VarType.irDouble:
                     {
                         if (count > 1)
                         {
@@ -168,9 +170,8 @@ namespace irsdkSharp
                             return FileMapView.ReadDouble(Header.Buffer + varOffset);
                         }
                     }
-                }
+                default: return null;
             }
-            return null;
         }
 
         public string GetSessionInfo()
@@ -178,7 +179,7 @@ namespace irsdkSharp
             if (IsInitialized && Header != null)
             {
                 byte[] data = new byte[Header.SessionInfoLength];
-                FileMapView.ReadArray<byte>(Header.SessionInfoOffset, data, 0, Header.SessionInfoLength);
+                FileMapView.ReadArray(Header.SessionInfoOffset, data, 0, Header.SessionInfoLength);
                 return _encoding.GetString(data).TrimEnd(new char[] { '\0' });
             }
             return null;
@@ -188,11 +189,7 @@ namespace irsdkSharp
         {
             if (IsInitialized && Header != null)
             {
-                // need to check the header on each update
-                // this may be an issue later with the rest of the header
-                var status = IRacingSdkHeader.GetStatus(FileMapView);
-
-                return (status & 1) > 0;
+                return (Header.Status & 1) > 0;
             }
             return false;
         }
