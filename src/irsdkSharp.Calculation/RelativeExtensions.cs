@@ -18,7 +18,8 @@ namespace irsdkSharp.Calculation
 
             var relatives = new Dictionary<int, CarRelativeModel>();
 
-            var currentCar = sessionModel.DriverInfo.Drivers.FirstOrDefault(x=> x.CarIdx == dataModel.Data.PlayerCarIdx);
+            var currentCar = sessionModel.DriverInfo.Drivers.FirstOrDefault(x => x.CarIdx == dataModel.Data.PlayerCarIdx);
+            
             if (currentCar == null || currentCar.IsSpectator != 0)
             {
                 currentCar = sessionModel.DriverInfo.Drivers.FirstOrDefault(x => x.CarIdx == dataModel.Data.CamCarIdx);
