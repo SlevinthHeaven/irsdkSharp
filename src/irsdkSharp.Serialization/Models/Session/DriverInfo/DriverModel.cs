@@ -32,6 +32,7 @@ namespace irsdkSharp.Serialization.Models.Session.DriverInfo
         public string CarClassMaxFuelPct { get; set; }// %.3f %
         public string CarClassWeightPenalty { get; set; }// %.3f kg
         public string CarClassColor { get; set; }// 0x%02x%02x%02x
+        public float CarClassEstLapTime { get; set; }
         public int IRating { get; set; }// %d
         public int LicLevel { get; set; }// %d
         public int LicSubLevel { get; set; }// %d
