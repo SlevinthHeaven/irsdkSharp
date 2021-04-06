@@ -1,5 +1,6 @@
 ﻿using irsdkSharp.Calculation;
 using irsdkSharp.Serialization;
+using irsdkSharp.Serialization.Models.Session;
 using System;
 using System.IO;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace irsdkSharp.ConsoleTest
         private static System.Timers.Timer timer;
         private static IRacingSDK sdk;
         private static bool _IsConnected = false;
-       // private static irsdkSharp.Calculation.IRating _rating = new irsdkSharp.Calculation.IRating();
+        private static IRacingSessionModel _session;
 
         private static double _TelemetryUpdateFrequency;
         /// <summary>
@@ -110,7 +111,7 @@ namespace irsdkSharp.ConsoleTest
                         _DriverId = (int)sdk.GetData("PlayerCarIdx");
                     }
 
-                 
+                    var data = sdk.GetSerializedData();
 
                     // Raise the TelemetryUpdated event and pass along the lap info and session time
                     //var telArgs = new TelemetryUpdatedEventArgs(new TelemetryInfo(sdk), time);
@@ -121,9 +122,37 @@ namespace irsdkSharp.ConsoleTest
                     if (newUpdate != lastUpdate)
                     {
                         lastUpdate = newUpdate;
-
+                        _session = sdk.GetSerializedSessionInfo();
                     }
 
+                    if(data != null && _session != null)
+                    {
+                        Console.SetCursorPosition(0,0);
+
+
+                        foreach (var car in data.Data.Cars.OrderByDescending(x => x.CarIdxLap).ThenByDescending(x => x.CarIdxLapDistPct))
+                        {
+                            var currentData = _session.DriverInfo.Drivers.Where(y => y.CarIdx == car.CarIdx).FirstOrDefault();
+                            if (currentData != null && car.CarIdxEstTime != 0)
+                            {
+                                Console.WriteLine($"{currentData.CarNumber}\t{string.Format("{0:0.00}", car.CarIdxEstTime)}\t{string.Format("{0:0.00}", car.CarIdxLapDistPct * 100)}");
+                            }
+
+                        }
+
+                        //foreach (var driver in _session.DriverInfo.Drivers.Where(x => x.IsSpectator == 0).Where(x => x.CarIsPaceCar == "0").Where(x => x.CarIsAI == "0"))
+                        //{
+                        //    var currentData = data.Data.Cars.Where(x => x.CarIdx == driver.CarIdx).FirstOrDefault();
+                        //    if (currentData.CarIdxLap != 0 && currentData.CarIdxLapDistPct == -1)
+                        //    {
+                        //        Console.WriteLine($"{driver.CarNumber} {string.Format("{0:0.00}", currentData.CarIdxLapDistPct * 100)}");
+                        //    } 
+                        //    else
+                        //    {
+                        //        var a = "";
+                        //    }
+                        //}
+                    }
 
                 }
                 else if (_hasConnected)
@@ -147,7 +176,7 @@ namespace irsdkSharp.ConsoleTest
                 // Sleep for a short amount of time until the next update is available
                 if (_IsConnected)
                 {
-                    if (waitTime <= 0 || waitTime > 1000) waitTime = 15;
+                    if (waitTime <= 0 || waitTime > 1000) waitTime = 250;
                     Thread.Sleep(waitTime);
                 }
                 else

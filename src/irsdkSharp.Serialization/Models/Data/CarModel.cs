@@ -6,6 +6,7 @@ namespace irsdkSharp.Serialization.Models.Data
 {
     public class CarModel
     {
+        public double SessionTime { get; set; }
         public int CarIdx { get; set; }
         public int CarIdxBestLapNum { get; set; }
         public float CarIdxBestLapTime { get; set; }
@@ -23,7 +24,7 @@ namespace irsdkSharp.Serialization.Models.Data
         public int CarIdxPosition { get; set; }
         public float CarIdxRPM { get; set; }
         public float CarIdxSteer { get; set; }
-        public int CarIdxTrackSurface { get; set; }
-        public int CarIdxTrackSurfaceMaterial { get; set; }
+        public int CarIdxTrackSurface { get; set; } = -1;
+        public int CarIdxTrackSurfaceMaterial { get; set; } = -1;
     }
 }
