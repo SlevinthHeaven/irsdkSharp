@@ -7,6 +7,7 @@ using irsdkSharp.Models;
 using System.Threading;
 using System.Text;
 using System.Linq;
+using Microsoft.Win32.SafeHandles;
 
 namespace irsdkSharp
 {
@@ -56,8 +57,8 @@ namespace irsdkSharp
                 var hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
                 var are = new AutoResetEvent(false)
                 {
-                    // This is deprecated, need beter option
-                    Handle = hEvent
+                    // This is deprecated, need better option
+                    SafeWaitHandle = new SafeWaitHandle(hEvent, true)
                 };
 
                 var wh = new WaitHandle[1];
