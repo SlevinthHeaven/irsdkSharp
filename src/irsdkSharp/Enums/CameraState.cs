@@ -1,6 +1,9 @@
-﻿namespace irsdkSharp.Enums
+﻿using System;
+
+namespace irsdkSharp.Enums
 {
-    public enum CameraStateTypes
+    [Flags]
+    public enum CameraState
     {
         None = 0x0000,
         IsSessionScreen = 0x0001,

@@ -7,6 +7,7 @@ using irsdkSharp.Models;
 using System.Threading;
 using System.Text;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Win32.SafeHandles;
 
 namespace irsdkSharp
@@ -14,6 +15,7 @@ namespace irsdkSharp
     public class IRacingSDK
     {
         private readonly Encoding _encoding;
+        private char[] trimChars = { '\0' };
 
         //VarHeader offsets
         public const int VarOffsetOffset = 4;
@@ -21,66 +23,76 @@ namespace irsdkSharp
         public const int VarNameOffset = 16;
         public const int VarDescOffset = 48;
         public const int VarUnitOffset = 112;
-        //public int VarHeaderSize = 144;
 
 
         public bool IsInitialized = false;
-
-        MemoryMappedFile iRacingFile;
-        protected MemoryMappedViewAccessor FileMapView;
+        private readonly MemoryMappedFile _iRacingFile;
+        internal readonly MemoryMappedViewAccessor FileMapView;
 
         public static MemoryMappedViewAccessor GetFileMapView(IRacingSDK racingSDK)
         {
             return racingSDK.FileMapView;
         }
-        
-        public IRacingSdkHeader Header = null;
 
-        public List<VarHeader> VarHeaders = new List<VarHeader>();
+        public static MemoryMappedFile GetMappedFile(IRacingSDK racingSDK)
+        {
+            return racingSDK._iRacingFile;
+        }
+
+        internal IRacingSdkHeader Header = null;
+        internal Dictionary<string, VarHeader> Headers;
+        
+        public Session Session { get; private set; }
 
         public IRacingSDK()
         {
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
+            _iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
+            FileMapView = _iRacingFile.CreateViewAccessor();
+
         }
 
-        public bool Startup()
+        public IRacingSDK(MemoryMappedViewAccessor accessor)
+        {
+            // Register CP1252 encoding
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            _encoding = Encoding.GetEncoding(1252);
+            FileMapView = accessor;
+        }
+
+        public bool Startup(bool openWaitHandle = true)
         {
             if (IsInitialized) return true;
 
             try
             {
-                iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
-                FileMapView = iRacingFile.CreateViewAccessor();
-
-                var hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
-                var are = new AutoResetEvent(false)
+                if (openWaitHandle)
                 {
-                    // This is deprecated, need better option
-                    SafeWaitHandle = new SafeWaitHandle(hEvent, true)
-                };
-
-                var wh = new WaitHandle[1];
-                wh[0] = are;
-
-                WaitHandle.WaitAny(wh);
+                    using var hEvent = EventWaitHandle.OpenExisting(Constants.DataValidEventName);
+                    if (!hEvent.WaitOne(TimeSpan.FromSeconds(1)))
+                    {
+                        Console.WriteLine("Failed to wait on DataValid Event.");
+                        return false;
+                    }
+                }
 
                 Header = new IRacingSdkHeader(FileMapView);
+                Headers = new Dictionary<string, VarHeader>(Header.VarCount);
                 GetVarHeaders();
-
                 IsInitialized = true;
             }
             catch (Exception)
             {
                 return false;
             }
+
             return true;
         }
-
+        
         private void GetVarHeaders()
         {
-            VarHeaders.Clear();
             for (int i = 0; i < Header.VarCount; i++)
             {
                 int type = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size)));
@@ -89,23 +101,22 @@ namespace irsdkSharp
                 byte[] name = new byte[Constants.MaxString];
                 byte[] desc = new byte[Constants.MaxDesc];
                 byte[] unit = new byte[Constants.MaxString];
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarNameOffset), name, 0, Constants.MaxString);
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarDescOffset), desc, 0, Constants.MaxDesc);
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarUnitOffset), unit, 0, Constants.MaxString);
-                string nameStr = _encoding.GetString(name).TrimEnd(new char[] { '\0' });
-                string descStr = _encoding.GetString(desc).TrimEnd(new char[] { '\0' });
-                string unitStr = _encoding.GetString(unit).TrimEnd(new char[] { '\0' });
-                VarHeaders.Add(new VarHeader(type, offset, count, nameStr, descStr, unitStr));
+                FileMapView.ReadArray(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarNameOffset), name, 0, Constants.MaxString);
+                FileMapView.ReadArray(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarDescOffset), desc, 0, Constants.MaxDesc);
+                FileMapView.ReadArray(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarUnitOffset), unit, 0, Constants.MaxString);
+                string nameStr = _encoding.GetString(name).TrimEnd(trimChars);
+                string descStr = _encoding.GetString(desc).TrimEnd(trimChars);
+                string unitStr = _encoding.GetString(unit).TrimEnd(trimChars);
+                var header = new VarHeader(type, offset, count, nameStr, descStr, unitStr);
+                Headers[header.Name] = header;
+                Session = new Session(this);
             }
         }
 
         public object GetData(string name)
         {
             if (!IsInitialized || Header == null) return null;
-
-            var requestedHeader = VarHeaders.FirstOrDefault(h => h.Name == name);
-
-            if (requestedHeader == null) return null;
+            if (!Headers.TryGetValue(name, out var requestedHeader)) return null;
 
             int varOffset = requestedHeader.Offset;
             int count = requestedHeader.Count;
@@ -115,7 +126,7 @@ namespace irsdkSharp
                 case VarType.irChar:
                     {
                         byte[] data = new byte[count];
-                        FileMapView.ReadArray<byte>(Header.Buffer + varOffset, data, 0, count);
+                        FileMapView.ReadArray<byte>(Header.Offset + varOffset, data, 0, count);
                         return _encoding.GetString(data).TrimEnd(new char[] { '\0' });
                     }
                 case VarType.irBool:
@@ -123,12 +134,12 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             bool[] data = new bool[count];
-                            FileMapView.ReadArray<bool>(Header.Buffer + varOffset, data, 0, count);
+                            FileMapView.ReadArray<bool>(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
                         {
-                            return FileMapView.ReadBoolean(Header.Buffer + varOffset);
+                            return FileMapView.ReadBoolean(Header.Offset + varOffset);
                         }
                     }
                 case VarType.irInt:
@@ -137,12 +148,12 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             int[] data = new int[count];
-                            FileMapView.ReadArray<int>(Header.Buffer + varOffset, data, 0, count);
+                            FileMapView.ReadArray<int>(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
                         {
-                            return FileMapView.ReadInt32(Header.Buffer + varOffset);
+                            return FileMapView.ReadInt32(Header.Offset + varOffset);
                         }
                     }
                 case VarType.irFloat:
@@ -150,12 +161,12 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             float[] data = new float[count];
-                            FileMapView.ReadArray<float>(Header.Buffer + varOffset, data, 0, count);
+                            FileMapView.ReadArray<float>(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
                         {
-                            return FileMapView.ReadSingle(Header.Buffer + varOffset);
+                            return FileMapView.ReadSingle(Header.Offset + varOffset);
                         }
                     }
                 case VarType.irDouble:
@@ -163,28 +174,24 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             double[] data = new double[count];
-                            FileMapView.ReadArray<double>(Header.Buffer + varOffset, data, 0, count);
+                            FileMapView.ReadArray<double>(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
                         {
-                            return FileMapView.ReadDouble(Header.Buffer + varOffset);
+                            return FileMapView.ReadDouble(Header.Offset + varOffset);
                         }
                     }
                 default: return null;
             }
         }
 
-        public string GetSessionInfo()
-        {
-            if (IsInitialized && Header != null)
+        public string GetSessionInfo() =>
+            (IsInitialized && Header != null) switch
             {
-                byte[] data = new byte[Header.SessionInfoLength];
-                FileMapView.ReadArray(Header.SessionInfoOffset, data, 0, Header.SessionInfoLength);
-                return _encoding.GetString(data).TrimEnd(new char[] { '\0' });
-            }
-            return null;
-        }
+                true => FileMapView.ReadString(Header.SessionInfoOffset, Header.SessionInfoLength, 2400),
+                _ => null
+            };
 
         public bool IsConnected()
         {
@@ -199,6 +206,8 @@ namespace irsdkSharp
         {
             IsInitialized = false;
             Header = null;
+            FileMapView?.Dispose();
+            _iRacingFile?.Dispose();
         }
 
         IntPtr GetBroadcastMessageID()
@@ -231,28 +240,12 @@ namespace irsdkSharp
         [DllImport("user32.dll")]
         private static extern IntPtr RegisterWindowMessage(string lpProcName);
 
-        //[DllImport("user32.dll")]
-        //private static extern IntPtr SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-
         [DllImport("user32.dll")]
         private static extern IntPtr PostMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-
-        [DllImport("Kernel32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr OpenEvent(UInt32 dwDesiredAccess, Boolean bInheritHandle, String lpName);
 
         public int MakeLong(short lowPart, short highPart)
         {
             return (int)(((ushort)lowPart) | (uint)(highPart << 16));
-        }
-
-        public static short HiWord(int dword)
-        {
-            return (short)(dword >> 16);
-        }
-
-        public static short LoWord(int dword)
-        {
-            return (short)dword;
         }
     }
 }

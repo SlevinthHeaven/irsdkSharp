@@ -2,6 +2,7 @@
 using irsdkSharp.Serialization;
 using irsdkSharp.Serialization.Models.Session;
 using System;
+using System.Data.SqlTypes;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -79,6 +80,7 @@ namespace irsdkSharp.ConsoleTest
                 // Check if we can find the sim
                 if (sdk.IsConnected())
                 {
+                    //Console.WriteLine("SDK is connected.");
                     if (!_IsConnected)
                     {
                         // If this is the first time, raise the Connected event
@@ -111,34 +113,33 @@ namespace irsdkSharp.ConsoleTest
                         _DriverId = (int)sdk.GetData("PlayerCarIdx");
                     }
 
-                    var data = sdk.GetSerializedData();
+                    //var data = sdk.GetSerializedData();
 
                     // Raise the TelemetryUpdated event and pass along the lap info and session time
                     //var telArgs = new TelemetryUpdatedEventArgs(new TelemetryInfo(sdk), time);
                     // this.RaiseEvent(OnTelemetryUpdated, telArgs);
 
-                    // Is the session info updated?
-                    int newUpdate = sdk.Header.SessionInfoUpdate;
-                    if (newUpdate != lastUpdate)
-                    {
-                        lastUpdate = newUpdate;
-                        _session = sdk.GetSerializedSessionInfo();
-                    }
+                    //if (data != null && _session != null)
+                    //{
+                      //Console.SetCursorPosition(0,0);
+                      //  var mm = IRacingSDK.GetMappedFile(sdk).CreateViewStream();
+                       // byte[] bytes = new byte[mm.Length];
+                       // var numBytes = mm.Read(bytes);
 
-                    if(data != null && _session != null)
-                    {
-                        Console.SetCursorPosition(0,0);
+                        //if (numBytes > 0)
+                       // {
+                            //File.WriteAllBytes($".\\{Guid.NewGuid()}.ibt", bytes);
+                       // }
 
-
-                        foreach (var car in data.Data.Cars.OrderByDescending(x => x.CarIdxLap).ThenByDescending(x => x.CarIdxLapDistPct))
-                        {
-                            var currentData = _session.DriverInfo.Drivers.Where(y => y.CarIdx == car.CarIdx).FirstOrDefault();
-                            if (currentData != null && car.CarIdxEstTime != 0)
-                            {
-                                Console.WriteLine($"{currentData.CarNumber}\t{string.Format("{0:0.00}", car.CarIdxEstTime)}\t{string.Format("{0:0.00}", car.CarIdxLapDistPct * 100)}");
-                            }
-
-                        }
+                        //foreach (var car in data.Data.Cars.OrderByDescending(x => x.CarIdxLap).ThenByDescending(x => x.CarIdxLapDistPct))
+                        //{
+                         //   var currentData = _session.DriverInfo.Drivers.Where(y => y.CarIdx == car.CarIdx).FirstOrDefault();
+                          // if (currentData != null && car.CarIdxEstTime != 0)
+                           // {
+                               //Console.WriteLine($"{currentData.CarNumber}\t{string.Format("{0:0.00}", car.CarIdxEstTime)}\t{string.Format("{0:0.00}", car.CarIdxLapDistPct * 100)}");
+                                Console.WriteLine($"SeesionTick: {sdk.Session.SessionTick.ToString()}");
+                            //}
+                        //}
 
                         //foreach (var driver in _session.DriverInfo.Drivers.Where(x => x.IsSpectator == 0).Where(x => x.CarIsPaceCar == "0").Where(x => x.CarIsAI == "0"))
                         //{
@@ -152,7 +153,7 @@ namespace irsdkSharp.ConsoleTest
                         //        var a = "";
                         //    }
                         //}
-                    }
+                    //}
 
                 }
                 else if (_hasConnected)
@@ -170,7 +171,15 @@ namespace irsdkSharp.ConsoleTest
                     _DriverId = -1;
 
                     //Try to find the sim
-                    sdk.Startup();
+                    Console.WriteLine("Connecting to SDK.");
+                    if (sdk.Startup())
+                    {
+                        Console.WriteLine("Connected.");   
+                    }
+                    else
+                    {
+                        Console.WriteLine("Failed to connect.");
+                    }
                 }
 
                 // Sleep for a short amount of time until the next update is available
