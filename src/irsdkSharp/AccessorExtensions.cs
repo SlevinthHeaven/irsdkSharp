@@ -1,0 +1,32 @@
+﻿using System.IO.MemoryMappedFiles;
+using System.Text;
+
+namespace irsdkSharp
+{
+    public static class AccessorExtensions
+    {
+        public static string ReadString(this MemoryMappedViewAccessor accessor, int offset, int maxLength, int minLength = 0)
+        {
+            StringBuilder sb;
+            if (minLength > 0)
+            {
+                sb = new(minLength);
+            }
+            else
+            {
+                sb = new();
+            }
+            char c;
+            for (int i = 0; i < maxLength; i++)
+            {
+                c = accessor.ReadChar(i);
+                if(c == '\0')
+                {
+                    break;
+                }
+                sb.Append(c);
+            }
+            return sb.ToString();    
+        }
+    }
+}

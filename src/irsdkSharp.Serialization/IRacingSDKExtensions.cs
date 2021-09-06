@@ -21,20 +21,20 @@ namespace irsdkSharp.Serialization
             return IRacingSessionModel.Serialize(sessionInfo);
         }
 
-        public static IRacingDataModel GetSerializedData(this IRacingSDK racingSDK)
-        {
-            if (racingSDK.IsInitialized && racingSDK.Header != null)
-            {
-                var length = (int)IRacingSDK.GetFileMapView(racingSDK).Capacity;
-                var data = new byte[length];
-                IRacingSDK.GetFileMapView(racingSDK).ReadArray(0, data, 0, length);
-                //Serialise the string into objects, tada!
-                return IRacingDataModel.Serialize(
-                    data[racingSDK.Header.Buffer..(racingSDK.Header.Buffer + racingSDK.Header.BufferLength)],
-                    racingSDK.VarHeaders);
-            }
-            return null;
-        }
+        // public static IRacingDataModel GetSerializedData(this IRacingSDK racingSDK)
+        // {
+        //     if (racingSDK.IsInitialized && racingSDK.Header != null)
+        //     {
+        //         var length = (int)IRacingSDK.GetFileMapView(racingSDK).Capacity;
+        //         var data = new byte[length];
+        //         IRacingSDK.GetFileMapView(racingSDK).ReadArray(0, data, 0, length);
+        //         //Serialise the string into objects, tada!
+        //         return IRacingDataModel.Serialize(
+        //             data[racingSDK.Header.Offset..(racingSDK.Header.Offset + racingSDK.Header.BufferLength)],
+        //             racingSDK.Headers.Values);
+        //     }
+        //     return null;
+        // }
 
         public static List<CarModel> GetPositions(this IRacingSDK racingSDK)
         {

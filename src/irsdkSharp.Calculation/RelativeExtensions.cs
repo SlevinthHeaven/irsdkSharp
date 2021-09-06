@@ -6,31 +6,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using irsdkSharp.Models;
 
 namespace irsdkSharp.Calculation
 {
     public static class RelativeExtensions
     {
-        public static Dictionary<int, CarRelativeModel> CalculateRelatives(IRacingDataModel dataModel, IRacingSessionModel sessionModel)
+        public static Dictionary<int, CarRelativeModel> CalculateRelatives(Session dataModel, IRacingSessionModel sessionModel)
         {
             if (sessionModel == null) return null;
             if (dataModel == null) return null;
 
             var relatives = new Dictionary<int, CarRelativeModel>();
 
-            var currentCar = sessionModel.DriverInfo.Drivers.FirstOrDefault(x => x.CarIdx == dataModel.Data.PlayerCarIdx);
+            var currentCar = sessionModel.DriverInfo.Drivers.FirstOrDefault(x => x.CarIdx == dataModel.PlayerCarIdx);
             
             if (currentCar == null || currentCar.IsSpectator != 0)
             {
-                currentCar = sessionModel.DriverInfo.Drivers.FirstOrDefault(x => x.CarIdx == dataModel.Data.CamCarIdx);
+                currentCar = sessionModel.DriverInfo.Drivers.FirstOrDefault(x => x.CarIdx == dataModel.CamCarIdx);
             }
             if (currentCar == null || currentCar.IsSpectator != 0)
             {
                 currentCar = sessionModel.DriverInfo.Drivers.FirstOrDefault(x => x.CarIsPaceCar == "0" && x.CarIsAI == "0");
             }
-            var currentCarData = dataModel.Data.Cars.FirstOrDefault(x => x.CarIdx == currentCar.CarIdx);
 
-            foreach (var car in dataModel.Data.Cars)
+            var currentCarData = new CarModel();// dataModel.Data.Cars.FirstOrDefault(x => x.CarIdx == currentCar.CarIdx);
+
+            foreach (var car in Enumerable.Empty<CarModel>())//dataModel.Data.Cars)
             {
                 if (car.CarIdx == currentCar.CarIdx)
                 {
@@ -74,11 +76,7 @@ namespace irsdkSharp.Calculation
 
             if(sessionModel == null) return null;
 
-            var dataModel = racingSDK.GetSerializedData();
-
-            if(dataModel == null) return null;
-
-            return CalculateRelatives(dataModel, sessionModel);
+            return CalculateRelatives(racingSDK.Session, sessionModel);
         }
     }
 }
