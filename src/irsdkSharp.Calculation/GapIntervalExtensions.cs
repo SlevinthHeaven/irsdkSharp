@@ -5,7 +5,6 @@ using irsdkSharp.Serialization.Models.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using irsdkSharp.Models;
 
 namespace irsdkSharp.Calculation
 {
@@ -22,7 +21,7 @@ namespace irsdkSharp.Calculation
         /// <param name="dataModel"></param>
         /// <param name="sessionModel"></param>
         /// <returns></returns>
-        public static List<CarGapIntervalModel> CalculateGapsAndIntervals(Session dataModel, IRacingSessionModel sessionModel)
+        public static List<CarGapIntervalModel> CalculateGapsAndIntervals(IRacingDataModel dataModel, IRacingSessionModel sessionModel)
         {
             if (sessionModel == null) return null;
             if (dataModel == null) return null;
@@ -41,7 +40,7 @@ namespace irsdkSharp.Calculation
 
 
             //Get Current Session
-            var currentSessionNumber = dataModel.SessionNum;
+            var currentSessionNumber = dataModel.Data.SessionNum;
 
             var currentSession = sessionModel.SessionInfo.Sessions
                 .Where(x => x.SessionNum == currentSessionNumber)
@@ -50,15 +49,13 @@ namespace irsdkSharp.Calculation
 
             //All drivers ordered 
 
-            // var orderedDrivers = dataModel.Data.Cars
-            //     .Where(x => x.CarIdxLapDistPct != -1)
-            //     .OrderByDescending(x => x.CarIdxLap)
-            //     .ThenByDescending(x => x.CarIdxLapDistPct).ToList();
+            var orderedDrivers = dataModel.Data.Cars
+                .Where(x => x.CarIdxLapDistPct != -1)
+                .OrderByDescending(x => x.CarIdxLap)
+                .ThenByDescending(x => x.CarIdxLapDistPct).ToList();
 
             //find car in first
-            // var leader = orderedDrivers.FirstOrDefault();
-            var leader = new CarModel();
-            var orderedDrivers = new List<CarModel>();
+            var leader = orderedDrivers.FirstOrDefault();
             var leaderSession = currentSession.ResultsPositions.Where(ses => ses.CarIdx == leader.CarIdx).FirstOrDefault();
             var leaderDriver = sessionModel.DriverInfo.Drivers.Where(ses => ses.CarIdx == leader.CarIdx).FirstOrDefault();
 
@@ -174,7 +171,11 @@ namespace irsdkSharp.Calculation
 
             if(sessionModel == null) return null;
 
-            return CalculateGapsAndIntervals(racingSDK.Session, sessionModel);
+            var dataModel = racingSDK.GetSerializedData();
+
+            if(dataModel == null) return null;
+
+            return CalculateGapsAndIntervals(dataModel, sessionModel);
         }
 
         private static (TimeSpan, int) BetweenCars(CarModel leader, CarModel car, float trackLength)

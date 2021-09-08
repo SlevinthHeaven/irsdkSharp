@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using irsdkSharp.Enums;
 
 namespace irsdkSharp.Serialization.Models.Data
 {
@@ -24,7 +25,7 @@ namespace irsdkSharp.Serialization.Models.Data
         public int CarIdxPosition { get; set; }
         public float CarIdxRPM { get; set; }
         public float CarIdxSteer { get; set; }
-        public int CarIdxTrackSurface { get; set; } = -1;
-        public int CarIdxTrackSurfaceMaterial { get; set; } = -1;
+        public TrackSurface CarIdxTrackSurface { get; set; } = TrackSurface.NotInWorld;
+        public TrackSurfaceMaterial CarIdxTrackSurfaceMaterialMaterial { get; set; } = TrackSurfaceMaterial.SurfaceNotInWorld;
     }
 }
