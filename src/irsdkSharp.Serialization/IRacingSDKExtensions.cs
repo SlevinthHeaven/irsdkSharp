@@ -32,7 +32,7 @@ namespace irsdkSharp.Serialization
                 //Serialise the string into objects, tada!
                 return IRacingDataModel.Serialize(
                     data[racingSDK.Header.Buffer..(racingSDK.Header.Buffer + racingSDK.Header.BufferLength)],
-                    racingSDK.VarHeaders);
+                    racingSDK.Headers.Values);
             }
             return null;
         }

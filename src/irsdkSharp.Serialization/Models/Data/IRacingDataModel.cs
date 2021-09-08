@@ -9,7 +9,7 @@ namespace irsdkSharp.Serialization.Models.Data
 {
     public class IRacingDataModel
     {
-        public static IRacingDataModel Serialize(Span<byte> toSerialize, List<VarHeader> headers)
+        public static IRacingDataModel Serialize(Span<byte> toSerialize, IEnumerable<VarHeader> headers)
         {
 
             var dataModelProperties = typeof(DataModel).GetProperties().ToList();
