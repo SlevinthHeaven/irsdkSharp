@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using irsdkSharp.Models;
 
 namespace irsdkSharp.Calculation
 {
@@ -13,12 +12,12 @@ namespace irsdkSharp.Calculation
     {
         private static readonly double _initialConstant = 1600 / Math.Log(2);
               
-        public static Dictionary<int, double> CalculateIRatingGains(Session dataModel, IRacingSessionModel sessionModel)
+        public static Dictionary<int, double> CalculateIRatingGains(IRacingDataModel dataModel, IRacingSessionModel sessionModel)
         {
             if (sessionModel == null) return null;
 
             if (dataModel == null) return null;
-            var currentSessionId = dataModel.SessionNum;
+            var currentSessionId = dataModel.Data.SessionNum;
             var currentSession = sessionModel.SessionInfo.Sessions.Where(x=>x.SessionNum == currentSessionId).FirstOrDefault();
 
             if (currentSession == null) return null;
@@ -152,9 +151,9 @@ namespace irsdkSharp.Calculation
         {
             var sessionModel = racingSDK.GetSerializedSessionInfo();
 
-            // var dataModel = racingSDK.GetSerializedData();
+            var dataModel = racingSDK.GetSerializedData();
 
-            return CalculateIRatingGains(racingSDK.Session, sessionModel);
+            return CalculateIRatingGains(dataModel, sessionModel);
         }
     }
 }

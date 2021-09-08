@@ -34,13 +34,17 @@ namespace irsdkSharp
             return racingSDK.FileMapView;
         }
 
+        public IRacingSdkHeader Header = null;
+
+        public List<VarHeader> VarHeaders = new List<VarHeader>();
+        internal Dictionary<string, VarHeader> Headers;
+
+
         public static MemoryMappedFile GetMappedFile(IRacingSDK racingSDK)
         {
             return racingSDK._iRacingFile;
         }
 
-        internal IRacingSdkHeader Header = null;
-        internal Dictionary<string, VarHeader> Headers;
         
         public Session Session { get; private set; }
 
@@ -93,6 +97,7 @@ namespace irsdkSharp
         
         private void GetVarHeaders()
         {
+            VarHeaders.Clear();
             for (int i = 0; i < Header.VarCount; i++)
             {
                 int type = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size)));
@@ -108,6 +113,7 @@ namespace irsdkSharp
                 string descStr = _encoding.GetString(desc).TrimEnd(trimChars);
                 string unitStr = _encoding.GetString(unit).TrimEnd(trimChars);
                 var header = new VarHeader(type, offset, count, nameStr, descStr, unitStr);
+                VarHeaders.Add(header);
                 Headers[header.Name] = header;
                 Session = new Session(this);
             }

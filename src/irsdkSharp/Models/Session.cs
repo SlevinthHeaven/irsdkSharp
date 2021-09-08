@@ -4,6 +4,9 @@ using irsdkSharp.Enums;
 
 namespace irsdkSharp.Models
 {
+    /// <summary>
+    /// Serializes all session properties on-demand with the latest value.
+    /// </summary>
     public class Session
     {
         private readonly IRacingSDK _sdk;
@@ -69,12 +72,23 @@ namespace irsdkSharp.Models
             ? (CameraState) _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
             : default;
 
+        private int[] _camCarIdx = new int[64];
+
         /// <summary>
         /// Active camera's focus car index
         /// </summary>
-        public int CamCarIdx => _sdk.Headers.TryGetValue(nameof(CamCarIdx), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CamCarIdx
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CamCarIdx), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _camCarIdx, 0, 64);
+                }
+
+                return _camCarIdx;
+            }
+        }
 
         /// <summary>
         /// Active camera group number
@@ -83,145 +97,365 @@ namespace irsdkSharp.Models
             ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
             : default;
 
+        private int[] _carIdxBestLapNum = new int[64];
+
         /// <summary>
         /// Cars best lap number
         /// </summary>
-        public int CarIdxBestLapNum => _sdk.Headers.TryGetValue(nameof(CarIdxBestLapNum), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CarIdxBestLapNum
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxBestLapNum), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxBestLapNum, 0, 64);
+                }
+
+                return _carIdxBestLapNum;
+            }
+        }
+
+        private float[] _carIdxBestLapTime = new float[64];
 
         /// <summary>
         /// Cars best lap time
         /// </summary>
-        public float CarIdxBestLapTime => _sdk.Headers.TryGetValue(nameof(CarIdxBestLapTime), out var header)
-            ? _sdk.FileMapView.ReadSingle(_sdk.Header.Offset + header.Offset)
-            : default;
+        public float[] CarIdxBestLapTime
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxBestLapTime), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxBestLapTime, 0, 64);
+                }
+
+                return _carIdxBestLapTime;
+            }
+        }
+
+        private int[] _carIdxClass = new int[64];
 
         /// <summary>
         /// Cars class id by car index
         /// </summary>
-        public int CarIdxClass => _sdk.Headers.TryGetValue(nameof(CarIdxClass), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CarIdxClass
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxClass), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxClass, 0, 64);
+                }
+
+                return _carIdxClass;
+            }
+        }
+
+        private int[] _carIdxClassPosition = new int[64];
 
         /// <summary>
         /// Cars class position in race by car index
         /// </summary>
-        public int CarIdxClassPosition => _sdk.Headers.TryGetValue(nameof(CarIdxClassPosition), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CarIdxClassPosition
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxClassPosition), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxClassPosition, 0, 64);
+                }
+
+                return _carIdxClassPosition;
+            }
+        }
+
+        private float[] _carIdxEstTime = new float[64];
 
         /// <summary>
         /// Estimated time to reach current location on track
         /// </summary>
-        public float CarIdxEstTime => _sdk.Headers.TryGetValue(nameof(CarIdxEstTime), out var header)
-            ? _sdk.FileMapView.ReadSingle(_sdk.Header.Offset + header.Offset)
-            : default;
+        public float[] CarIdxEstTime
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxEstTime), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxEstTime, 0, 64);
+                }
+
+                return _carIdxEstTime;
+            }
+        }
+
+        private float[] _carIdxF2Time = new float[64];
 
         /// <summary>
         /// Race time behind leader or fastest lap time otherwise
         /// </summary>
-        public float CarIdxF2Time => _sdk.Headers.TryGetValue(nameof(CarIdxF2Time), out var header)
-            ? _sdk.FileMapView.ReadSingle(_sdk.Header.Offset + header.Offset)
-            : default;
+        public float[] CarIdxF2Time
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxF2Time), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxF2Time, 0, 64);
+                }
+
+                return _carIdxF2Time;
+            }
+        }
+
+        private int[] _carIdxFastRepairsUsed = new int[64];
 
         /// <summary>
         /// How many fast repairs each car has used
         /// </summary>
-        public int CarIdxFastRepairsUsed => _sdk.Headers.TryGetValue(nameof(CarIdxFastRepairsUsed), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CarIdxFastRepairsUsed
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxFastRepairsUsed), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxFastRepairsUsed, 0, 64);
+                }
+
+                return _carIdxFastRepairsUsed;
+            }
+        }
+
+        private int[] _carIdxGear = new int[64];
 
         /// <summary>
         /// -1=reverse  0=neutral  1..n=current gear by car index
         /// </summary>
-        public int CarIdxGear => _sdk.Headers.TryGetValue(nameof(CarIdxGear), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CarIdxGear
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxGear), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxGear, 0, 64);
+                }
+
+                return _carIdxGear;
+            }
+        }
+
+        private int[] _carIdxLap = new int[64];
 
         /// <summary>
         /// Laps started by car index
         /// </summary>
-        public int CarIdxLap => _sdk.Headers.TryGetValue(nameof(CarIdxLap), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CarIdxLap
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxLap), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxLap, 0, 64);
+                }
+
+                return _carIdxLap;
+            }
+        }
+
+        private int[] _carIdxLapCompleted = new int[64];
 
         /// <summary>
         /// Laps completed by car index
         /// </summary>
-        public int CarIdxLapCompleted => _sdk.Headers.TryGetValue(nameof(CarIdxLapCompleted), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CarIdxLapCompleted
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxLapCompleted), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxLapCompleted, 0, 64);
+                }
+
+                return _carIdxLapCompleted;
+            }
+        }
+
+        private float[] _carIdxLapDistPct = new float[64];
 
         /// <summary>
         /// Percentage distance around lap by car index
         /// </summary>
-        public float CarIdxLapDistPct => _sdk.Headers.TryGetValue(nameof(CarIdxLapDistPct), out var header)
-            ? _sdk.FileMapView.ReadSingle(_sdk.Header.Offset + header.Offset)
-            : default;
+        public float[] CarIdxLapDistPct
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxLapDistPct), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxLapDistPct, 0, 64);
+                }
+
+                return _carIdxLapDistPct;
+            }
+        }
+
+        private float[] _carIdxLastLapTime = new float[64];
 
         /// <summary>
         /// Cars last lap time
         /// </summary>
-        public float CarIdxLastLapTime => _sdk.Headers.TryGetValue(nameof(CarIdxLastLapTime), out var header)
-            ? _sdk.FileMapView.ReadSingle(_sdk.Header.Offset + header.Offset)
-            : default;
+        public float[] CarIdxLastLapTime
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxLastLapTime), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxLastLapTime, 0, 64);
+                }
+
+                return _carIdxLastLapTime;
+            }
+        }
+
+        private bool[] _carIdxOnPitRoad = new bool[64];
 
         /// <summary>
         /// On pit road between the cones by car index
         /// </summary>
-        public bool CarIdxOnPitRoad => _sdk.Headers.TryGetValue(nameof(CarIdxOnPitRoad), out var header)
-            ? _sdk.FileMapView.ReadBoolean(_sdk.Header.Offset + header.Offset)
-            : default;
+        public bool[] CarIdxOnPitRoad
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxOnPitRoad), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxOnPitRoad, 0, 64);
+                }
+
+                return _carIdxOnPitRoad;
+            }
+        }
+
+        private int[] _carIdxP2PCount = new int[64];
 
         /// <summary>
         /// Push2Pass count of usage (or remaining in Race)
         /// </summary>
-        public int CarIdxP2P_Count => _sdk.Headers.TryGetValue(nameof(CarIdxP2P_Count), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CarIdxP2P_Count
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxP2P_Count), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxP2PCount, 0, 64);
+                }
+
+                return _carIdxP2PCount;
+            }
+        }
+
+        private bool[] _carIdxP2PStatus = new bool[64];
 
         /// <summary>
         /// Push2Pass active or not
         /// </summary>
-        public bool CarIdxP2P_Status => _sdk.Headers.TryGetValue(nameof(CarIdxP2P_Status), out var header)
-            ? _sdk.FileMapView.ReadBoolean(_sdk.Header.Offset + header.Offset)
-            : default;
+        public bool[] CarIdxP2P_Status
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxP2P_Status), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxP2PStatus, 0, 64);
+                }
+
+                return _carIdxP2PStatus;
+            }
+        }
+
+        private PaceFlags[] _carIdxPaceFlags = new PaceFlags[64];
 
         /// <summary>
         /// Pacing status flags for each car
         /// </summary>
-        public int CarIdxPaceFlags => _sdk.Headers.TryGetValue(nameof(CarIdxPaceFlags), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public PaceFlags[] CarIdxPaceFlags
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxPaceFlags), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxPaceFlags, 0, 64);
+                }
+
+                return _carIdxPaceFlags;
+            }
+        }
+
+        private int[] _carIdxPaceLine = new int[64];
 
         /// <summary>
         /// What line cars are pacing in  or -1 if not pacing
         /// </summary>
-        public int CarIdxPaceLine => _sdk.Headers.TryGetValue(nameof(CarIdxPaceLine), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CarIdxPaceLine
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxPaceLine), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxPaceLine, 0, 64);
+                }
+
+                return _carIdxPaceLine;
+            }
+        }
+
+        private int[] _carIdxPaceRow = new int[64];
 
         /// <summary>
         /// What row cars are pacing in  or -1 if not pacing
         /// </summary>
-        public int CarIdxPaceRow => _sdk.Headers.TryGetValue(nameof(CarIdxPaceRow), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CarIdxPaceRow
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxPaceRow), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxPaceRow, 0, 64);
+                }
+
+                return _carIdxPaceRow;
+            }
+        }
+
+        private int[] _carIdxPosition = new int[64];
 
         /// <summary>
         /// Cars position in race by car index
         /// </summary>
-        public int CarIdxPosition => _sdk.Headers.TryGetValue(nameof(CarIdxPosition), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CarIdxPosition
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxPosition), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxPosition, 0, 64);
+                }
+
+                return _carIdxPosition;
+            }
+        }
+
+        private int[] _carIdxQualTireCompound = new int[64];
 
         /// <summary>
         /// Cars Qual tire compound
         /// </summary>
-        public int CarIdxQualTireCompound => _sdk.Headers.TryGetValue(nameof(CarIdxQualTireCompound), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CarIdxQualTireCompound
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxQualTireCompound), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxQualTireCompound, 0, 64);
+                }
+
+                return _carIdxQualTireCompound;
+            }
+        }
 
         /// <summary>
         /// Cars Qual tire compound is locked-in
@@ -231,41 +465,95 @@ namespace irsdkSharp.Models
                 ? _sdk.FileMapView.ReadBoolean(_sdk.Header.Offset + header.Offset)
                 : default;
 
+        private float[] _carIdxRpm = new float[64];
+
         /// <summary>
         /// Engine rpm by car index
         /// </summary>
-        public float CarIdxRPM => _sdk.Headers.TryGetValue(nameof(CarIdxRPM), out var header)
-            ? _sdk.FileMapView.ReadSingle(_sdk.Header.Offset + header.Offset)
-            : default;
+        public float[] CarIdxRPM
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxRPM), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxRpm, 0, 64);
+                }
+
+                return _carIdxRpm;
+            }
+        }
+
+        private float[] _carIdxSteer = new float[64];
 
         /// <summary>
         /// Steering wheel angle by car index
         /// </summary>
-        public float CarIdxSteer => _sdk.Headers.TryGetValue(nameof(CarIdxSteer), out var header)
-            ? _sdk.FileMapView.ReadSingle(_sdk.Header.Offset + header.Offset)
-            : default;
+        public float[] CarIdxSteer
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxSteer), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxSteer, 0, 64);
+                }
+
+                return _carIdxSteer;
+            }
+        }
+
+        private int[] _carIdxTireCompound = new int[64];
 
         /// <summary>
         /// Cars current tire compound
         /// </summary>
-        public int CarIdxTireCompound => _sdk.Headers.TryGetValue(nameof(CarIdxTireCompound), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public int[] CarIdxTireCompound
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxTireCompound), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxTireCompound, 0, 64);
+                }
+
+                return _carIdxTireCompound;
+            }
+        }
+
+        private TrackSurface[] _carIdxTrackSurface = new TrackSurface[64];
 
         /// <summary>
         /// Track surface type by car index
         /// </summary>
-        public int CarIdxTrackSurface => _sdk.Headers.TryGetValue(nameof(CarIdxTrackSurface), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-            : default;
+        public TrackSurface[] CarIdxTrackSurface
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxTrackSurface), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxTrackSurface, 0, 64);
+                }
+
+                return _carIdxTrackSurface;
+            }
+        }
+
+        private TrackSurfaceMaterial[] _carIdxTrackSurfaceMaterial = new TrackSurfaceMaterial[64];
 
         /// <summary>
         /// Track surface material type by car index
         /// </summary>
-        public int CarIdxTrackSurfaceMaterial =>
-            _sdk.Headers.TryGetValue(nameof(CarIdxTrackSurfaceMaterial), out var header)
-                ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
-                : default;
+        public TrackSurfaceMaterial[] CarIdxTrackSurfaceMaterial
+        {
+            get
+            {
+                if (_sdk.Headers.TryGetValue(nameof(CarIdxTrackSurfaceMaterial), out var header))
+                {
+                    _sdk.FileMapView.ReadArray(_sdk.Header.Offset + header.Offset, _carIdxTrackSurfaceMaterial, 0, 64);
+                }
+
+                return _carIdxTrackSurfaceMaterial;
+            }
+        }
 
         /// <summary>
         /// Notify if car is to the left or right of driver
@@ -1092,8 +1380,8 @@ namespace irsdkSharp.Models
         /// <summary>
         /// Are we pacing or not
         /// </summary>
-        public int PaceMode => _sdk.Headers.TryGetValue(nameof(PaceMode), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
+        public PaceMode PaceMode => _sdk.Headers.TryGetValue(nameof(PaceMode), out var header)
+            ? (PaceMode) _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
             : default;
 
         /// <summary>
@@ -1307,16 +1595,16 @@ namespace irsdkSharp.Models
         /// <summary>
         /// Players car track surface type
         /// </summary>
-        public int PlayerTrackSurface => _sdk.Headers.TryGetValue(nameof(PlayerTrackSurface), out var header)
-            ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
+        public TrackSurface PlayerTrackSurface => _sdk.Headers.TryGetValue(nameof(PlayerTrackSurface), out var header)
+            ? (TrackSurface) _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
             : default;
 
         /// <summary>
         /// Players car track surface material type
         /// </summary>
-        public int PlayerTrackSurfaceMaterial =>
+        public TrackSurfaceMaterial PlayerTrackSurfaceMaterial =>
             _sdk.Headers.TryGetValue(nameof(PlayerTrackSurfaceMaterial), out var header)
-                ? _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
+                ? (TrackSurfaceMaterial) _sdk.FileMapView.ReadInt32(_sdk.Header.Offset + header.Offset)
                 : default;
 
         /// <summary>
@@ -1414,7 +1702,7 @@ namespace irsdkSharp.Models
         /// <summary>
         /// Seconds since replay session start
         /// </summary>
-        double ReplaySessionTime;
+        public double ReplaySessionTime;
 
         /// <summary>
         /// RF tire cold pressure  as set in the garage
@@ -1692,7 +1980,7 @@ namespace irsdkSharp.Models
         /// <summary>
         /// Seconds since session start
         /// </summary>
-        double SessionTime;
+        public double SessionTime;
 
         /// <summary>
         /// Time of day in seconds
@@ -1704,12 +1992,12 @@ namespace irsdkSharp.Models
         /// <summary>
         /// Seconds left till session ends
         /// </summary>
-        double SessionTimeRemain;
+        public double SessionTimeRemain;
 
         /// <summary>
         /// Total number of seconds in session
         /// </summary>
-        double SessionTimeTotal;
+        public double SessionTimeTotal;
 
         /// <summary>
         /// Session ID
