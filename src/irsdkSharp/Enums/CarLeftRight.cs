@@ -2,7 +2,6 @@
 
 namespace irsdkSharp.Enums
 {
-    [Flags]
     public enum CarLeftRight
     {
         /// <summary>

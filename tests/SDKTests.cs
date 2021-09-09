@@ -6,6 +6,7 @@ using System.Reflection;
 using irsdkSharp.Enums;
 using irsdkSharp.Models;
 using irsdkSharp.Serialization;
+using irsdkSharp.Serialization.Models.Session;
 using NUnit.Framework;
 
 namespace irsdkSharp.Tests
@@ -33,7 +34,7 @@ namespace irsdkSharp.Tests
         public void GetSessionInfo()
         {
             var session = sdk.GetSessionInfo();
-            StringAssert.Contains(session, "WeekendInfo:");
+            Assert.That(session, Does.Contain("WeekendInfo"));
         }
 
         [Test]
@@ -68,6 +69,15 @@ namespace irsdkSharp.Tests
 
                 TestContext.WriteLine($"{prop.Name}: {val.ToString()}");
             }
+        }
+
+        [Test]
+        public void SessionDataSerialize()
+        {
+            string sessionYAML = sdk.GetSessionInfo();
+
+            var model = IRacingSessionModel.Serialize(sessionYAML);
+            Assert.NotNull(model);
         }
 
         [Test]

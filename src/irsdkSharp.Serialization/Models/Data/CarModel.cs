@@ -26,6 +26,6 @@ namespace irsdkSharp.Serialization.Models.Data
         public float CarIdxRPM { get; set; }
         public float CarIdxSteer { get; set; }
         public TrackSurface CarIdxTrackSurface { get; set; } = TrackSurface.NotInWorld;
-        public TrackSurfaceMaterial CarIdxTrackSurfaceMaterialMaterial { get; set; } = TrackSurfaceMaterial.SurfaceNotInWorld;
+        public TrackSurfaceMaterial CarIdxTrackSurfaceMaterial { get; set; } = TrackSurfaceMaterial.SurfaceNotInWorld;
     }
 }

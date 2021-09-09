@@ -6,9 +6,6 @@ using irsdkSharp.Enums;
 using irsdkSharp.Models;
 using System.Threading;
 using System.Text;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Win32.SafeHandles;
 
 namespace irsdkSharp
 {
@@ -38,13 +35,6 @@ namespace irsdkSharp
 
         public Dictionary<string, VarHeader> Headers;
 
-
-        public static MemoryMappedFile GetMappedFile(IRacingSDK racingSDK)
-        {
-            return racingSDK._iRacingFile;
-        }
-
-        
         public Session Session { get; private set; }
 
         public IRacingSDK()
@@ -54,7 +44,6 @@ namespace irsdkSharp
             _encoding = Encoding.GetEncoding(1252);
             _iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
             FileMapView = _iRacingFile.CreateViewAccessor();
-
         }
 
         public IRacingSDK(MemoryMappedViewAccessor accessor)
@@ -93,7 +82,7 @@ namespace irsdkSharp
 
             return true;
         }
-        
+
         private void GetVarHeaders()
         {
             for (int i = 0; i < Header.VarCount; i++)

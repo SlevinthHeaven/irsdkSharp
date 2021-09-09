@@ -82,7 +82,7 @@ namespace irsdkSharp.Serialization
                     CarIdxRPM = CarIdxRPM[i],
                     CarIdxSteer = CarIdxSteer[i],
                     CarIdxTrackSurface = CarIdxTrackSurface[i],
-                    CarIdxTrackSurfaceMaterialMaterial = CarIdxTrackSurfaceMaterial[i],
+                    CarIdxTrackSurfaceMaterial = CarIdxTrackSurfaceMaterial[i],
                     SessionTime = tick
                 });
             }
