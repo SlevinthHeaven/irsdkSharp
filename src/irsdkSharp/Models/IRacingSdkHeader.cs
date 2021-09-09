@@ -55,25 +55,5 @@ namespace irsdkSharp.Models
                 return curOffset;
             }
         }
-        
-        internal List<VarBuf> Buffers()
-        {
-            var Buffers = new List<VarBuf>();
-            for (var i = 0; i < BufferCount; i++)
-            {
-                var bufferArray = new byte[16];
-                _mapView.ReadArray(48 + (i * 16), bufferArray, 0, 16);
-                Buffers.Add(new VarBuf(bufferArray));
-            }
-            return Buffers;
-        }
-
-        public int Buffer
-        {
-            get
-            {
-                return Buffers().OrderByDescending(x => x.TickCount).First().BufOffset;
-            }
-        }
     }
 }
