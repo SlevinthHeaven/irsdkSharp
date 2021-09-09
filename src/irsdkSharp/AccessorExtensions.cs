@@ -19,7 +19,7 @@ namespace irsdkSharp
             char c;
             for (int i = 0; i < maxLength; i++)
             {
-                c = accessor.ReadChar(i);
+                c = (char)accessor.ReadByte(offset + i);
                 if(c == '\0')
                 {
                     break;
