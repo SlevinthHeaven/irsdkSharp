@@ -35,7 +35,7 @@ namespace irsdkSharp
 
         public Dictionary<string, VarHeader> Headers;
 
-        public Session Session { get; private set; }
+        public Data Data { get; private set; }
 
         public IRacingSDK()
         {
@@ -101,7 +101,7 @@ namespace irsdkSharp
                 string unitStr = _encoding.GetString(unit).TrimEnd(trimChars);
                 var header = new VarHeader(type, offset, count, nameStr, descStr, unitStr);
                 Headers[header.Name] = header;
-                Session = new Session(this);
+                Data = new Data(this);
             }
         }
 
