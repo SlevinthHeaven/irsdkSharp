@@ -240,5 +240,9 @@ namespace irsdkSharp.Serialization.Models.Data
         public float YawRate { get; set; }
         public float[] YawRate_ST { get; set; } = new float[6];
 
+        public float SteeringWheelMaxForceNm { get; set; }
+
+        public bool SteeringWheelUseLinear { get; set; }
+
     }
 }
