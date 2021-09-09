@@ -28,15 +28,36 @@ namespace irsdkSharp.Calculation
 
             var results = new List<CarGapIntervalModel>();
 
+            var trackLength = float.Parse(sessionModel.WeekendInfo.TrackLength.Replace("km","").Replace("mi","").Trim());
+            if(sessionModel.WeekendInfo.TrackLength.Contains("km"))
+            {
+                trackLength *= 1000;
+            } else
+            {
+                trackLength = (trackLength * (5 / 8)) * 1000;
+            }
+
+
+
+            //Get Current Session
+            var currentSessionNumber = dataModel.Data.SessionNum;
+
+            var currentSession = sessionModel.SessionInfo.Sessions
+                .Where(x => x.SessionNum == currentSessionNumber)
+                .FirstOrDefault();
+
+
             //All drivers ordered 
 
             var orderedDrivers = dataModel.Data.Cars
-                .OrderByDescending(x => x.CarIdxLapDistPct)
-                .ThenByDescending(x => x.CarIdxLap).ToList();
-
+                .Where(x => x.CarIdxLapDistPct != -1)
+                .OrderByDescending(x => x.CarIdxLap)
+                .ThenByDescending(x => x.CarIdxLapDistPct).ToList();
 
             //find car in first
             var leader = orderedDrivers.FirstOrDefault();
+            var leaderSession = currentSession.ResultsPositions.Where(ses => ses.CarIdx == leader.CarIdx).FirstOrDefault();
+            var leaderDriver = sessionModel.DriverInfo.Drivers.Where(ses => ses.CarIdx == leader.CarIdx).FirstOrDefault();
 
             var drivers = sessionModel.DriverInfo.Drivers
                     .Where(x => x.IsSpectator == 0)
@@ -72,11 +93,9 @@ namespace irsdkSharp.Calculation
             {
                 CarIdx = leader.CarIdx,
                 ClassGap = TimeSpan.Zero,
-                ClassGapLapDifference = 0,
                 ClassInterval = TimeSpan.Zero,
                 ClassIntervalLapDifference = 0,
                 Gap = TimeSpan.Zero,
-                GapLapDifference = 0,
                 Interval = TimeSpan.Zero,
                 IntervalLapDifference = 0
             });
@@ -87,7 +106,7 @@ namespace irsdkSharp.Calculation
                 var carInFront = orderedDrivers[i-1];
                 var currentDriver = drivers.Where(driver => driver.CarIdx == car.CarIdx).FirstOrDefault();
 
-                if (currentDriver == null) throw new NullReferenceException("Driver should not be null here, they are in the data not the session.. odd");
+                if (currentDriver == null) continue;
                 
                 //Create model for current car
                 var carModel = new CarGapIntervalModel
@@ -96,31 +115,14 @@ namespace irsdkSharp.Calculation
                 };
 
                 //Interval to Leader
-                if (car.CarIdxLapDistPct > leader.CarIdxLapDistPct)
-                {
-                    var remainingThisLap = car.CarIdxLastLapTime * (1 - car.CarIdxLapDistPct);
-                    carModel.Interval = TimeSpan.FromSeconds(leader.CarIdxEstTime + remainingThisLap);
-                    carModel.IntervalLapDifference = leader.CarIdxLap - car.CarIdxLap - 1;
-                }
-                else
-                {
-                    carModel.Interval = TimeSpan.FromSeconds(leader.CarIdxEstTime - car.CarIdxEstTime);
-                    carModel.IntervalLapDifference = leader.CarIdxLap - car.CarIdxLap;
-                }
+                var times = BetweenCars(leader, car, trackLength);
+                carModel.Interval = times.Item1;
+                carModel.IntervalLapDifference = times.Item2;
 
                 //Gap between driver in front of current car
-                if (car.CarIdxLapDistPct > carInFront.CarIdxLapDistPct)
-                {
-                    var remainingThisLap = car.CarIdxLastLapTime * (1 - car.CarIdxLapDistPct);
-                    carModel.Gap = TimeSpan.FromSeconds(carInFront.CarIdxEstTime + remainingThisLap);
-                    carModel.GapLapDifference = carInFront.CarIdxLap - car.CarIdxLap - 1;
-                }
-                else
-                {
-                    carModel.Gap = TimeSpan.FromSeconds(carInFront.CarIdxEstTime - car.CarIdxEstTime);
-                    carModel.GapLapDifference = carInFront.CarIdxLap - car.CarIdxLap;
-                }
-
+                times = BetweenCars(carInFront, car, trackLength);
+                carModel.Gap = times.Item1;
+               
 
                 //grab current class leader
                 CarModel currentClassLeader = null;
@@ -141,45 +143,23 @@ namespace irsdkSharp.Calculation
                 if (currentClassLeader.CarIdx == car.CarIdx)
                 {
                     carModel.ClassGap = TimeSpan.Zero;
-                    carModel.ClassGapLapDifference = 0;
                     carModel.ClassInterval = TimeSpan.Zero;
                     carModel.ClassIntervalLapDifference = 0;
                 }
                 else
                 {
                     //Interval to Class Leader
-                    if (car.CarIdxLapDistPct > currentClassLeader.CarIdxLapDistPct)
-                    {
-                        var remainingThisLap = car.CarIdxLastLapTime * (1 - car.CarIdxLapDistPct);
+                    times = BetweenCars(currentClassLeader, car, trackLength);
+                    carModel.ClassInterval = times.Item1;
+                    carModel.ClassIntervalLapDifference = times.Item2;
 
-                        carModel.ClassInterval = TimeSpan.FromSeconds(currentClassLeader.CarIdxEstTime + remainingThisLap);
-                        carModel.ClassIntervalLapDifference = currentClassLeader.CarIdxLap - car.CarIdxLap - 1;
-                    }
-                    else
-                    {
-                        carModel.ClassInterval = TimeSpan.FromSeconds(currentClassLeader.CarIdxEstTime - car.CarIdxEstTime);
-                        carModel.ClassIntervalLapDifference = currentClassLeader.CarIdxLap - car.CarIdxLap;
-                    }
-
-                    //Interval to Class Leader
-                    if (car.CarIdxLapDistPct > lastCarUsed.CarIdxLapDistPct)
-                    {
-                        var remainingThisLap = car.CarIdxLastLapTime * (1 - car.CarIdxLapDistPct);
-
-                        carModel.ClassGap = TimeSpan.FromSeconds(lastCarUsed.CarIdxEstTime + remainingThisLap);
-                        carModel.ClassGapLapDifference = lastCarUsed.CarIdxLap - car.CarIdxLap - 1;
-                    }
-                    else
-                    {
-                        carModel.ClassGap = TimeSpan.FromSeconds(lastCarUsed.CarIdxEstTime - car.CarIdxEstTime);
-                        carModel.ClassGapLapDifference = lastCarUsed.CarIdxLap - car.CarIdxLap;
-                    }
+                    //Gap between class driver in front of current car
+                    times = BetweenCars(lastCarUsed, car, trackLength);
+                    carModel.ClassGap = times.Item1;
 
                     lastClassCar[currentDriver.CarClassID] = car;
                 }
-
                 results.Add(carModel);
-
             }
 
             return results;
@@ -196,6 +176,52 @@ namespace irsdkSharp.Calculation
             if(dataModel == null) return null;
 
             return CalculateGapsAndIntervals(dataModel, sessionModel);
+        }
+
+        private static (TimeSpan, int) BetweenCars(CarModel leader, CarModel car, float trackLength)
+        {
+            TimeSpan time;
+            int lap;
+
+            if (car.CarIdxLapDistPct > leader.CarIdxLapDistPct)
+            {
+                var remainingThisLap = car.CarIdxLastLapTime * (1 - car.CarIdxLapDistPct);
+                time = TimeSpan.FromSeconds(leader.CarIdxEstTime + remainingThisLap);
+                lap = leader.CarIdxLap - car.CarIdxLap - 1;
+            }
+            else
+            {
+                if (leader.CarIdxLapDistPct > 0.5 && leader.CarIdxEstTime < 2)
+                {
+                    //leader has crossed the timing beam but not the start finish
+                    //this seems to be a long standing issue
+                    var remainingThisLap = car.CarIdxLastLapTime * (1 - car.CarIdxLapDistPct);
+                    time = TimeSpan.FromSeconds(leader.CarIdxEstTime + remainingThisLap);
+                }
+                else
+                {
+                    time = TimeSpan.FromSeconds(leader.CarIdxEstTime - car.CarIdxEstTime);
+
+                    // if the time is -ve we take their last lap
+                    if (time.TotalMilliseconds < 0)
+                    {
+                        var timeInToLap = car.CarIdxLastLapTime * car.CarIdxLapDistPct;
+                        time = TimeSpan.FromSeconds(leader.CarIdxEstTime - timeInToLap);
+                    }
+
+                    //// if the time is STILL -ve we use distance % and current speed
+                    //if (time.TotalMilliseconds < 0)
+                    //{
+                    //    var driverAvgSpeed = trackLength / car.CarIdxLastLapTime;
+                    //    var distanceBetween = (leader.CarIdxLapDistPct - car.CarIdxLapDistPct) * trackLength;
+                    //    var timeGap = distanceBetween / driverAvgSpeed;
+                    //    time = TimeSpan.FromSeconds(timeGap);
+                    //}
+                }
+                lap = leader.CarIdxLap - car.CarIdxLap;
+            }
+
+            return (time, lap);
         }
     }
 }
