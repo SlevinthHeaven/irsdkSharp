@@ -31,7 +31,7 @@ namespace irsdkSharp.Serialization
                 IRacingSDK.GetFileMapView(racingSDK).ReadArray(0, data, 0, length);
                 //Serialise the string into objects, tada!
                 return IRacingDataModel.Serialize(
-                    data[racingSDK.Header.Buffer..(racingSDK.Header.Buffer + racingSDK.Header.BufferLength)],
+                    data[racingSDK.Header.Offset..(racingSDK.Header.Offset + racingSDK.Header.BufferLength)],
                     racingSDK.Headers.Values);
             }
             return null;
