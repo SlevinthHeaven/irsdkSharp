@@ -38,24 +38,24 @@ namespace irsdkSharp.Tests
         }
 
         [Test]
-        public void GetSessionProperty()
+        public void GetDataProperty()
         {
-            Assert.NotZero(sdk.Session.SessionTick);
+            Assert.NotZero(sdk.Data.SessionTick);
         }
 
         [Test]
         public void GetData()
         {
-            Assert.NotZero((int) sdk.GetData(nameof(sdk.Session.SessionTick)));
+            TestContext.WriteLine(sdk.Data.ToString());
         }
 
         [Test]
         public void GetAllSessionProperties()
         {
-            var props = typeof(Session).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var props = typeof(Data).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var prop in props)
             {
-                var val = prop.GetValue(sdk.Session);
+                var val = prop.GetValue(sdk.Data);
 
                 val = val switch
                 {
@@ -67,7 +67,7 @@ namespace irsdkSharp.Tests
                     _ => val
                 };
 
-                TestContext.WriteLine($"{prop.Name}: {val.ToString()}");
+                TestContext.WriteLine($"{prop.Name}: {val?.ToString()}");
             }
         }
 

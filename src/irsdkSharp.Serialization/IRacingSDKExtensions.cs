@@ -39,25 +39,25 @@ namespace irsdkSharp.Serialization
 
         public static List<CarModel> GetPositions(this IRacingSDK racingSDK)
         {
-            var tick = racingSDK.Session.SessionTick;
-            var CarIdxBestLapNum = racingSDK.Session.CarIdxBestLapNum;
-            var CarIdxBestLapTime = racingSDK.Session.CarIdxBestLapTime;
-            var CarIdxClassPosition = racingSDK.Session.CarIdxClassPosition;
-            var CarIdxEstTime = racingSDK.Session.CarIdxEstTime;
-            var CarIdxF2Time = racingSDK.Session.CarIdxF2Time;
-            var CarIdxGear = racingSDK.Session.CarIdxGear;
-            var CarIdxLap = racingSDK.Session.CarIdxLap;
-            var CarIdxLapCompleted = racingSDK.Session.CarIdxLapCompleted;
-            var CarIdxLapDistPct = racingSDK.Session.CarIdxLapDistPct;
-            var CarIdxLastLapTime = racingSDK.Session.CarIdxLastLapTime;
-            var CarIdxOnPitRoad = racingSDK.Session.CarIdxOnPitRoad;
-            var CarIdxP2P_Count = racingSDK.Session.CarIdxP2P_Count;
-            var CarIdxP2P_Status = racingSDK.Session.CarIdxP2P_Status;
-            var CarIdxPosition = racingSDK.Session.CarIdxPosition;
-            var CarIdxRPM = racingSDK.Session.CarIdxRPM;
-            var CarIdxSteer = racingSDK.Session.CarIdxSteer;
-            var CarIdxTrackSurface = racingSDK.Session.CarIdxTrackSurface;
-            var CarIdxTrackSurfaceMaterial = racingSDK.Session.CarIdxTrackSurfaceMaterial;
+            var tick = racingSDK.Data.SessionTick;
+            var CarIdxBestLapNum = racingSDK.Data.CarIdxBestLapNum;
+            var CarIdxBestLapTime = racingSDK.Data.CarIdxBestLapTime;
+            var CarIdxClassPosition = racingSDK.Data.CarIdxClassPosition;
+            var CarIdxEstTime = racingSDK.Data.CarIdxEstTime;
+            var CarIdxF2Time = racingSDK.Data.CarIdxF2Time;
+            var CarIdxGear = racingSDK.Data.CarIdxGear;
+            var CarIdxLap = racingSDK.Data.CarIdxLap;
+            var CarIdxLapCompleted = racingSDK.Data.CarIdxLapCompleted;
+            var CarIdxLapDistPct = racingSDK.Data.CarIdxLapDistPct;
+            var CarIdxLastLapTime = racingSDK.Data.CarIdxLastLapTime;
+            var CarIdxOnPitRoad = racingSDK.Data.CarIdxOnPitRoad;
+            var CarIdxP2P_Count = racingSDK.Data.CarIdxP2P_Count;
+            var CarIdxP2P_Status = racingSDK.Data.CarIdxP2P_Status;
+            var CarIdxPosition = racingSDK.Data.CarIdxPosition;
+            var CarIdxRPM = racingSDK.Data.CarIdxRPM;
+            var CarIdxSteer = racingSDK.Data.CarIdxSteer;
+            var CarIdxTrackSurface = racingSDK.Data.CarIdxTrackSurface;
+            var CarIdxTrackSurfaceMaterial = racingSDK.Data.CarIdxTrackSurfaceMaterial;
 
             var results = new List<CarModel>();
             for (var i = 0; i< 64; i++)
