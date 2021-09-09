@@ -30,6 +30,10 @@ namespace irsdkSharp.Serialization.Models.Session.DriverInfo
         public int DriverSetupIsModified { get; set; }// %d
         public string DriverSetupLoadTypeName { get; set; }// %s
         public int DriverSetupPassedTech { get; set; }// %d
+
+        public int DriverCarGearReverse { get; set; } //%d
+        public int DriverCarGearNeutral { get; set; } // %d
+        public int DriverCarGearNumForward { get; set; } // %d
         public List<DriverModel> Drivers { get; set; }
     }
 }
