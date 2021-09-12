@@ -3,7 +3,9 @@ using irsdkSharp.Serialization.Models.Data;
 using irsdkSharp.Serialization.Models.Session;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
+using static irsdkSharp.Serialization.ExpressionAccessors;
 
 namespace irsdkSharp.Serialization
 {
@@ -30,7 +32,7 @@ namespace irsdkSharp.Serialization
                 IRacingSDK.GetFileMapView(racingSDK).ReadArray(0, data, 0, length);
                 //Serialise the string into objects, tada!
                 return IRacingDataModel.Serialize(
-                    data[racingSDK.Header.Buffer..(racingSDK.Header.Buffer + racingSDK.Header.BufferLength)],
+                    data[racingSDK.Header.Offset..(racingSDK.Header.Offset + racingSDK.Header.BufferLength)],
                     racingSDK.VarHeaders);
             }
             return null;
@@ -88,7 +90,5 @@ namespace irsdkSharp.Serialization
             }
             return results;
         }
-
     }
-
 }

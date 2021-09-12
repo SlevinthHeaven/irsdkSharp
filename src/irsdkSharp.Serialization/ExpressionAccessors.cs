@@ -1,66 +1,34 @@
-﻿using System;
+﻿using irsdkSharp.Serialization.Models.Data;
+using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace irsdkSharp.Serialization
 {
     public static class ExpressionAccessors
     {
-        public static Func<TTarget, TReturn> GenerateMemberGetter<TTarget, TReturn>(string memberName)
+        public static Dictionary<string, ReferenceTypeMemberSetterDelegate<object, object>> ModelSetters;
+        public static PropertyInfo[] CarModelProperties;
+        public static PropertyInfo[] DataModelProperties;
+        static ExpressionAccessors()
         {
-            if (string.IsNullOrEmpty(memberName)) throw new ArgumentException(nameof(memberName));
+            CarModelProperties = typeof(DataModel).GetProperties();
+            DataModelProperties = typeof(CarModel).GetProperties();
+            ModelSetters = new Dictionary<string, ReferenceTypeMemberSetterDelegate<object, object>>();
 
-            var param = Expression.Parameter(typeof(TTarget), "this");
-            var member = Expression.PropertyOrField(param, memberName);
-            var lambda = Expression.Lambda<Func<TTarget, TReturn>>(member, param);
+            foreach (var property in CarModelProperties)
+            {
+                ModelSetters.Add($"CarModel::{property.Name}", GetSetter(typeof(CarModel), property));
+            }
 
-            return lambda.Compile();
+            foreach (var property in DataModelProperties)
+            {
+                ModelSetters.Add($"DataModel::{property.Name}", GetSetter(typeof(DataModel), property));
+            }
         }
 
-        public static Func<object, TReturn> GenerateMemberGetter<TReturn>(Type type, string memberName)
-        {
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            if (string.IsNullOrEmpty(memberName)) throw new ArgumentException(nameof(memberName));
-
-            var param = Expression.Parameter(typeof(object), "this");
-            var castParam = Expression.Convert(param, type);
-            var member = Expression.PropertyOrField(castParam, memberName);
-            var lambda = Expression.Lambda<Func<object, TReturn>>(member, param);
-
-            return lambda.Compile();
-        }
-
-        public delegate void ValueTypeMemberSetterDelegate<TTarget, TValue>(ref TTarget @this, TValue value);
         public delegate void ReferenceTypeMemberSetterDelegate<TTarget, TValue>(TTarget @this, TValue value);
-
-        public static ValueTypeMemberSetterDelegate<TTarget, TValue> GenerateValueTypeMemberSetter<TTarget, TValue>(string memberName)
-            where TTarget : struct
-        {
-            if (string.IsNullOrEmpty(memberName)) throw new ArgumentException(nameof(memberName));
-
-            var thisRef = typeof(TTarget).MakeByRefType();
-
-            var paramThis = Expression.Parameter(thisRef, "this");
-            var paramValue = Expression.Parameter(typeof(TValue), "value");
-            var member = Expression.PropertyOrField(paramThis, memberName);
-            var assign = Expression.Assign(member, paramValue);
-            var lambda = Expression.Lambda<ValueTypeMemberSetterDelegate<TTarget, TValue>>(assign, paramThis, paramValue);
-
-            return lambda.Compile();
-        }
-
-        public static ReferenceTypeMemberSetterDelegate<TTarget, TValue> GenerateReferenceTypeMemberSetter<TTarget, TValue>(string memberName)
-            where TTarget : class
-        {
-            if (string.IsNullOrEmpty(memberName)) throw new ArgumentException(nameof(memberName));
-
-            var paramThis = Expression.Parameter(typeof(TTarget), "this");
-            var paramValue = Expression.Parameter(typeof(TValue), "value");
-            var member = Expression.PropertyOrField(paramThis, memberName);
-            var assign = Expression.Assign(member, paramValue);
-            var lambda = Expression.Lambda<ReferenceTypeMemberSetterDelegate<TTarget, TValue>>(assign, paramThis, paramValue);
-
-            return lambda.Compile();
-        }
 
         public static ReferenceTypeMemberSetterDelegate<object, TValue> GenerateReferenceTypeMemberSetter<TValue>(Type type, string memberName)
         {
@@ -76,6 +44,11 @@ namespace irsdkSharp.Serialization
             var lambda = Expression.Lambda<ReferenceTypeMemberSetterDelegate<object, TValue>>(assign, paramThis, paramValue);
 
             return lambda.Compile();
+        }
+
+        private static ReferenceTypeMemberSetterDelegate<object, object> GetSetter(Type model, PropertyInfo property)
+        {
+            return GenerateReferenceTypeMemberSetter<object>(model, property.Name);
         }
     }
 }

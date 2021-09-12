@@ -12,9 +12,6 @@ namespace irsdkSharp.Serialization.Models.Data
         public static IRacingDataModel Serialize(Span<byte> toSerialize, Dictionary<string, VarHeader> headers)
         {
 
-            var dataModelProperties = typeof(DataModel).GetProperties().ToList();
-            var carModelProperties = typeof(CarModel).GetProperties().ToList();
-
             var model = new DataModel();
             var missing = new List<VarHeader>();
             var cars = new CarModel[64];
@@ -23,24 +20,30 @@ namespace irsdkSharp.Serialization.Models.Data
                 cars[i] = new CarModel { CarIdx = i };
             }
 
-            foreach(var property in carModelProperties)
+            foreach(var property in ExpressionAccessors.CarModelProperties)
             {
+
+                var name = ExpressionAccessors.ModelSetters[$"CarModel::{property.Name}"];
+                
                 if (headers.ContainsKey(property.Name) && headers[property.Name].Count == 64)
                 {
                     for (var i = 0; i < cars.Length; i++)
                     {
-                        property.SetValue(cars[i], GetValue(toSerialize, headers[property.Name].Offset + ((headers[property.Name].Length / headers[property.Name].Count) * i), (headers[property.Name].Length / headers[property.Name].Count), headers[property.Name].Type));
+                        name.Invoke(cars[i], GetValue(toSerialize, headers[property.Name].Offset + ((headers[property.Name].Length / headers[property.Name].Count) * i), (headers[property.Name].Length / headers[property.Name].Count), headers[property.Name].Type));
+                        //property.SetValue(cars[i], GetValue(toSerialize, headers[property.Name].Offset + ((headers[property.Name].Length / headers[property.Name].Count) * i), (headers[property.Name].Length / headers[property.Name].Count), headers[property.Name].Type));
                     }
                 } 
             }
 
-            foreach (var property in dataModelProperties)
+            foreach (var property in ExpressionAccessors.DataModelProperties)
             {
+                var name = ExpressionAccessors.ModelSetters[$"DataModel::{property.Name}"];
+
                 if (headers.ContainsKey(property.Name))
                 {
                     if (headers[property.Name].Count == 1)
                     {
-                        property.SetValue(model, GetValue(toSerialize, headers[property.Name].Offset, headers[property.Name].Length, headers[property.Name].Type));
+                        name.Invoke(model, GetValue(toSerialize, headers[property.Name].Offset, headers[property.Name].Length, headers[property.Name].Type));
                     }
                     else
                     {
