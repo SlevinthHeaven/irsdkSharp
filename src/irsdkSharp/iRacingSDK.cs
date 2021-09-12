@@ -6,7 +6,6 @@ using irsdkSharp.Enums;
 using irsdkSharp.Models;
 using System.Threading;
 using System.Text;
-using System.Linq;
 using Microsoft.Win32.SafeHandles;
 
 namespace irsdkSharp
@@ -14,6 +13,7 @@ namespace irsdkSharp
     public class IRacingSDK
     {
         private readonly Encoding _encoding;
+        private char[] trimChars = { '\0' };
 
         //VarHeader offsets
         public const int VarOffsetOffset = 4;
@@ -21,7 +21,6 @@ namespace irsdkSharp
         public const int VarNameOffset = 16;
         public const int VarDescOffset = 48;
         public const int VarUnitOffset = 112;
-        //public int VarHeaderSize = 144;
 
 
         public bool IsInitialized = false;
@@ -36,7 +35,7 @@ namespace irsdkSharp
         
         public IRacingSdkHeader Header = null;
 
-        public List<VarHeader> VarHeaders = new List<VarHeader>();
+        public Dictionary<string, VarHeader> VarHeaders;
 
         public IRacingSDK()
         {
@@ -80,7 +79,7 @@ namespace irsdkSharp
 
         private void GetVarHeaders()
         {
-            VarHeaders.Clear();
+            VarHeaders = new Dictionary<string, VarHeader>(Header.VarCount);
             for (int i = 0; i < Header.VarCount; i++)
             {
                 int type = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size)));
@@ -92,20 +91,18 @@ namespace irsdkSharp
                 FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarNameOffset), name, 0, Constants.MaxString);
                 FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarDescOffset), desc, 0, Constants.MaxDesc);
                 FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarUnitOffset), unit, 0, Constants.MaxString);
-                string nameStr = _encoding.GetString(name).TrimEnd(new char[] { '\0' });
-                string descStr = _encoding.GetString(desc).TrimEnd(new char[] { '\0' });
-                string unitStr = _encoding.GetString(unit).TrimEnd(new char[] { '\0' });
-                VarHeaders.Add(new VarHeader(type, offset, count, nameStr, descStr, unitStr));
+                string nameStr = _encoding.GetString(name).TrimEnd(trimChars);
+                string descStr = _encoding.GetString(desc).TrimEnd(trimChars);
+                string unitStr = _encoding.GetString(unit).TrimEnd(trimChars);
+                var header = new VarHeader(type, offset, count, nameStr, descStr, unitStr);
+                VarHeaders[header.Name] = header;
             }
         }
 
         public object GetData(string name)
         {
             if (!IsInitialized || Header == null) return null;
-
-            var requestedHeader = VarHeaders.FirstOrDefault(h => h.Name == name);
-
-            if (requestedHeader == null) return null;
+            if (!VarHeaders.TryGetValue(name, out var requestedHeader)) return null;
 
             int varOffset = requestedHeader.Offset;
             int count = requestedHeader.Count;
@@ -115,7 +112,7 @@ namespace irsdkSharp
                 case VarType.irChar:
                     {
                         byte[] data = new byte[count];
-                        FileMapView.ReadArray<byte>(Header.Buffer + varOffset, data, 0, count);
+                        FileMapView.ReadArray<byte>(Header.Offset + varOffset, data, 0, count);
                         return _encoding.GetString(data).TrimEnd(new char[] { '\0' });
                     }
                 case VarType.irBool:
@@ -123,12 +120,12 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             bool[] data = new bool[count];
-                            FileMapView.ReadArray<bool>(Header.Buffer + varOffset, data, 0, count);
+                            FileMapView.ReadArray<bool>(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
                         {
-                            return FileMapView.ReadBoolean(Header.Buffer + varOffset);
+                            return FileMapView.ReadBoolean(Header.Offset + varOffset);
                         }
                     }
                 case VarType.irInt:
@@ -137,12 +134,12 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             int[] data = new int[count];
-                            FileMapView.ReadArray<int>(Header.Buffer + varOffset, data, 0, count);
+                            FileMapView.ReadArray<int>(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
                         {
-                            return FileMapView.ReadInt32(Header.Buffer + varOffset);
+                            return FileMapView.ReadInt32(Header.Offset + varOffset);
                         }
                     }
                 case VarType.irFloat:
@@ -150,12 +147,12 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             float[] data = new float[count];
-                            FileMapView.ReadArray<float>(Header.Buffer + varOffset, data, 0, count);
+                            FileMapView.ReadArray<float>(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
                         {
-                            return FileMapView.ReadSingle(Header.Buffer + varOffset);
+                            return FileMapView.ReadSingle(Header.Offset + varOffset);
                         }
                     }
                 case VarType.irDouble:
@@ -163,12 +160,12 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             double[] data = new double[count];
-                            FileMapView.ReadArray<double>(Header.Buffer + varOffset, data, 0, count);
+                            FileMapView.ReadArray<double>(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
                         {
-                            return FileMapView.ReadDouble(Header.Buffer + varOffset);
+                            return FileMapView.ReadDouble(Header.Offset + varOffset);
                         }
                     }
                 default: return null;
