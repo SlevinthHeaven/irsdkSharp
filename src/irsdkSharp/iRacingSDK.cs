@@ -23,8 +23,8 @@ namespace irsdkSharp
 
 
         public bool IsInitialized = false;
-        private readonly MemoryMappedFile _iRacingFile;
-        internal readonly MemoryMappedViewAccessor FileMapView;
+        private MemoryMappedFile _iRacingFile;
+        internal MemoryMappedViewAccessor FileMapView;
 
         public static MemoryMappedViewAccessor GetFileMapView(IRacingSDK racingSDK)
         {
@@ -42,8 +42,6 @@ namespace irsdkSharp
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
-            _iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
-            FileMapView = _iRacingFile.CreateViewAccessor();
         }
 
         public IRacingSDK(MemoryMappedViewAccessor accessor)
@@ -62,6 +60,8 @@ namespace irsdkSharp
             {
                 if (openWaitHandle)
                 {
+                    _iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
+                    FileMapView = _iRacingFile.CreateViewAccessor();
                     using var hEvent = EventWaitHandle.OpenExisting(Constants.DataValidEventName);
                     if (!hEvent.WaitOne(TimeSpan.FromSeconds(1)))
                     {
