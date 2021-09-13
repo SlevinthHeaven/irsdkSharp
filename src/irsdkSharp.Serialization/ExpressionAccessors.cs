@@ -13,8 +13,8 @@ namespace irsdkSharp.Serialization
         public static PropertyInfo[] DataModelProperties;
         static ExpressionAccessors()
         {
-            CarModelProperties = typeof(DataModel).GetProperties();
-            DataModelProperties = typeof(CarModel).GetProperties();
+            DataModelProperties = typeof(DataModel).GetProperties();
+            CarModelProperties = typeof(CarModel).GetProperties();
             ModelSetters = new Dictionary<string, ReferenceTypeMemberSetterDelegate<object, object>>();
 
             foreach (var property in CarModelProperties)
