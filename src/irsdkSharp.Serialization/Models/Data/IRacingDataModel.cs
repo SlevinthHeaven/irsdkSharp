@@ -9,6 +9,30 @@ namespace irsdkSharp.Serialization.Models.Data
 {
     public class IRacingDataModel
     {
+        public static List<CarModel> SerializeCars(Span<byte> toSerialize, Dictionary<string, VarHeader> headers)
+        {
+            var cars = new CarModel[64];
+            for (var i = 0; i < cars.Length; i++)
+            {
+                cars[i] = new CarModel { CarIdx = i };
+            }
+            
+            foreach(var property in ExpressionAccessors.CarModelProperties)
+            {
+
+                var name = ExpressionAccessors.ModelSetters[$"CarModel::{property.Name}"];
+                
+                if (headers.ContainsKey(property.Name) && headers[property.Name].Count == 64)
+                {
+                    for (var i = 0; i < cars.Length; i++)
+                    {
+                        name.Invoke(cars[i], GetValue(toSerialize, headers[property.Name].Offset + ((headers[property.Name].Length / headers[property.Name].Count) * i), (headers[property.Name].Length / headers[property.Name].Count), headers[property.Name].Type));
+                    }
+                } 
+            }
+
+        }
+        
         public static IRacingDataModel Serialize(Span<byte> toSerialize, Dictionary<string, VarHeader> headers)
         {
 
@@ -30,7 +54,6 @@ namespace irsdkSharp.Serialization.Models.Data
                     for (var i = 0; i < cars.Length; i++)
                     {
                         name.Invoke(cars[i], GetValue(toSerialize, headers[property.Name].Offset + ((headers[property.Name].Length / headers[property.Name].Count) * i), (headers[property.Name].Length / headers[property.Name].Count), headers[property.Name].Type));
-                        //property.SetValue(cars[i], GetValue(toSerialize, headers[property.Name].Offset + ((headers[property.Name].Length / headers[property.Name].Count) * i), (headers[property.Name].Length / headers[property.Name].Count), headers[property.Name].Type));
                     }
                 } 
             }
@@ -51,7 +74,6 @@ namespace irsdkSharp.Serialization.Models.Data
                         for (int i = 0; i < headers[property.Name].Count; i++)
                         {
                             values[i] = GetValue(toSerialize, headers[property.Name].Offset + ((headers[property.Name].Length / headers[property.Name].Count) * i), (headers[property.Name].Length / headers[property.Name].Count), headers[property.Name].Type);
-
                         }
                     }
 

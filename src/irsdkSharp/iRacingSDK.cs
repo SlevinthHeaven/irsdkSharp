@@ -7,6 +7,7 @@ using irsdkSharp.Models;
 using System.Threading;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
+using Microsoft.Extensions.Logging;
 
 namespace irsdkSharp
 {
@@ -32,13 +33,36 @@ namespace irsdkSharp
         {
             return racingSDK.FileMapView;
         }
-        
+
         public IRacingSdkHeader Header = null;
 
         public Dictionary<string, VarHeader> VarHeaders;
 
+        private readonly AutoResetEvent _gameLoopEvent;
+        private IntPtr _hEvent;
+        private readonly ILogger<IRacingSDK> _logger;
+
         public IRacingSDK()
         {
+            _hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
+            _gameLoopEvent = new AutoResetEvent(false)
+            {
+                SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
+            };
+            // Register CP1252 encoding
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            _encoding = Encoding.GetEncoding(1252);
+        }
+
+        public IRacingSDK(ILogger<IRacingSDK> logger)
+        {
+            _logger = logger;
+
+            _hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
+            _gameLoopEvent = new AutoResetEvent(false)
+            {
+                SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
+            };
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
@@ -53,16 +77,8 @@ namespace irsdkSharp
                 iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
                 FileMapView = iRacingFile.CreateViewAccessor();
 
-                var hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
-                var are = new AutoResetEvent(false)
-                {
-                    // This is deprecated, need better option
-                    SafeWaitHandle = new SafeWaitHandle(hEvent, true)
-                };
-
                 var wh = new WaitHandle[1];
-                wh[0] = are;
-
+                wh[0] = _gameLoopEvent;
                 WaitHandle.WaitAny(wh);
 
                 Header = new IRacingSdkHeader(FileMapView);
@@ -74,7 +90,25 @@ namespace irsdkSharp
             {
                 return false;
             }
+            Task.Run(GameLoop);
             return true;
+        }
+
+        private void GameLoop()
+        {
+            while (true)
+            {
+                try
+                {
+                    var wh = new WaitHandle[1];
+                    wh[0] = _gameLoopEvent;
+
+                    WaitHandle.WaitAny(wh);
+                }
+                catch
+                {
+                }
+            }
         }
 
         private void GetVarHeaders()
@@ -95,7 +129,7 @@ namespace irsdkSharp
                 string descStr = _encoding.GetString(desc).TrimEnd(trimChars);
                 string unitStr = _encoding.GetString(unit).TrimEnd(trimChars);
                 var header = new VarHeader(type, offset, count, nameStr, descStr, unitStr);
-                VarHeaders[header.Name] = header;
+                VarHeaders[header.Name] = header;  
             }
         }
 
