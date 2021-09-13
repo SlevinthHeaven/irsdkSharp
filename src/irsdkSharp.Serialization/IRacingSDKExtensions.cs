@@ -45,8 +45,12 @@ namespace irsdkSharp.Serialization
                 IRacingSDK.GetFileMapView(racingSDK).ReadArray(0, data, 0, length);
                 //Serialise the string into objects, tada!
                 sessionTime = (double)racingSDK.GetData("SessionTime");
-                return IRacingDataModel.SerializeCars(data[racingSDK.Header.Buffer..(racingSDK.Header.Buffer + racingSDK.Header.BufferLength)], racingSDK.VarHeaders);
+                return IRacingDataModel.SerializeCars(
+                    data[racingSDK.Header.Offset..(racingSDK.Header.Offset + racingSDK.Header.BufferLength)],
+                    racingSDK.VarHeaders);
             }
+            sessionTime = 0;
+            return null;
         }
     }
 }

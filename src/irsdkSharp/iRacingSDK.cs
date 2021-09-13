@@ -8,6 +8,7 @@ using System.Threading;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace irsdkSharp
 {

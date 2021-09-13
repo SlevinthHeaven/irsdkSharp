@@ -30,7 +30,7 @@ namespace irsdkSharp.Serialization.Models.Data
                     }
                 } 
             }
-
+            return cars.ToList();
         }
         
         public static IRacingDataModel Serialize(Span<byte> toSerialize, Dictionary<string, VarHeader> headers)
