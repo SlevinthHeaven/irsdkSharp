@@ -33,23 +33,22 @@ namespace irsdkSharp.Models
 
         public int BufferLength => _mapView.ReadInt32(36);
 
-        internal List<VarBuf> Buffers()
-        {
-            var Buffers = new List<VarBuf>();
-            for (var i = 0; i < BufferCount; i++)
-            {
-                var bufferArray = new byte[16];
-                _mapView.ReadArray(48 + (1 * 16), bufferArray, 0, 16);
-                Buffers.Add(new VarBuf(bufferArray));
-            }
-            return Buffers;
-        }
-
-        public int Buffer
+        public int Offset
         {
             get
             {
-                return Buffers().OrderByDescending(x => x.TickCount).First().BufOffset;
+                int maxTickCount = _mapView.ReadInt32(48);
+                int curOffset = _mapView.ReadInt32(48 + 4);
+                for (var i = 1; i < BufferCount; i++)
+                {
+                    var curTick = _mapView.ReadInt32(48 + (i * 16));
+                    if (maxTickCount < curTick)
+                    {
+                        maxTickCount = curTick;
+                        curOffset = _mapView.ReadInt32(48 + (i * 16) + 4);
+                    }
+                }
+                return curOffset;
             }
         }
     }

@@ -30,65 +30,27 @@ namespace irsdkSharp.Serialization
                 IRacingSDK.GetFileMapView(racingSDK).ReadArray(0, data, 0, length);
                 //Serialise the string into objects, tada!
                 return IRacingDataModel.Serialize(
-                    data[racingSDK.Header.Buffer..(racingSDK.Header.Buffer + racingSDK.Header.BufferLength)],
+                    data[racingSDK.Header.Offset..(racingSDK.Header.Offset + racingSDK.Header.BufferLength)],
                     racingSDK.VarHeaders);
             }
             return null;
         }
 
-        public static List<CarModel> GetPositions(this IRacingSDK racingSDK)
+        public static List<CarModel> GetPositions(this IRacingSDK racingSDK, out double sessionTime)
         {
-            var tick = (double)racingSDK.GetData("SessionTime");
-            //var CarIdx = (int[])racingSDK.GetData("CarIdx");
-            var CarIdxBestLapNum = (int[])racingSDK.GetData("CarIdxBestLapNum");
-            var CarIdxBestLapTime = (float[])racingSDK.GetData("CarIdxBestLapTime");
-            var CarIdxClassPosition = (int[])racingSDK.GetData("CarIdxClassPosition");
-            var CarIdxEstTime = (float[])racingSDK.GetData("CarIdxEstTime");
-            var CarIdxF2Time = (float[])racingSDK.GetData("CarIdxF2Time");
-            var CarIdxGear = (int[])racingSDK.GetData("CarIdxGear");
-            var CarIdxLap = (int[])racingSDK.GetData("CarIdxLap");
-            var CarIdxLapCompleted = (int[])racingSDK.GetData("CarIdxLapCompleted");
-            var CarIdxLapDistPct = (float[])racingSDK.GetData("CarIdxLapDistPct");
-            var CarIdxLastLapTime = (float[])racingSDK.GetData("CarIdxLastLapTime");
-            var CarIdxOnPitRoad = (bool[])racingSDK.GetData("CarIdxOnPitRoad");
-            var CarIdxP2P_Count = (int[])racingSDK.GetData("CarIdxP2P_Count");
-            var CarIdxP2P_Status = (bool[])racingSDK.GetData("CarIdxP2P_Status");
-            var CarIdxPosition = (int[])racingSDK.GetData("CarIdxPosition");
-            var CarIdxRPM = (float[])racingSDK.GetData("CarIdxRPM");
-            var CarIdxSteer = (float[])racingSDK.GetData("CarIdxSteer");
-            var CarIdxTrackSurface = (int[])racingSDK.GetData("CarIdxTrackSurface");
-            var CarIdxTrackSurfaceMaterial = (int[])racingSDK.GetData("CarIdxTrackSurfaceMaterial");
-
-            var results = new List<CarModel>();
-            for (var i = 0; i< 64; i++)
+            if (racingSDK.IsInitialized && racingSDK.Header != null)
             {
-                results.Add(new CarModel
-                {
-                    CarIdx = i,
-                    CarIdxBestLapNum = CarIdxBestLapNum[i],
-                    CarIdxBestLapTime = CarIdxBestLapTime[i],
-                    CarIdxClassPosition = CarIdxClassPosition[i],
-                    CarIdxEstTime = CarIdxEstTime[i],
-                    CarIdxF2Time = CarIdxF2Time[i],
-                    CarIdxGear = CarIdxGear[i],
-                    CarIdxLap = CarIdxLap[i],
-                    CarIdxLapCompleted = CarIdxLapCompleted[i],
-                    CarIdxLapDistPct = CarIdxLapDistPct[i],
-                    CarIdxLastLapTime = CarIdxLastLapTime[i],
-                    CarIdxOnPitRoad = CarIdxOnPitRoad[i],
-                    CarIdxP2P_Count = CarIdxP2P_Count[i],
-                    CarIdxP2P_Status = CarIdxP2P_Status[i],
-                    CarIdxPosition = CarIdxPosition[i],
-                    CarIdxRPM = CarIdxRPM[i],
-                    CarIdxSteer = CarIdxSteer[i],
-                    CarIdxTrackSurface = CarIdxTrackSurface[i],
-                    CarIdxTrackSurfaceMaterial = CarIdxTrackSurfaceMaterial[i],
-                    SessionTime = tick
-                });
+                var length = (int)IRacingSDK.GetFileMapView(racingSDK).Capacity;
+                var data = new byte[length];
+                IRacingSDK.GetFileMapView(racingSDK).ReadArray(0, data, 0, length);
+                //Serialise the string into objects, tada!
+                sessionTime = (double)racingSDK.GetData("SessionTime");
+                return IRacingDataModel.SerializeCars(
+                    data[racingSDK.Header.Offset..(racingSDK.Header.Offset + racingSDK.Header.BufferLength)],
+                    racingSDK.VarHeaders);
             }
-            return results;
+            sessionTime = 0;
+            return null;
         }
-
     }
-
 }

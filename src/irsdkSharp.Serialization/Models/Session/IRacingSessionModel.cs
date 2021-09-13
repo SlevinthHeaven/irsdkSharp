@@ -15,13 +15,8 @@ namespace irsdkSharp.Serialization.Models.Session
     {
         public static IRacingSessionModel Serialize(string yaml)
         {
-            if (yaml.IndexOf("CarSetup:") != -1)
-            {
-                yaml = yaml.Substring(0, yaml.IndexOf("CarSetup:")) + "...";
-            }
-
             var r = new StringReader(yaml);
-            var deserializer = new DeserializerBuilder().Build();
+            var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
             try
             {
                 return deserializer.Deserialize<IRacingSessionModel>(r);

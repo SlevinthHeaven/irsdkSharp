@@ -6,7 +6,6 @@ namespace irsdkSharp.Serialization.Models.Data
 {
     public class CarModel
     {
-        public double SessionTime { get; set; }
         public int CarIdx { get; set; }
         public int CarIdxBestLapNum { get; set; }
         public float CarIdxBestLapTime { get; set; }
