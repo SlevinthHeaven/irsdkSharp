@@ -16,4 +16,10 @@
     <ProjectReference Include="..\src\irsdkSharp\irsdkSharp.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="testdata\session.ibt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

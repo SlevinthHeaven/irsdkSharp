@@ -18,7 +18,7 @@ namespace irsdkSharp.Tests
         [OneTimeSetUp]
         public void Setup()
         {
-            var memMap = MemoryMappedFile.CreateFromFile("..\\..\\..\\testdata\\session.ibt");
+            var memMap = MemoryMappedFile.CreateFromFile("testdata\\session.ibt");
             sdk = new IRacingSDK(memMap.CreateViewAccessor());
             Assert.IsTrue(sdk.Startup(false));
         }
