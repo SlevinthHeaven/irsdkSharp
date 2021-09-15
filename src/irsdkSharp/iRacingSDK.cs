@@ -68,20 +68,30 @@ namespace irsdkSharp
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
         }
+        
+        public IRacingSDK(MemoryMappedViewAccessor accessor)
+        {
+            FileMapView = accessor;
+            // Register CP1252 encoding
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            _encoding = Encoding.GetEncoding(1252);
+        }
 
-        public bool Startup()
+        public bool Startup(bool openWaitHandle = true)
         {
             if (IsInitialized) return true;
 
             try
             {
-                iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
-                FileMapView = iRacingFile.CreateViewAccessor();
+                if (openWaitHandle)
+                {
+                    iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
+                    FileMapView = iRacingFile.CreateViewAccessor();
 
-                var wh = new WaitHandle[1];
-                wh[0] = _gameLoopEvent;
-                WaitHandle.WaitAny(wh);
-
+                    var wh = new WaitHandle[1];
+                    wh[0] = _gameLoopEvent;
+                    WaitHandle.WaitAny(wh);
+                }
                 Header = new IRacingSdkHeader(FileMapView);
                 GetVarHeaders();
 
@@ -91,7 +101,10 @@ namespace irsdkSharp
             {
                 return false;
             }
-            Task.Run(GameLoop);
+            if (openWaitHandle)
+            {
+                Task.Run(GameLoop);
+            }
             return true;
         }
 
