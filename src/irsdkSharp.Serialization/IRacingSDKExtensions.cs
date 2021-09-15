@@ -3,6 +3,7 @@ using irsdkSharp.Serialization.Models.Data;
 using irsdkSharp.Serialization.Models.Session;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace irsdkSharp.Serialization
@@ -25,13 +26,10 @@ namespace irsdkSharp.Serialization
         {
             if (racingSDK.IsInitialized && racingSDK.Header != null)
             {
-                var length = (int)IRacingSDK.GetFileMapView(racingSDK).Capacity;
-                var data = new byte[length];
-                IRacingSDK.GetFileMapView(racingSDK).ReadArray(0, data, 0, length);
-                //Serialise the string into objects, tada!
-                return IRacingDataModel.Serialize(
-                    data[racingSDK.Header.Offset..(racingSDK.Header.Offset + racingSDK.Header.BufferLength)],
-                    racingSDK.VarHeaders);
+                var fileView = IRacingSDK.GetFileMapView(racingSDK);
+                var data = new byte[racingSDK.Header.BufferLength];
+                fileView.ReadArray(racingSDK.Header.Offset, data, 0, racingSDK.Header.BufferLength);
+                return IRacingDataModel.Serialize(data, racingSDK.VarHeaders);
             }
             return null;
         }
@@ -40,17 +38,15 @@ namespace irsdkSharp.Serialization
         {
             if (racingSDK.IsInitialized && racingSDK.Header != null)
             {
-                var length = (int)IRacingSDK.GetFileMapView(racingSDK).Capacity;
-                var data = new byte[length];
-                IRacingSDK.GetFileMapView(racingSDK).ReadArray(0, data, 0, length);
-                //Serialise the string into objects, tada!
+                var fileView = IRacingSDK.GetFileMapView(racingSDK);
+                var data = new byte[racingSDK.Header.BufferLength];
+                fileView.ReadArray(racingSDK.Header.Offset, data, 0, racingSDK.Header.BufferLength);
                 sessionTime = (double)racingSDK.GetData("SessionTime");
-                return IRacingDataModel.SerializeCars(
-                    data[racingSDK.Header.Offset..(racingSDK.Header.Offset + racingSDK.Header.BufferLength)],
-                    racingSDK.VarHeaders);
+                return IRacingDataModel.SerializeCars(data, racingSDK.VarHeaders);
             }
             sessionTime = 0;
             return null;
         }
+
     }
 }
