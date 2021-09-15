@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Reflection;
@@ -18,7 +19,7 @@ namespace irsdkSharp.Tests
         [OneTimeSetUp]
         public void Setup()
         {
-            var memMap = MemoryMappedFile.CreateFromFile("testdata\\session.ibt");
+            var memMap = MemoryMappedFile.CreateFromFile(Path.Combine("testdata", "session.ibt"));
             sdk = new IRacingSDK(memMap.CreateViewAccessor());
             Assert.IsTrue(sdk.Startup(false));
         }
