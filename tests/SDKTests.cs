@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Reflection;
 using irsdkSharp.Enums;
 using irsdkSharp.Models;
 using irsdkSharp.Serialization;
+using irsdkSharp.Serialization.Models.Data;
 using irsdkSharp.Serialization.Models.Session;
 using NUnit.Framework;
 
@@ -15,6 +17,8 @@ namespace irsdkSharp.Tests
     public class Tests
     {
         IRacingSDK sdk;
+        IRacingDataModel data;
+        IRacingSessionModel session;
 
         [OneTimeSetUp]
         public void Setup()
@@ -30,6 +34,47 @@ namespace irsdkSharp.Tests
             sdk.Shutdown();
         }
 
+        [Test, Order(1)]
+        public void GetSerializedSession()
+        {
+            session = sdk.GetSerializedSessionInfo();
+            Assert.NotNull(session);
+        }
+
+        [Test, Order(1)]
+        public void GetSerializedData()
+        {
+            data = sdk.GetSerializedData();
+            Assert.NotNull(data);
+        }
+
+        [Test]
+        public void SerializedSessionMulti()
+        {
+            Stopwatch stopWatch = new();
+            stopWatch.Start();
+            for (var i = 0; i < 1000; i++)
+            {
+                GetSerializedSession();
+            }
+            stopWatch.Stop();
+            Console.WriteLine($"{nameof(SerializedSessionMulti)}: {stopWatch.ElapsedTicks / 1000}");
+
+        }
+
+        [Test]
+        public void SerializedDataMulti()
+        {
+            Stopwatch stopWatch = new();
+            stopWatch.Start();
+            for (var i = 0; i < 1000; i++)
+            {
+                GetSerializedData();
+            }
+            stopWatch.Stop();
+            Console.WriteLine($"{nameof(SerializedDataMulti)}: {stopWatch.ElapsedTicks / 1000}");
+          
+        }
 
         [Test]
         public void GetSessionInfo()
@@ -41,52 +86,35 @@ namespace irsdkSharp.Tests
         [Test]
         public void GetDataProperty()
         {
-            Assert.NotZero(sdk.Data.SessionTick);
+            Assert.NotZero(data.Data.SessionTick);
         }
 
         [Test]
         public void GetData()
         {
-            TestContext.WriteLine(sdk.Data.ToString());
-        }
+            TestContext.WriteLine(data.Data.ToString());
 
-        [Test]
-        public void GetAllSessionProperties()
-        {
-            var props = typeof(Data).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            foreach (var prop in props)
-            {
-                var val = prop.GetValue(sdk.Data);
-
-                val = val switch
-                {
-                    int[] i when !val.GetType().GetElementType().IsEnum => string.Join(',', i),
-                    Single[] s => string.Join(',', s),
-                    bool[] b => string.Join(',', b),
-                    TrackSurfaceMaterial[] s => string.Join(',', s.Select(e => e.ToString())),
-                    TrackSurface[] s => string.Join(',', s.Select(e => e.ToString())),
-                    _ => val
-                };
-
-                TestContext.WriteLine($"{prop.Name}: {val?.ToString()}");
-            }
-        }
-
-        [Test]
-        public void SessionDataSerialize()
-        {
-            string sessionYAML = sdk.GetSessionInfo();
-
-            var model = IRacingSessionModel.Serialize(sessionYAML);
-            Assert.NotNull(model);
         }
 
         [Test]
         public void GetPositions()
         {
-            var positions = sdk.GetPositions();
-            
+            var positions = sdk.GetPositions(out double sessionTime);
             Assert.IsNotEmpty(positions);
+            Assert.NotZero(sessionTime);
+        }
+
+        [Test]
+        public void GetPositionsMulti()
+        {
+            Stopwatch stopWatch = new();
+            stopWatch.Start();
+            for (var i = 0; i < 1000; i++)
+            {
+                GetPositions();
+            }
+            stopWatch.Stop();
+            Console.WriteLine($"{nameof(GetPositionsMulti)}: {stopWatch.ElapsedTicks / 1000}");
         }
     }
 }

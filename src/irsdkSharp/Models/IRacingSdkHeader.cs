@@ -40,8 +40,7 @@ namespace irsdkSharp.Models
         {
             get
             {
-                var latestSpan = new Span<byte>(latestBufferArray);
-                int maxTickCount = _mapView.ReadInt32(48 );
+                int maxTickCount = _mapView.ReadInt32(48);
                 int curOffset = _mapView.ReadInt32(48 + 4);
                 for (var i = 1; i < BufferCount; i++)
                 {

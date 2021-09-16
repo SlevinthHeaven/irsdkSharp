@@ -27,3 +27,6 @@ The build and release is done through Azure Pipelines and pushes to NuGet, the r
 
 ## Usage and Docs
 This is a TODO, we are working hard on this and other projects. Docs will come soon.
+
+## Contributions
+[Christopher Scott](https://github.com/christothes) - Added a major contribution to irskSharp however this was at this time not pulled into the library due to a difference in where processes took place. Work was done on this by LuckyNoS7evin with some of the contribution code being transferred into the library.

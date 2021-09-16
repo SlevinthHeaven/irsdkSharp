@@ -20,13 +20,13 @@ namespace irsdkSharp.Extensions
             for (int i = 0; i < maxLength; i++)
             {
                 c = (char)accessor.ReadByte(offset + i);
-                if(c == '\0')
+                if (c == '\0')
                 {
                     break;
                 }
                 sb.Append(c);
             }
-            return sb.ToString();    
+            return sb.ToString();
         }
     }
 }
