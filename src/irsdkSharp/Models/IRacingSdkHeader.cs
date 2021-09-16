@@ -8,6 +8,9 @@ namespace irsdkSharp.Models
     public class IRacingSdkHeader
     {
         private readonly MemoryMappedViewAccessor _mapView;
+        private byte[] latestBufferArray = new byte[16];
+        private byte[] bufferArray = new byte[16];
+
         public IRacingSdkHeader(MemoryMappedViewAccessor mapView)
         {
             _mapView = mapView;

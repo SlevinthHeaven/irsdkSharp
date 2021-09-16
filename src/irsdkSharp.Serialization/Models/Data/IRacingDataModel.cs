@@ -6,7 +6,6 @@ namespace irsdkSharp.Serialization.Models.Data
 {
     public class IRacingDataModel
     {
-
         public static List<CarModel> SerializeCars(byte[] toSerialize, Dictionary<string, VarHeader> headers)
         {
             var cars = new CarModel[64];

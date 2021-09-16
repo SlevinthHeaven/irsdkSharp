@@ -26,8 +26,6 @@ namespace irsdkSharp.Tests
             var memMap = MemoryMappedFile.CreateFromFile(Path.Combine("testdata", "session.ibt"));
             sdk = new IRacingSDK(memMap.CreateViewAccessor());
             Assert.IsTrue(sdk.Startup(false));
-
-
         }
 
         [OneTimeTearDown]
@@ -95,6 +93,7 @@ namespace irsdkSharp.Tests
         public void GetData()
         {
             TestContext.WriteLine(data.Data.ToString());
+
         }
 
         [Test]
@@ -117,6 +116,5 @@ namespace irsdkSharp.Tests
             stopWatch.Stop();
             Console.WriteLine($"{nameof(GetPositionsMulti)}: {stopWatch.ElapsedTicks / 1000}");
         }
-
     }
 }
