@@ -1,15 +1,16 @@
 ﻿using irsdkSharp.Models;
 using irsdkSharp.Serialization.Models.Data;
 using irsdkSharp.Serialization.Models.Session;
-using System;
 using System.Collections.Generic;
-using System.Text;
-using irsdkSharp.Enums;
 
 namespace irsdkSharp.Serialization
 {
     public static class IRacingSDKExtensions
     {
+        public static Data GetData(this IRacingSDK racingSDK) 
+        {
+            return new Data(racingSDK);
+        }
         public static IRacingSessionModel GetSerializedSessionInfo(this IRacingSDK racingSDK)
         {
             var sessionInfo = racingSDK.GetSessionInfo();

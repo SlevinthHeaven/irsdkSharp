@@ -6,6 +6,10 @@ using irsdkSharp.Enums;
 using irsdkSharp.Models;
 using System.Threading;
 using System.Text;
+using irsdkSharp.Extensions;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("irsdkSharp.Serialization")]
 
 namespace irsdkSharp
 {
@@ -34,8 +38,6 @@ namespace irsdkSharp
         public IRacingSdkHeader Header = null;
 
         public Dictionary<string, VarHeader> Headers;
-
-        public Data Data { get; private set; }
 
         public IRacingSDK()
         {
@@ -101,7 +103,6 @@ namespace irsdkSharp
                 string unitStr = _encoding.GetString(unit).TrimEnd(trimChars);
                 var header = new VarHeader(type, offset, count, nameStr, descStr, unitStr);
                 Headers[header.Name] = header;
-                Data = new Data(this);
             }
         }
 
