@@ -1,5 +1,6 @@
 ﻿using irsdkSharp.Models;
 using irsdkSharp.Serialization.Models.Data;
+using irsdkSharp.Serialization.Models.Fastest;
 using irsdkSharp.Serialization.Models.Session;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +13,7 @@ namespace irsdkSharp.Serialization
         {
             return new Data(racingSDK);
         }
+
         public static IRacingSessionModel GetSerializedSessionInfo(this IRacingSDK racingSDK)
         {
             var sessionInfo = racingSDK.GetSessionInfo();
@@ -36,7 +38,7 @@ namespace irsdkSharp.Serialization
             return null;
         }
 
-        public static List<CarModel> GetPositionsNew(this IRacingSDK racingSDK)
+        public static List<PositionModel> GetPositionsNew(this IRacingSDK racingSDK)
         {
             var data = new Data(racingSDK);
             var tick = data.SessionTick;
@@ -59,10 +61,10 @@ namespace irsdkSharp.Serialization
             var CarIdxTrackSurface = data.CarIdxTrackSurface;
             var CarIdxTrackSurfaceMaterial = data.CarIdxTrackSurfaceMaterial;
 
-            var results = new List<CarModel>();
+            var results = new List<PositionModel>();
             for (var i = 0; i< 64; i++)
             {
-                results.Add(new CarModel
+                results.Add(new PositionModel
                 {
                     CarIdx = i,
                     CarIdxBestLapNum = CarIdxBestLapNum[i],
