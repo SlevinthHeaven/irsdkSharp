@@ -12,18 +12,36 @@ namespace irsdkSharp.Serialization.Models.Data
         public DataModel(byte[] data, Dictionary<string, VarHeader> headers)
         {
             _data = data;
-            _headers = headers;
+            _headers = headers;           
+        }
 
-            Cars = new CarModel[64];
-            for (var i = 0; i < Cars.Length; i++)
+        private CarModel[] _cars;
+
+        public CarModel[] Cars
+        {
+            get
             {
-                Cars[i] = new CarModel(i, data, headers);
+                if (_cars.Length != 64) 
+                {
+                    _cars = new CarModel[64];
+                    for (var i = 0; i < _cars.Length; i++)
+                    {
+                        Cars[i] = new CarModel(i, _data, _headers);
+                    }
+                }
+                return _cars;
             }
         }
 
-        public CarModel[] Cars { get; set; }
-
-        public float AirDensity => ValueSerializer.GetFloatValue(nameof(AirDensity), _data, _headers);
+        private float? _airDensity;
+        public float AirDensity
+        {
+            get
+            {
+                if (!_airDensity.HasValue) _airDensity = ValueSerializer.GetFloatValue(nameof(AirDensity), _data, _headers);
+                return _airDensity.Value;
+            }
+        }
 
         public float AirPressure => ValueSerializer.GetFloatValue(nameof(AirPressure), _data, _headers);
 

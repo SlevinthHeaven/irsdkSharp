@@ -31,9 +31,10 @@ namespace irsdkSharp.Serialization
             if (racingSDK.IsInitialized && racingSDK.Header != null)
             {
                 var fileView = IRacingSDK.GetFileMapView(racingSDK);
+                var headers = IRacingSDK.GetVarHeaders(racingSDK);
                 var data = new byte[racingSDK.Header.BufferLength];
                 fileView.ReadArray(racingSDK.Header.Offset, data, 0, racingSDK.Header.BufferLength);
-                return IRacingDataModel.Serialize(data, racingSDK.VarHeaders);
+                return IRacingDataModel.Serialize(data, headers);
             }
             return null;
         }
@@ -96,10 +97,11 @@ namespace irsdkSharp.Serialization
             if (racingSDK.IsInitialized && racingSDK.Header != null)
             {
                 var fileView = IRacingSDK.GetFileMapView(racingSDK);
+                var headers = IRacingSDK.GetVarHeaders(racingSDK);
                 var data = new byte[racingSDK.Header.BufferLength];
                 fileView.ReadArray(racingSDK.Header.Offset, data, 0, racingSDK.Header.BufferLength);
                 sessionTime = (double)racingSDK.GetData("SessionTime");
-                return IRacingDataModel.SerializeCars(data, racingSDK.VarHeaders);
+                return IRacingDataModel.SerializeCars(data, headers);
             }
             sessionTime = 0;
             return null;

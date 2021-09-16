@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.Win32.SafeHandles;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using irsdkSharp.Extensions;
 
 namespace irsdkSharp
 {
@@ -29,15 +30,19 @@ namespace irsdkSharp
 
         MemoryMappedFile iRacingFile;
         protected MemoryMappedViewAccessor FileMapView;
+        protected Dictionary<string, VarHeader> VarHeaders;
 
         public static MemoryMappedViewAccessor GetFileMapView(IRacingSDK racingSDK)
         {
             return racingSDK.FileMapView;
         }
 
-        public IRacingSdkHeader Header = null;
+        public static Dictionary<string, VarHeader> GetVarHeaders(IRacingSDK racingSDK)
+        {
+            return racingSDK.VarHeaders;
+        }
 
-        public Dictionary<string, VarHeader> VarHeaders;
+        public IRacingSdkHeader Header = null;
 
         private readonly AutoResetEvent _gameLoopEvent;
         private IntPtr _hEvent;
@@ -160,15 +165,15 @@ namespace irsdkSharp
                 case VarType.irChar:
                     {
                         byte[] data = new byte[count];
-                        FileMapView.ReadArray<byte>(Header.Offset + varOffset, data, 0, count);
-                        return _encoding.GetString(data).TrimEnd(new char[] { '\0' });
+                        FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
+                        return _encoding.GetString(data).TrimEnd(trimChars);
                     }
                 case VarType.irBool:
                     {
                         if (count > 1)
                         {
                             bool[] data = new bool[count];
-                            FileMapView.ReadArray<bool>(Header.Offset + varOffset, data, 0, count);
+                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
@@ -182,7 +187,7 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             int[] data = new int[count];
-                            FileMapView.ReadArray<int>(Header.Offset + varOffset, data, 0, count);
+                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
@@ -195,7 +200,7 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             float[] data = new float[count];
-                            FileMapView.ReadArray<float>(Header.Offset + varOffset, data, 0, count);
+                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
@@ -208,7 +213,7 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             double[] data = new double[count];
-                            FileMapView.ReadArray<double>(Header.Offset + varOffset, data, 0, count);
+                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
@@ -220,16 +225,12 @@ namespace irsdkSharp
             }
         }
 
-        public string GetSessionInfo()
-        {
-            if (IsInitialized && Header != null)
+        public string GetSessionInfo() =>
+            (IsInitialized && Header != null) switch
             {
-                byte[] data = new byte[Header.SessionInfoLength];
-                FileMapView.ReadArray(Header.SessionInfoOffset, data, 0, Header.SessionInfoLength);
-                return _encoding.GetString(data).TrimEnd(new char[] { '\0' });
-            }
-            return null;
-        }
+                true => FileMapView.ReadString(Header.SessionInfoOffset, Header.SessionInfoLength),
+                _ => null
+            };
 
         public bool IsConnected()
         {
