@@ -30,7 +30,7 @@ This is a TODO, we are working hard on this and other projects. Docs will come s
 
 
 ## Benchmarks
-We are looking into two different serializations and as of this moment there is a variability to the results which mean
+We are looking into two different serializations and as of this moment there is a variability to the results which means we may give both choices in the end. However, we are not quite sure right now. As you can see from the benchmarks below we have a costly first hit vs a costly reading system.
 
 |                    Method |         Mean |      Error |     StdDev |  Gen 0 | Allocated |
 |-------------------------- |-------------:|-----------:|-----------:|-------:|----------:|
@@ -42,4 +42,8 @@ We are looking into two different serializations and as of this moment there is 
 |      AccessDataAirDensity |  3,599.90 ns |  27.307 ns |  24.207 ns |      - |         - |
 
 ## Contributions
-[Christopher Scott](https://github.com/christothes) - Added a major contribution to irskSharp however this was at this time not pulled into the library due to a difference in where processes took place. Work was done on this by LuckyNoS7evin with some of the contribution code being transferred into the library.
+If you would like to contribute to the SDK please do the following:
+
+1. Fork from the dev branch and commit all PRs into this branch
+1. Try and keep the base irsdkSharp project clean, we are trying to keep serialization and calculations out of the base library. The reason around this is to keep the main library as close as possible to bare bones and allow the developer the choice on if they would like any of the serialization or calculation extras.
+
