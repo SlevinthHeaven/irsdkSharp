@@ -20,7 +20,7 @@ namespace irsdkSharp.Serialization.Models.Data
         {
             get
             {
-                if (_cars.Length != 64) 
+                if (_cars == null) 
                 {
                     _cars = new CarModel[64];
                     for (var i = 0; i < _cars.Length; i++)

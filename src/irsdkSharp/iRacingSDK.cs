@@ -16,7 +16,7 @@ namespace irsdkSharp
     public class IRacingSDK
     {
         private readonly Encoding _encoding;
-        private char[] trimChars = { '\0' };
+        private readonly char[] trimChars = { '\0' };
 
         //VarHeader offsets
         public const int VarOffsetOffset = 4;
@@ -47,6 +47,9 @@ namespace irsdkSharp
         private readonly AutoResetEvent _gameLoopEvent;
         private IntPtr _hEvent;
         private readonly ILogger<IRacingSDK> _logger;
+        private Task _gameLoop;
+        private CancellationTokenSource _gameLoopCancellation;
+        private WaitHandle[] _waitHandle;
 
         public IRacingSDK()
         {
@@ -55,6 +58,8 @@ namespace irsdkSharp
             {
                 SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
             };
+            _waitHandle = new WaitHandle[1];
+            _waitHandle[0] = _gameLoopEvent;
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
@@ -69,6 +74,8 @@ namespace irsdkSharp
             {
                 SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
             };
+            _waitHandle = new WaitHandle[1];
+            _waitHandle[0] = _gameLoopEvent;
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
@@ -92,37 +99,28 @@ namespace irsdkSharp
                 {
                     iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
                     FileMapView = iRacingFile.CreateViewAccessor();
-
-                    var wh = new WaitHandle[1];
-                    wh[0] = _gameLoopEvent;
-                    WaitHandle.WaitAny(wh);
+                    _gameLoopCancellation =  new CancellationTokenSource();
+                    _gameLoop = Task.Run(GameLoop, _gameLoopCancellation.Token);
                 }
                 Header = new IRacingSdkHeader(FileMapView);
-                GetVarHeaders();
-
                 IsInitialized = true;
             }
             catch (Exception)
             {
                 return false;
             }
-            if (openWaitHandle)
-            {
-                Task.Run(GameLoop);
-            }
             return true;
         }
 
-        private void GameLoop()
+        private void GameLoop(CancellationToken token)
         {
             while (true)
             {
+                if (token.IsCancellationRequested) break;
                 try
                 {
-                    var wh = new WaitHandle[1];
-                    wh[0] = _gameLoopEvent;
-
-                    WaitHandle.WaitAny(wh);
+                    WaitHandle.WaitAny(_waitHandle);
+                    if (VarHeaders == null) GetVarHeaders();
                 }
                 catch
                 {
@@ -243,8 +241,11 @@ namespace irsdkSharp
 
         public void Shutdown()
         {
+            _gameLoopCancellation.Cancel();
+            _gameLoop = null;
             IsInitialized = false;
             Header = null;
+            VarHeaders = null;
         }
 
         IntPtr GetBroadcastMessageID()
