@@ -45,11 +45,12 @@ namespace irsdkSharp
         public IRacingSdkHeader Header = null;
 
         private readonly AutoResetEvent _gameLoopEvent;
-        private IntPtr _hEvent;
+        private readonly WaitHandle[] _waitHandle;
+        private readonly IntPtr _hEvent;
         private readonly ILogger<IRacingSDK> _logger;
         private Task _gameLoop;
         private CancellationTokenSource _gameLoopCancellation;
-        private WaitHandle[] _waitHandle;
+        private CancellationToken _gameLoopCancellationToken;
 
         public IRacingSDK()
         {
@@ -100,7 +101,8 @@ namespace irsdkSharp
                     iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
                     FileMapView = iRacingFile.CreateViewAccessor();
                     _gameLoopCancellation =  new CancellationTokenSource();
-                    _gameLoop = Task.Run(GameLoop, _gameLoopCancellation.Token);
+                    _gameLoopCancellationToken = _gameLoopCancellation.Token;
+                    _gameLoop = Task.Run(GameLoop, _gameLoopCancellationToken);
                 }
                 Header = new IRacingSdkHeader(FileMapView);
                 IsInitialized = true;
@@ -112,11 +114,11 @@ namespace irsdkSharp
             return true;
         }
 
-        private void GameLoop(CancellationToken token)
+        private void GameLoop()
         {
             while (true)
             {
-                if (token.IsCancellationRequested) break;
+                if (_gameLoopCancellationToken.IsCancellationRequested) break;
                 try
                 {
                     WaitHandle.WaitAny(_waitHandle);
@@ -242,7 +244,7 @@ namespace irsdkSharp
         public void Shutdown()
         {
             _gameLoopCancellation.Cancel();
-            _gameLoop = null;
+            _gameLoop.Dispose();
             IsInitialized = false;
             Header = null;
             VarHeaders = null;
