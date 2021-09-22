@@ -105,6 +105,7 @@ namespace irsdkSharp
                     _gameLoop = Task.Run(GameLoop, _gameLoopCancellationToken);
                 }
                 Header = new IRacingSdkHeader(FileMapView);
+                GetVarHeaders();
                 IsInitialized = true;
             }
             catch (Exception)
