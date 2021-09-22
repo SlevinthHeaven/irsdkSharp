@@ -10,6 +10,7 @@ using Microsoft.Win32.SafeHandles;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using irsdkSharp.Extensions;
+using System.IO;
 
 namespace irsdkSharp
 {
@@ -17,6 +18,7 @@ namespace irsdkSharp
     {
         private readonly Encoding _encoding;
         private readonly char[] trimChars = { '\0' };
+        private bool IsStarted = false;
 
         //VarHeader offsets
         public const int VarOffsetOffset = 4;
@@ -24,9 +26,6 @@ namespace irsdkSharp
         public const int VarNameOffset = 16;
         public const int VarDescOffset = 48;
         public const int VarUnitOffset = 112;
-
-
-        public bool IsInitialized = false;
 
         MemoryMappedFile iRacingFile;
         protected MemoryMappedViewAccessor FileMapView;
@@ -44,89 +43,108 @@ namespace irsdkSharp
 
         public IRacingSdkHeader Header = null;
 
-        private readonly AutoResetEvent _gameLoopEvent;
-        private readonly WaitHandle[] _waitHandle;
-        private readonly IntPtr _hEvent;
+        private AutoResetEvent _gameLoopEvent;
+        private IntPtr _hEvent;
         private readonly ILogger<IRacingSDK> _logger;
-        private Task _gameLoop;
-        private CancellationTokenSource _gameLoopCancellation;
-        private CancellationToken _gameLoopCancellationToken;
+        private readonly CancellationTokenSource _waitValidDataLoopCancellation;
+        private readonly CancellationToken _waitValidDataLoopCancellationToken;
+
+
+        private readonly CancellationTokenSource _connectionLoopCancellation;
+        private readonly CancellationToken _connectionLoopCancellationToken;
 
         public IRacingSDK()
         {
-            _hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
-            _gameLoopEvent = new AutoResetEvent(false)
-            {
-                SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
-            };
-            _waitHandle = new WaitHandle[1];
-            _waitHandle[0] = _gameLoopEvent;
+           
+
+            _waitValidDataLoopCancellation = new CancellationTokenSource();
+            _waitValidDataLoopCancellationToken = _waitValidDataLoopCancellation.Token;
+            Task.Run(WaitValidDataLoop, _waitValidDataLoopCancellationToken);
+
+            _connectionLoopCancellation = new CancellationTokenSource();
+            _connectionLoopCancellationToken = _connectionLoopCancellation.Token;
+            Task.Run(ConnectionLoop, _waitValidDataLoopCancellationToken);
+
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
         }
 
-        public IRacingSDK(ILogger<IRacingSDK> logger)
+        public IRacingSDK(ILogger<IRacingSDK> logger) : this()
         {
             _logger = logger;
-
-            _hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
-            _gameLoopEvent = new AutoResetEvent(false)
-            {
-                SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
-            };
-            _waitHandle = new WaitHandle[1];
-            _waitHandle[0] = _gameLoopEvent;
-            // Register CP1252 encoding
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            _encoding = Encoding.GetEncoding(1252);
         }
-        
+
         public IRacingSDK(MemoryMappedViewAccessor accessor)
         {
             FileMapView = accessor;
+
+            Header = new IRacingSdkHeader(FileMapView);
+            GetVarHeaders();
+            IsStarted = true;
+
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
         }
 
-        public bool Startup(bool openWaitHandle = true)
-        {
-            if (IsInitialized) return true;
-
-            try
-            {
-                if (openWaitHandle)
-                {
-                    iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
-                    FileMapView = iRacingFile.CreateViewAccessor();
-                    _gameLoopCancellation =  new CancellationTokenSource();
-                    _gameLoopCancellationToken = _gameLoopCancellation.Token;
-                    _gameLoop = Task.Run(GameLoop, _gameLoopCancellationToken);
-                }
-                Header = new IRacingSdkHeader(FileMapView);
-                GetVarHeaders();
-                IsInitialized = true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        private void GameLoop()
+        private void ConnectionLoop()
         {
             while (true)
             {
-                if (_gameLoopCancellationToken.IsCancellationRequested) break;
+                if (_connectionLoopCancellationToken.IsCancellationRequested) break;
                 try
                 {
-                    WaitHandle.WaitAny(_waitHandle);
-                    if (VarHeaders == null) GetVarHeaders();
+                    if (!IsConnected() && !IsStarted && Header == null)
+                    {
+                        iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
+                        FileMapView = iRacingFile.CreateViewAccessor();
+
+                        _hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
+                        _gameLoopEvent = new AutoResetEvent(false)
+                        {
+                            SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
+                        };
+
+                        IsStarted = true;
+                        _logger?.LogDebug("Connected Starting");
+                    }
                 }
-                catch
+                catch (FileNotFoundException ex)
                 {
+                    IsStarted = false;
+                    Header = null;
+                    VarHeaders = null;
+                    _logger?.LogDebug($"Not Connected {ex.Message}");
+                }
+                finally
+                {
+                    Thread.Sleep(1000);
+                }
+
+            }
+        }
+
+        private void WaitValidDataLoop()
+        {
+            while (true)
+            {
+                if (_waitValidDataLoopCancellationToken.IsCancellationRequested) break;
+                if (IsStarted)
+                {
+                    try
+                    {
+                        _gameLoopEvent.WaitOne();
+                        if (Header == null) Header = new IRacingSdkHeader(FileMapView);
+                        if (IsConnected() && VarHeaders == null) GetVarHeaders();
+                    }
+                    catch
+                    {
+                    }
+                } 
+                else
+                {
+                    Thread.Sleep(1000);
                 }
             }
         }
@@ -155,7 +173,7 @@ namespace irsdkSharp
 
         public object GetData(string name)
         {
-            if (!IsInitialized || Header == null) return null;
+            if (!IsStarted || Header == null) return null;
             if (!VarHeaders.TryGetValue(name, out var requestedHeader)) return null;
 
             int varOffset = requestedHeader.Offset;
@@ -227,7 +245,7 @@ namespace irsdkSharp
         }
 
         public string GetSessionInfo() =>
-            (IsInitialized && Header != null) switch
+            (IsStarted && Header != null) switch
             {
                 true => FileMapView.ReadString(Header.SessionInfoOffset, Header.SessionInfoLength),
                 _ => null
@@ -235,20 +253,11 @@ namespace irsdkSharp
 
         public bool IsConnected()
         {
-            if (IsInitialized && Header != null)
+            if (IsStarted && Header != null)
             {
                 return (Header.Status & 1) > 0;
             }
             return false;
-        }
-
-        public void Shutdown()
-        {
-            _gameLoopCancellation.Cancel();
-            _gameLoop.Dispose();
-            IsInitialized = false;
-            Header = null;
-            VarHeaders = null;
         }
 
         IntPtr GetBroadcastMessageID()

@@ -19,7 +19,7 @@ namespace irsdkSharp.Serialization.Models.Fastest
         private readonly IRacingSDK _sdk;
         private readonly MemoryMappedViewAccessor _fileView;
         private readonly Dictionary<string, VarHeader> _headers;
-        private volatile int _currentSessionUpdate;
+        //private volatile int _currentSessionUpdate;
 
         public Data(IRacingSDK sdk)
         {

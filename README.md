@@ -26,7 +26,98 @@ The build and release is done through Azure Pipelines and pushes to NuGet, the r
 | Nuget irsdkSharp.Calculation   | ![Nuget irsdkSharp.Calculation (dev)](https://img.shields.io/nuget/v/irsdkSharp.Calculation)        |
 
 ## Usage and Docs
-This is a TODO, we are working hard on this and other projects. Docs will come soon.
+
+### The basics
+The base SDK is a convertion of the C++ SDK but converted to .Net and some modifications made to make it easier for you to use.
+
+The SDK reads a memory mapped file `Local\\IRSDKMemMapFileName` which contains the following constituants:
+ 1. A Header
+ 1. A list of variables in the telemetry data
+ 1. Session Information in the form of a yaml file
+ 1. A list of telemetry data.
+
+When this file is created or updated a second file is "pinged" to signify a data event. This file is `Local\\IRSDKDataValidEvent`.
+
+### How does the SDK work?
+When you initialise the SDK you have a couple of options
+1. Empty constructor - no logging
+1. Logger constructor - with logging
+1. MemoryMappedViewAccessor constructor - This is used to read a static file and does not use the memory mapped file or valid data event file.
+
+We will ignore the `MemoryMappedViewAccessor constructor` for now as this is not the important one people are after.
+
+When you create an instance of `iRacingSDK` a looping task is created to wait for the valid data event and wait for the creation of the memory mapped file. Once this occurs you should receive a `true` for `IsConnected()`. As the SDK is running it's own loops and does not provide events we have to run our own.
+
+### Basic use
+
+```csharp
+using irsdkSharp.Serialization;
+using irsdkSharp.Serialization.Models.Session;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace irsdkSharp.ConsoleTest
+{
+    class Program
+    {
+        private static IRacingSDK sdk;
+        private static IRacingSessionModel _session;
+        private static int _DriverId;
+
+        /// <summary>
+        /// Gets the Id (CarIdx) of yourself (the driver running this application).
+        /// </summary>
+        public static int DriverId { get { return _DriverId; } }
+
+
+        static void Main(string[] args)
+        {
+            sdk = new IRacingSDK();
+            Task.Run(() => Loop());
+            Console.ReadLine();
+        }
+
+        private static void Loop()
+        {
+            int lastUpdate = -1;
+
+            while (true)
+            {
+                var currentlyConnected = sdk.IsConnected();
+                
+                // Check if we can find the sim
+                if (currentlyConnected)
+                {
+                    // Parse out your own driver Id
+                    if (DriverId == -1)
+                    {
+                        _DriverId = (int)sdk.GetData("PlayerCarIdx");
+                    }
+
+                    var data = sdk.GetSerializedData();
+
+                    // Is the session info updated?
+                    int newUpdate = sdk.Header.SessionInfoUpdate;
+                    if (newUpdate != lastUpdate)
+                    {
+                        lastUpdate = newUpdate;
+                        _session = sdk.GetSerializedSessionInfo();
+                    }
+
+                    Thread.Sleep(15);
+                }
+                else
+                {
+                    Thread.Sleep(1000);
+                }
+            }
+        }
+    }
+}
+```
+
 
 
 ## Benchmarks
