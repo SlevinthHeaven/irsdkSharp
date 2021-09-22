@@ -12,7 +12,7 @@ using irsdkSharp.Serialization.Models.Session;
 namespace irsdkSharp.Benchmark
 {
     [MemoryDiagnoser]
-    public class Runner : IDisposable
+    public class Runner
     {
         private readonly IRacingSDK sdk;
         private readonly IRacingDataModel _dataModel;
@@ -21,7 +21,6 @@ namespace irsdkSharp.Benchmark
         {
             var memMap = MemoryMappedFile.CreateFromFile(Path.Combine("data", "session.ibt"));
             sdk = new IRacingSDK(memMap.CreateViewAccessor());
-            sdk.Startup(false);
 
             _dataModel = sdk.GetSerializedData();
             _data = sdk.GetData();
@@ -100,10 +99,6 @@ namespace irsdkSharp.Benchmark
         //[Benchmark]
         public List<PositionModel> PositionsNew() => sdk.GetPositionsNew();
 
-        public void Dispose()
-        {
-            sdk.Shutdown();
-        }
     }
 
     class Program

@@ -25,14 +25,8 @@ namespace irsdkSharp.Tests
         {
             var memMap = MemoryMappedFile.CreateFromFile(Path.Combine("testdata", "session.ibt"));
             sdk = new IRacingSDK(memMap.CreateViewAccessor());
-            Assert.IsTrue(sdk.Startup(false));
         }
 
-        [OneTimeTearDown]
-        public void TearDown()
-        {
-            sdk.Shutdown();
-        }
 
         [Test, Order(1)]
         public void GetSerializedSession()
