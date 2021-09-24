@@ -55,8 +55,6 @@ namespace irsdkSharp
 
         public IRacingSDK()
         {
-           
-
             _waitValidDataLoopCancellation = new CancellationTokenSource();
             _waitValidDataLoopCancellationToken = _waitValidDataLoopCancellation.Token;
             Task.Run(WaitValidDataLoop, _waitValidDataLoopCancellationToken);
@@ -137,6 +135,7 @@ namespace irsdkSharp
                         _gameLoopEvent.WaitOne();
                         if (Header == null) Header = new IRacingSdkHeader(FileMapView);
                         if (IsConnected() && VarHeaders == null) GetVarHeaders();
+                        if (!IsConnected() && VarHeaders != null) VarHeaders = null;
                     }
                     catch
                     {
