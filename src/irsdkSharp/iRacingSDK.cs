@@ -55,6 +55,10 @@ namespace irsdkSharp
 
         public IRacingSDK()
         {
+            // Register CP1252 encoding
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            _encoding = Encoding.GetEncoding(1252);
+
             _waitValidDataLoopCancellation = new CancellationTokenSource();
             _waitValidDataLoopCancellationToken = _waitValidDataLoopCancellation.Token;
             Task.Run(WaitValidDataLoop, _waitValidDataLoopCancellationToken);
@@ -62,10 +66,6 @@ namespace irsdkSharp
             _connectionLoopCancellation = new CancellationTokenSource();
             _connectionLoopCancellationToken = _connectionLoopCancellation.Token;
             Task.Run(ConnectionLoop, _waitValidDataLoopCancellationToken);
-
-            // Register CP1252 encoding
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            _encoding = Encoding.GetEncoding(1252);
         }
 
         public IRacingSDK(ILogger<IRacingSDK> logger) : this()
@@ -75,15 +75,15 @@ namespace irsdkSharp
 
         public IRacingSDK(MemoryMappedViewAccessor accessor)
         {
+            // Register CP1252 encoding
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            _encoding = Encoding.GetEncoding(1252);
+
             FileMapView = accessor;
 
             Header = new IRacingSdkHeader(FileMapView);
             GetVarHeaders();
             IsStarted = true;
-
-            // Register CP1252 encoding
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            _encoding = Encoding.GetEncoding(1252);
         }
 
         private void ConnectionLoop()
