@@ -155,5 +155,46 @@ namespace irsdkSharp.Calculation
 
             return CalculateIRatingGains(dataModel, sessionModel);
         }
+
+
+        public static Dictionary<int, int> CalculateSOFs(IRacingDataModel dataModel, IRacingSessionModel sessionModel)
+        {
+            if (sessionModel == null) return null;
+
+            if (dataModel == null) return null;
+          
+            var drivers = sessionModel.DriverInfo.Drivers;
+
+            var result = new Dictionary<int, int>();
+            var classes = drivers
+                .Where(x => x.IsSpectator == 0)
+                .Where(x => x.CarIsPaceCar == "0")
+                .Where(x => x.CarIsAI == "0")
+                .Select(x => x.CarClassID)
+                .GroupBy(x => x)
+                .Select(x => x.Key)
+                .ToList();
+
+            classes.ForEach(carClass =>
+            {
+                var driversInClass = drivers
+                    .Where(x => x.IsSpectator == 0)
+                    .Where(x => x.CarIsPaceCar == "0")
+                    .Where(x => x.CarIsAI == "0")
+                    .Where(x => x.CarClassID == carClass).ToList();
+
+                var fieldSize = driversInClass.Count();
+
+                var exponentials = new List<double>();
+
+                //Calculate exponentials
+                driversInClass.ForEach(x => exponentials.Add(Math.Exp((x.IRating * -1) / _initialConstant)));
+
+                result.Add(carClass, Convert.ToInt32(_initialConstant * Math.Log(driversInClass.Count / exponentials.Sum())));
+
+            });
+
+            return result;
+        }
     }
 }

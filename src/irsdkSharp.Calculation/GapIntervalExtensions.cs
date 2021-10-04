@@ -56,6 +56,8 @@ namespace irsdkSharp.Calculation
 
             //find car in first
             var leader = orderedDrivers.FirstOrDefault();
+            if (leader == null) return results;
+
             var leaderSession = currentSession.ResultsPositions.Where(ses => ses.CarIdx == leader.CarIdx).FirstOrDefault();
             var leaderDriver = sessionModel.DriverInfo.Drivers.Where(ses => ses.CarIdx == leader.CarIdx).FirstOrDefault();
 

@@ -3,20 +3,24 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "irsdkSharp", "irsdkSharp\irsdkSharp.csproj", "{D3D40673-6014-4BA2-A2C2-9083ACB0CF18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "irsdkSharp", "src\irsdkSharp\irsdkSharp.csproj", "{D3D40673-6014-4BA2-A2C2-9083ACB0CF18}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extras", "Extras", "{94D9DC0E-4505-4F79-B6F0-6C16A6022B9C}"
 	ProjectSection(SolutionItems) = preProject
-		..\.gitignore = ..\.gitignore
-		..\LICENSE = ..\LICENSE
-		..\README.md = ..\README.md
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "irsdkSharp.ConsoleTest", "irsdkSharp.Console\irsdkSharp.ConsoleTest.csproj", "{F82EBE0D-9E1C-44FC-80AE-ABC3E964885F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "irsdkSharp.ConsoleTest", "src\irsdkSharp.Console\irsdkSharp.ConsoleTest.csproj", "{F82EBE0D-9E1C-44FC-80AE-ABC3E964885F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "irsdkSharp.Serialization", "irsdkSharp.Serialization\irsdkSharp.Serialization.csproj", "{C509B629-0BEE-44D9-ADA1-D209C312288D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "irsdkSharp.Serialization", "src\irsdkSharp.Serialization\irsdkSharp.Serialization.csproj", "{C509B629-0BEE-44D9-ADA1-D209C312288D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "irsdkSharp.Calculation", "irsdkSharp.Calculation\irsdkSharp.Calculation.csproj", "{F039D704-A6F6-4A6F-8907-1805CF33FE19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "irsdkSharp.Calculation", "src\irsdkSharp.Calculation\irsdkSharp.Calculation.csproj", "{F039D704-A6F6-4A6F-8907-1805CF33FE19}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "irsdkSharp.Tests", "tests\irsdkSharp.Tests.csproj", "{F270C400-BA64-49D7-B7CD-528511FED4E8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "irsdkSharp.Benchmark", "benchmark\irsdkSharp.Benchmark.csproj", "{7BE08414-549E-48E4-BA54-95A52F4AE288}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +44,14 @@ Global
 		{F039D704-A6F6-4A6F-8907-1805CF33FE19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F039D704-A6F6-4A6F-8907-1805CF33FE19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F039D704-A6F6-4A6F-8907-1805CF33FE19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F270C400-BA64-49D7-B7CD-528511FED4E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F270C400-BA64-49D7-B7CD-528511FED4E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F270C400-BA64-49D7-B7CD-528511FED4E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F270C400-BA64-49D7-B7CD-528511FED4E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BE08414-549E-48E4-BA54-95A52F4AE288}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BE08414-549E-48E4-BA54-95A52F4AE288}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BE08414-549E-48E4-BA54-95A52F4AE288}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BE08414-549E-48E4-BA54-95A52F4AE288}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
