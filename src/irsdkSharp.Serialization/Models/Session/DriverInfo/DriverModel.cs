@@ -7,6 +7,7 @@ namespace irsdkSharp.Serialization.Models.Session.DriverInfo
     public class DriverModel
     {
         public int CarIdx { get; set; }// %d
+        public int DivisionID { get; set; } // %d
         public string UserName { get; set; }// %s
         public string AbbrevName { get; set; }// %s
         public string Initials { get; set; }// %s
@@ -46,6 +47,7 @@ namespace irsdkSharp.Serialization.Models.Session.DriverInfo
         public int CarSponsor_1 { get; set; }// %d
         public int CarSponsor_2 { get; set; }// %d
         public string ClubName { get; set; }// %s
+        public int ClubID { get; set; } // %d
         public string DivisionName { get; set; }// %s
     }
 }
