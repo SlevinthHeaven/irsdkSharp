@@ -9,13 +9,16 @@ using System.Text;
 using Microsoft.Win32.SafeHandles;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using irsdkSharp.Extensions;
+using System.IO;
 
 namespace irsdkSharp
 {
     public class IRacingSDK
     {
         private readonly Encoding _encoding;
-        private char[] trimChars = { '\0' };
+        private readonly char[] trimChars = { '\0' };
+        private bool IsStarted = false;
 
         //VarHeader offsets
         public const int VarOffsetOffset = 4;
@@ -24,103 +27,123 @@ namespace irsdkSharp
         public const int VarDescOffset = 48;
         public const int VarUnitOffset = 112;
 
-
-        public bool IsInitialized = false;
-
         MemoryMappedFile iRacingFile;
         protected MemoryMappedViewAccessor FileMapView;
+        protected Dictionary<string, VarHeader> VarHeaders;
 
         public static MemoryMappedViewAccessor GetFileMapView(IRacingSDK racingSDK)
         {
             return racingSDK.FileMapView;
         }
 
+        public static Dictionary<string, VarHeader> GetVarHeaders(IRacingSDK racingSDK)
+        {
+            return racingSDK.VarHeaders;
+        }
+
         public IRacingSdkHeader Header = null;
 
-        public Dictionary<string, VarHeader> VarHeaders;
-
-        private readonly AutoResetEvent _gameLoopEvent;
+        private AutoResetEvent _gameLoopEvent;
         private IntPtr _hEvent;
         private readonly ILogger<IRacingSDK> _logger;
+        private readonly CancellationTokenSource _waitValidDataLoopCancellation;
+        private readonly CancellationToken _waitValidDataLoopCancellationToken;
+
+
+        private readonly CancellationTokenSource _connectionLoopCancellation;
+        private readonly CancellationToken _connectionLoopCancellationToken;
 
         public IRacingSDK()
         {
-            _hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
-            _gameLoopEvent = new AutoResetEvent(false)
-            {
-                SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
-            };
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
+
+            _waitValidDataLoopCancellation = new CancellationTokenSource();
+            _waitValidDataLoopCancellationToken = _waitValidDataLoopCancellation.Token;
+            Task.Run(WaitValidDataLoop, _waitValidDataLoopCancellationToken);
+
+            _connectionLoopCancellation = new CancellationTokenSource();
+            _connectionLoopCancellationToken = _connectionLoopCancellation.Token;
+            Task.Run(ConnectionLoop, _waitValidDataLoopCancellationToken);
         }
 
-        public IRacingSDK(ILogger<IRacingSDK> logger)
+        public IRacingSDK(ILogger<IRacingSDK> logger) : this()
         {
             _logger = logger;
-
-            _hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
-            _gameLoopEvent = new AutoResetEvent(false)
-            {
-                SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
-            };
-            // Register CP1252 encoding
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            _encoding = Encoding.GetEncoding(1252);
         }
-        
+
         public IRacingSDK(MemoryMappedViewAccessor accessor)
         {
-            FileMapView = accessor;
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
+
+            FileMapView = accessor;
+
+            Header = new IRacingSdkHeader(FileMapView);
+            GetVarHeaders();
+            IsStarted = true;
         }
 
-        public bool Startup(bool openWaitHandle = true)
-        {
-            if (IsInitialized) return true;
-
-            try
-            {
-                if (openWaitHandle)
-                {
-                    iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
-                    FileMapView = iRacingFile.CreateViewAccessor();
-
-                    var wh = new WaitHandle[1];
-                    wh[0] = _gameLoopEvent;
-                    WaitHandle.WaitAny(wh);
-                }
-                Header = new IRacingSdkHeader(FileMapView);
-                GetVarHeaders();
-
-                IsInitialized = true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-            if (openWaitHandle)
-            {
-                Task.Run(GameLoop);
-            }
-            return true;
-        }
-
-        private void GameLoop()
+        private void ConnectionLoop()
         {
             while (true)
             {
+                if (_connectionLoopCancellationToken.IsCancellationRequested) break;
                 try
                 {
-                    var wh = new WaitHandle[1];
-                    wh[0] = _gameLoopEvent;
+                    if (!IsConnected() && !IsStarted && Header == null)
+                    {
+                        iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
+                        FileMapView = iRacingFile.CreateViewAccessor();
 
-                    WaitHandle.WaitAny(wh);
+                        _hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
+                        _gameLoopEvent = new AutoResetEvent(false)
+                        {
+                            SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
+                        };
+
+                        IsStarted = true;
+                        _logger?.LogDebug("Connected Starting");
+                    }
                 }
-                catch
+                catch (FileNotFoundException ex)
                 {
+                    IsStarted = false;
+                    Header = null;
+                    VarHeaders = null;
+                    _logger?.LogDebug($"Not Connected {ex.Message}");
+                }
+                finally
+                {
+                    Thread.Sleep(1000);
+                }
+
+            }
+        }
+
+        private void WaitValidDataLoop()
+        {
+            while (true)
+            {
+                if (_waitValidDataLoopCancellationToken.IsCancellationRequested) break;
+                if (IsStarted)
+                {
+                    try
+                    {
+                        _gameLoopEvent.WaitOne();
+                        if (Header == null) Header = new IRacingSdkHeader(FileMapView);
+                        if (IsConnected() && VarHeaders == null) GetVarHeaders();
+                        if (!IsConnected() && VarHeaders != null) VarHeaders = null;
+                    }
+                    catch
+                    {
+                    }
+                } 
+                else
+                {
+                    Thread.Sleep(1000);
                 }
             }
         }
@@ -149,7 +172,7 @@ namespace irsdkSharp
 
         public object GetData(string name)
         {
-            if (!IsInitialized || Header == null) return null;
+            if (!IsStarted || Header == null) return null;
             if (!VarHeaders.TryGetValue(name, out var requestedHeader)) return null;
 
             int varOffset = requestedHeader.Offset;
@@ -160,15 +183,15 @@ namespace irsdkSharp
                 case VarType.irChar:
                     {
                         byte[] data = new byte[count];
-                        FileMapView.ReadArray<byte>(Header.Offset + varOffset, data, 0, count);
-                        return _encoding.GetString(data).TrimEnd(new char[] { '\0' });
+                        FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
+                        return _encoding.GetString(data).TrimEnd(trimChars);
                     }
                 case VarType.irBool:
                     {
                         if (count > 1)
                         {
                             bool[] data = new bool[count];
-                            FileMapView.ReadArray<bool>(Header.Offset + varOffset, data, 0, count);
+                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
@@ -182,7 +205,7 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             int[] data = new int[count];
-                            FileMapView.ReadArray<int>(Header.Offset + varOffset, data, 0, count);
+                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
@@ -195,7 +218,7 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             float[] data = new float[count];
-                            FileMapView.ReadArray<float>(Header.Offset + varOffset, data, 0, count);
+                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
@@ -208,7 +231,7 @@ namespace irsdkSharp
                         if (count > 1)
                         {
                             double[] data = new double[count];
-                            FileMapView.ReadArray<double>(Header.Offset + varOffset, data, 0, count);
+                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
                             return data;
                         }
                         else
@@ -220,30 +243,20 @@ namespace irsdkSharp
             }
         }
 
-        public string GetSessionInfo()
-        {
-            if (IsInitialized && Header != null)
+        public string GetSessionInfo() =>
+            (IsStarted && Header != null) switch
             {
-                byte[] data = new byte[Header.SessionInfoLength];
-                FileMapView.ReadArray(Header.SessionInfoOffset, data, 0, Header.SessionInfoLength);
-                return _encoding.GetString(data).TrimEnd(new char[] { '\0' });
-            }
-            return null;
-        }
+                true => FileMapView.ReadString(Header.SessionInfoOffset, Header.SessionInfoLength),
+                _ => null
+            };
 
         public bool IsConnected()
         {
-            if (IsInitialized && Header != null)
+            if (IsStarted && Header != null)
             {
                 return (Header.Status & 1) > 0;
             }
             return false;
-        }
-
-        public void Shutdown()
-        {
-            IsInitialized = false;
-            Header = null;
         }
 
         IntPtr GetBroadcastMessageID()
