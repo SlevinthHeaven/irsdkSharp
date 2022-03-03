@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <LangVersion>9.0</LangVersion>
-    <TargetFrameworks>netstandard2.1;net5.0</TargetFrameworks>
+	<TargetFrameworks>net5.0;net6.0</TargetFrameworks>
     <PackageId>irsdkSharp</PackageId>
     <VersionPrefix>0.4.0</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
@@ -41,9 +41,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Win32.SystemEvents" Version="5.0.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Win32.SystemEvents" Version="6.0.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
   </ItemGroup>
 
   <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
