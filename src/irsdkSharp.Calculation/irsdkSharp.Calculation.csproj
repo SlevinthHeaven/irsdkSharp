@@ -4,7 +4,7 @@
     <LangVersion>latest</LangVersion>
 	<TargetFrameworks>net5.0;net6.0</TargetFrameworks>
     <PackageId>irsdkSharp.Calculation</PackageId>
-    <VersionPrefix>0.5.0</VersionPrefix>
+	  <VersionPrefix>0.6.0</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
