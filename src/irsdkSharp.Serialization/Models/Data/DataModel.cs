@@ -12,18 +12,35 @@ namespace irsdkSharp.Serialization.Models.Data
         public DataModel(byte[] data, Dictionary<string, VarHeader> headers)
         {
             _data = data;
-            _headers = headers;
+            _headers = headers;           
+        }
 
-            Cars = new CarModel[64];
-            for (var i = 0; i < Cars.Length; i++)
+        private CarModel[] _cars;
+        public CarModel[] Cars
+        {
+            get
             {
-                Cars[i] = new CarModel(i, data, headers);
+                if (_cars == null) 
+                {
+                    _cars = new CarModel[64];
+                    for (var i = 0; i < _cars.Length; i++)
+                    {
+                        Cars[i] = new CarModel(i, _data, _headers);
+                    }
+                }
+                return _cars;
             }
         }
 
-        public CarModel[] Cars { get; set; }
-
-        public float AirDensity => ValueSerializer.GetFloatValue(nameof(AirDensity), _data, _headers);
+        private float? _airDensity;
+        public float AirDensity
+        {
+            get
+            {
+                if (!_airDensity.HasValue) _airDensity = ValueSerializer.GetFloatValue(nameof(AirDensity), _data, _headers);
+                return _airDensity.Value;
+            }
+        }
 
         public float AirPressure => ValueSerializer.GetFloatValue(nameof(AirPressure), _data, _headers);
 
@@ -411,6 +428,8 @@ namespace irsdkSharp.Serialization.Models.Data
 
         public float SteeringWheelAngleMax => ValueSerializer.GetFloatValue(nameof(SteeringWheelAngleMax), _data, _headers);
 
+        public float SteeringWheelMaxForceNm => ValueSerializer.GetFloatValue(nameof(SteeringWheelMaxForceNm), _data, _headers);
+
         public float SteeringWheelPctDamper => ValueSerializer.GetFloatValue(nameof(SteeringWheelPctDamper), _data, _headers);
 
         public float SteeringWheelPctTorque => ValueSerializer.GetFloatValue(nameof(SteeringWheelPctTorque), _data, _headers);
@@ -424,6 +443,8 @@ namespace irsdkSharp.Serialization.Models.Data
         public float SteeringWheelTorque => ValueSerializer.GetFloatValue(nameof(SteeringWheelTorque), _data, _headers);
 
         public float[] SteeringWheelTorque_ST => ValueSerializer.GetFloatArrayValue(nameof(SteeringWheelTorque_ST), _data, _headers);
+
+        public bool SteeringWheelUseLinear => ValueSerializer.GetBoolValue(nameof(SteeringWheelUseLinear), _data, _headers);
 
         public float Throttle => ValueSerializer.GetFloatValue(nameof(Throttle), _data, _headers);
 
@@ -477,9 +498,6 @@ namespace irsdkSharp.Serialization.Models.Data
 
         public float[] YawRate_ST => ValueSerializer.GetFloatArrayValue(nameof(YawRate_ST), _data, _headers);
 
-        public float SteeringWheelMaxForceNm => ValueSerializer.GetFloatValue(nameof(SteeringWheelMaxForceNm), _data, _headers);
-
-        public bool SteeringWheelUseLinear => ValueSerializer.GetBoolValue(nameof(SteeringWheelUseLinear), _data, _headers);
 
     }
 }
