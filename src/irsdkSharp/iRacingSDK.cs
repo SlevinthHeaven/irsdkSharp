@@ -31,6 +31,9 @@ namespace irsdkSharp
         protected MemoryMappedViewAccessor FileMapView;
         protected Dictionary<string, VarHeader> VarHeaders;
 
+        //events
+        public event EventHandler OnDataChanged;
+
         public static MemoryMappedViewAccessor GetFileMapView(IRacingSDK racingSDK)
         {
             return racingSDK.FileMapView;
@@ -136,6 +139,8 @@ namespace irsdkSharp
                         if (Header == null) Header = new IRacingSdkHeader(FileMapView);
                         if (IsConnected() && VarHeaders == null) GetVarHeaders();
                         if (!IsConnected() && VarHeaders != null) VarHeaders = null;
+
+                        OnDataChanged?.Invoke(this, new EventArgs());
                     }
                     catch
                     {

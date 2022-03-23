@@ -11,102 +11,53 @@ namespace irsdkSharp.ConsoleTest
     {
         private static IRacingSDK sdk;
         private static IRacingSessionModel _session;
-        private static int _DriverId;
-
-        /// <summary>
-        /// Gets the Id (CarIdx) of yourself (the driver running this application).
-        /// </summary>
-        public static int DriverId { get { return _DriverId; } }
-
-
+        private static int _DriverId = -1;
+        private static int _lastUpdate = -1;
         static void Main(string[] args)
         {
             sdk = new IRacingSDK();
-            Task.Run(() => Loop());
+            sdk.OnDataChanged += Sdk_OnDataChanged;
             Console.ReadLine();
         }
 
-        private static void Loop()
+        private static void Sdk_OnDataChanged(object sender, EventArgs e)
         {
-            int lastUpdate = -1;
-
-            while (true)
+            var currentlyConnected = sdk.IsConnected();
+            if (currentlyConnected)
             {
-                var currentlyConnected = sdk.IsConnected();
-                
-                // Check if we can find the sim
-                if (currentlyConnected)
+                // Is the session info updated?
+                int newUpdate = sdk.Header.SessionInfoUpdate;
+                if (newUpdate != _lastUpdate)
                 {
-                    int attempts = 0;
-                    const int maxAttempts = 99;
+                    _lastUpdate = newUpdate;
+                    _session = sdk.GetSerializedSessionInfo();
+                }
 
-                    object sessionnum = TryGetSessionNum();
-                    while (sessionnum == null && attempts <= maxAttempts)
+                if (_DriverId == -1)
+                {
+                    _DriverId = (int)sdk.GetData("PlayerCarIdx");
+                    Console.WriteLine(_DriverId);
+                }
+
+                var data = sdk.GetSerializedData();
+
+                if (data != null && _session != null)
+                {
+                    Console.SetCursorPosition(0, 0);
+
+
+                    foreach (var car in data.Data.Cars.OrderByDescending(x => x.CarIdxLap).ThenByDescending(x => x.CarIdxLapDistPct))
                     {
-                        attempts++;
-                        sessionnum = TryGetSessionNum();
-                    }
-                    if (attempts >= maxAttempts)
-                    {
-                        System.Console.WriteLine("Session num too many attempts");
-                        continue;
-                    }
-
-                    // Parse out your own driver Id
-                    if (DriverId == -1)
-                    {
-                        _DriverId = (int)sdk.GetData("PlayerCarIdx");
-                    }
-
-                    var data = sdk.GetSerializedData();
-
-                    // Raise the TelemetryUpdated event and pass along the lap info and session time
-                    //var telArgs = new TelemetryUpdatedEventArgs(new TelemetryInfo(sdk), time);
-                    // this.RaiseEvent(OnTelemetryUpdated, telArgs);
-
-                    // Is the session info updated?
-                    int newUpdate = sdk.Header.SessionInfoUpdate;
-                    if (newUpdate != lastUpdate)
-                    {
-                        lastUpdate = newUpdate;
-                        _session = sdk.GetSerializedSessionInfo();
-                    }
-
-                    if(data != null && _session != null)
-                    {
-                        Console.SetCursorPosition(0,0);
-
-
-                        foreach (var car in data.Data.Cars.OrderByDescending(x => x.CarIdxLap).ThenByDescending(x => x.CarIdxLapDistPct))
+                        var currentData = _session.DriverInfo.Drivers.Where(y => y.CarIdx == car.CarIdx).FirstOrDefault();
+                        if (currentData != null && car.CarIdxEstTime != 0)
                         {
-                            var currentData = _session.DriverInfo.Drivers.Where(y => y.CarIdx == car.CarIdx).FirstOrDefault();
-                            if (currentData != null && car.CarIdxEstTime != 0)
-                            {
-                                Console.WriteLine($"{currentData.CarNumber}\t{string.Format("{0:0.00}", car.CarIdxEstTime)}\t{string.Format("{0:0.00}", car.CarIdxLapDistPct * 100)}");
-                            }
-
+                            Console.WriteLine($"{currentData.CarNumber}\t{string.Format("{0:0.00}", car.CarIdxEstTime)}\t{string.Format("{0:0.00}", car.CarIdxLapDistPct * 100)}");
                         }
-                    }
 
-                    Thread.Sleep(15);
-                }
-                else
-                {
-                    Thread.Sleep(1000);
+                    }
                 }
             }
         }
-        private static object TryGetSessionNum()
-        {
-            try
-            {
-                var sessionnum = sdk.GetData("SessionNum");
-                return sessionnum;
-            }
-            catch
-            {
-                return null;
-            }
-        }
+
     }
 }

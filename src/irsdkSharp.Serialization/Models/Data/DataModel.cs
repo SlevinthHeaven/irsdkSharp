@@ -42,462 +42,2058 @@ namespace irsdkSharp.Serialization.Models.Data
             }
         }
 
-        public float AirPressure => ValueSerializer.GetFloatValue(nameof(AirPressure), _data, _headers);
-
-        public float AirTemp => ValueSerializer.GetFloatValue(nameof(AirTemp), _data, _headers);
-
-        public float Brake => ValueSerializer.GetFloatValue(nameof(Brake), _data, _headers);
-
-        public float BrakeRaw => ValueSerializer.GetFloatValue(nameof(BrakeRaw), _data, _headers);
-
-        public int CamCameraNumber => ValueSerializer.GetIntValue(nameof(CamCameraNumber), _data, _headers);
-
-        public int CamCameraState => ValueSerializer.GetIntValue(nameof(CamCameraState), _data, _headers);
-
-        public int CamCarIdx => ValueSerializer.GetIntValue(nameof(CamCarIdx), _data, _headers);
-
-        public int CamGroupNumber => ValueSerializer.GetIntValue(nameof(CamGroupNumber), _data, _headers);
-
-        public int CarLeftRight => ValueSerializer.GetIntValue(nameof(CarLeftRight), _data, _headers);
-
-        public float Clutch => ValueSerializer.GetFloatValue(nameof(Clutch), _data, _headers);
-
-        public float CpuUsageBG => ValueSerializer.GetFloatValue(nameof(CpuUsageBG), _data, _headers);
-
-        public int DCDriversSoFar => ValueSerializer.GetIntValue(nameof(DCDriversSoFar), _data, _headers);
-
-        public int DCLapStatus => ValueSerializer.GetIntValue(nameof(DCLapStatus), _data, _headers);
-
-        public bool dcStarter => ValueSerializer.GetBoolValue(nameof(dcStarter), _data, _headers);
-
-        public int DisplayUnits => ValueSerializer.GetIntValue(nameof(DisplayUnits), _data, _headers);
-
-        public float dpFastRepair => ValueSerializer.GetFloatValue(nameof(dpFastRepair), _data, _headers);
-
-        public float dpFuelAddKg => ValueSerializer.GetFloatValue(nameof(dpFuelAddKg), _data, _headers);
-
-        public float dpFuelFill => ValueSerializer.GetFloatValue(nameof(dpFuelFill), _data, _headers);
-
-        public float dpLFTireChange => ValueSerializer.GetFloatValue(nameof(dpLFTireChange), _data, _headers);
-
-        public float dpLFTireColdPress => ValueSerializer.GetFloatValue(nameof(dpLFTireColdPress), _data, _headers);
-
-        public float dpLRTireChange => ValueSerializer.GetFloatValue(nameof(dpLRTireChange), _data, _headers);
-
-        public float dpLRTireColdPress => ValueSerializer.GetFloatValue(nameof(dpLRTireColdPress), _data, _headers);
-
-        public float dpRFTireChange => ValueSerializer.GetFloatValue(nameof(dpRFTireChange), _data, _headers);
-
-        public float dpRFTireColdPress => ValueSerializer.GetFloatValue(nameof(dpRFTireColdPress), _data, _headers);
-
-        public float dpRRTireChange => ValueSerializer.GetFloatValue(nameof(dpRRTireChange), _data, _headers);
-
-        public float dpRRTireColdPress => ValueSerializer.GetFloatValue(nameof(dpRRTireColdPress), _data, _headers);
-
-        public float dpWindshieldTearoff => ValueSerializer.GetFloatValue(nameof(dpWindshieldTearoff), _data, _headers);
-
-        public bool DriverMarker => ValueSerializer.GetBoolValue(nameof(DriverMarker), _data, _headers);
-
-        public int EngineWarnings => ValueSerializer.GetIntValue(nameof(EngineWarnings), _data, _headers);
-
-        public int EnterExitReset => ValueSerializer.GetIntValue(nameof(EnterExitReset), _data, _headers);
-
-        public int FastRepairAvailable => ValueSerializer.GetIntValue(nameof(FastRepairAvailable), _data, _headers);
-
-        public int FastRepairUsed => ValueSerializer.GetIntValue(nameof(FastRepairUsed), _data, _headers);
-
-        public float FogLevel => ValueSerializer.GetFloatValue(nameof(FogLevel), _data, _headers);
-
-        public float FrameRate => ValueSerializer.GetFloatValue(nameof(FrameRate), _data, _headers);
-
-        public float FuelLevel => ValueSerializer.GetFloatValue(nameof(FuelLevel), _data, _headers);
-
-        public float FuelLevelPct => ValueSerializer.GetFloatValue(nameof(FuelLevelPct), _data, _headers);
-
-        public float FuelPress => ValueSerializer.GetFloatValue(nameof(FuelPress), _data, _headers);
-
-        public float FuelUsePerHour => ValueSerializer.GetFloatValue(nameof(FuelUsePerHour), _data, _headers);
-
-        public int Gear => ValueSerializer.GetIntValue(nameof(Gear), _data, _headers);
-
-        public float HandbrakeRaw => ValueSerializer.GetFloatValue(nameof(HandbrakeRaw), _data, _headers);
-
-        public bool IsDiskLoggingActive => ValueSerializer.GetBoolValue(nameof(IsDiskLoggingActive), _data, _headers);
-
-        public bool IsDiskLoggingEnabled => ValueSerializer.GetBoolValue(nameof(IsDiskLoggingEnabled), _data, _headers);
-
-        public bool IsInGarage => ValueSerializer.GetBoolValue(nameof(IsInGarage), _data, _headers);
-
-        public bool IsOnTrack => ValueSerializer.GetBoolValue(nameof(IsOnTrack), _data, _headers);
-
-        public bool IsOnTrackCar => ValueSerializer.GetBoolValue(nameof(IsOnTrackCar), _data, _headers);
-
-        public bool IsReplayPlaying => ValueSerializer.GetBoolValue(nameof(IsReplayPlaying), _data, _headers);
-
-        public int Lap => ValueSerializer.GetIntValue(nameof(Lap), _data, _headers);
-
-        public int LapBestLap => ValueSerializer.GetIntValue(nameof(LapBestLap), _data, _headers);
-
-        public float LapBestLapTime => ValueSerializer.GetFloatValue(nameof(LapBestLapTime), _data, _headers);
-
-        public int LapBestNLapLap => ValueSerializer.GetIntValue(nameof(LapBestNLapLap), _data, _headers);
-
-        public float LapBestNLapTime => ValueSerializer.GetFloatValue(nameof(LapBestNLapTime), _data, _headers);
-
-        public int LapCompleted => ValueSerializer.GetIntValue(nameof(LapCompleted), _data, _headers);
-
-        public float LapCurrentLapTime => ValueSerializer.GetFloatValue(nameof(LapCurrentLapTime), _data, _headers);
-
-        public float LapDeltaToBestLap => ValueSerializer.GetFloatValue(nameof(LapDeltaToBestLap), _data, _headers);
-
-        public float LapDeltaToBestLap_DD => ValueSerializer.GetFloatValue(nameof(LapDeltaToBestLap_DD), _data, _headers);
-
-        public bool LapDeltaToBestLap_OK => ValueSerializer.GetBoolValue(nameof(LapDeltaToBestLap_OK), _data, _headers);
-
-        public float LapDeltaToOptimalLap => ValueSerializer.GetFloatValue(nameof(LapDeltaToOptimalLap), _data, _headers);
-
-        public float LapDeltaToOptimalLap_DD => ValueSerializer.GetFloatValue(nameof(LapDeltaToOptimalLap_DD), _data, _headers);
-
-        public bool LapDeltaToOptimalLap_OK => ValueSerializer.GetBoolValue(nameof(LapDeltaToOptimalLap_OK), _data, _headers);
-
-        public float LapDeltaToSessionBestLap => ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionBestLap), _data, _headers);
-
-        public float LapDeltaToSessionBestLap_DD => ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionBestLap_DD), _data, _headers);
-
-        public bool LapDeltaToSessionBestLap_OK => ValueSerializer.GetBoolValue(nameof(LapDeltaToSessionBestLap_OK), _data, _headers);
-
-        public float LapDeltaToSessionLastlLap => ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionLastlLap), _data, _headers);
-
-        public float LapDeltaToSessionLastlLap_DD => ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionLastlLap_DD), _data, _headers);
-
-        public bool LapDeltaToSessionLastlLap_OK => ValueSerializer.GetBoolValue(nameof(LapDeltaToSessionLastlLap_OK), _data, _headers);
-
-        public float LapDeltaToSessionOptimalLap => ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionOptimalLap), _data, _headers);
-
-        public float LapDeltaToSessionOptimalLap_DD => ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionOptimalLap_DD), _data, _headers);
-
-        public bool LapDeltaToSessionOptimalLap_OK => ValueSerializer.GetBoolValue(nameof(LapDeltaToSessionOptimalLap_OK), _data, _headers);
-
-        public float LapDist => ValueSerializer.GetFloatValue(nameof(LapDist), _data, _headers);
-
-        public float LapDistPct => ValueSerializer.GetFloatValue(nameof(LapDistPct), _data, _headers);
-
-        public int LapLasNLapSeq => ValueSerializer.GetIntValue(nameof(LapLasNLapSeq), _data, _headers);
-
-        public float LapLastLapTime => ValueSerializer.GetFloatValue(nameof(LapLastLapTime), _data, _headers);
-
-        public float LapLastNLapTime => ValueSerializer.GetFloatValue(nameof(LapLastNLapTime), _data, _headers);
-
-        public float LatAccel => ValueSerializer.GetFloatValue(nameof(LatAccel), _data, _headers); 
-
-        public float[] LatAccel_ST => ValueSerializer.GetFloatArrayValue(nameof(LatAccel_ST), _data, _headers);
-
-        public float LFbrakeLinePress => ValueSerializer.GetFloatValue(nameof(LFbrakeLinePress), _data, _headers);
-
-        public float LFcoldPressure => ValueSerializer.GetFloatValue(nameof(LFcoldPressure), _data, _headers);
-
-        public float LFshockDefl => ValueSerializer.GetFloatValue(nameof(LFshockDefl), _data, _headers);
-
-        public float[] LFshockDefl_ST => ValueSerializer.GetFloatArrayValue(nameof(LFshockDefl_ST), _data, _headers);
-
-        public float LFshockVel => ValueSerializer.GetFloatValue(nameof(LFshockVel), _data, _headers);
-
-        public float[] LFshockVel_ST => ValueSerializer.GetFloatArrayValue(nameof(LFshockVel_ST), _data, _headers);
-
-        public float LFtempCL => ValueSerializer.GetFloatValue(nameof(LFtempCL), _data, _headers);
-
-        public float LFtempCM => ValueSerializer.GetFloatValue(nameof(LFtempCM), _data, _headers);
-
-        public float LFtempCR => ValueSerializer.GetFloatValue(nameof(LFtempCR), _data, _headers);
-
-        public float LFwearL => ValueSerializer.GetFloatValue(nameof(LFwearL), _data, _headers);
-
-        public float LFwearM => ValueSerializer.GetFloatValue(nameof(LFwearM), _data, _headers);
-
-        public float LFwearR => ValueSerializer.GetFloatValue(nameof(LFwearR), _data, _headers);
-
-        public bool LoadNumTextures => ValueSerializer.GetBoolValue(nameof(LoadNumTextures), _data, _headers);
-
-        public float LongAccel => ValueSerializer.GetFloatValue(nameof(LongAccel), _data, _headers);
-
-        public float[] LongAccel_ST => ValueSerializer.GetFloatArrayValue(nameof(LongAccel_ST), _data, _headers);
-
-        public float LRbrakeLinePress => ValueSerializer.GetFloatValue(nameof(LRbrakeLinePress), _data, _headers);
-
-        public float LRcoldPressure => ValueSerializer.GetFloatValue(nameof(LRcoldPressure), _data, _headers);
-
-        public float LRshockDefl => ValueSerializer.GetFloatValue(nameof(LRshockDefl), _data, _headers);
-
-        public float[] LRshockDefl_ST => ValueSerializer.GetFloatArrayValue(nameof(LRshockDefl_ST), _data, _headers);
-
-        public float LRshockVel => ValueSerializer.GetFloatValue(nameof(LRshockVel), _data, _headers);
-
-        public float[] LRshockVel_ST => ValueSerializer.GetFloatArrayValue(nameof(LRshockVel_ST), _data, _headers);
-
-        public float LRtempCL => ValueSerializer.GetFloatValue(nameof(LRtempCL), _data, _headers);
-
-        public float LRtempCM => ValueSerializer.GetFloatValue(nameof(LRtempCM), _data, _headers);
-
-        public float LRtempCR => ValueSerializer.GetFloatValue(nameof(LRtempCR), _data, _headers);
-
-        public float LRwearL => ValueSerializer.GetFloatValue(nameof(LRwearL), _data, _headers);
-
-        public float LRwearM => ValueSerializer.GetFloatValue(nameof(LRwearM), _data, _headers);
-
-        public float LRwearR => ValueSerializer.GetFloatValue(nameof(LRwearR), _data, _headers);
-
-        public float ManifoldPress => ValueSerializer.GetFloatValue(nameof(ManifoldPress), _data, _headers);
-
-        public bool ManualBoost => ValueSerializer.GetBoolValue(nameof(ManualBoost), _data, _headers);
-
-        public bool ManualNoBoost => ValueSerializer.GetBoolValue(nameof(ManualNoBoost), _data, _headers);
-
-        public float OilLevel => ValueSerializer.GetFloatValue(nameof(OilLevel), _data, _headers);
-
-        public float OilPress => ValueSerializer.GetFloatValue(nameof(OilPress), _data, _headers);
-
-        public float OilTemp => ValueSerializer.GetFloatValue(nameof(OilTemp), _data, _headers);
-
-        public bool OkToReloadTextures => ValueSerializer.GetBoolValue(nameof(OkToReloadTextures), _data, _headers);
-
-        public bool OnPitRoad => ValueSerializer.GetBoolValue(nameof(OnPitRoad), _data, _headers);
-
-        public float Pitch => ValueSerializer.GetFloatValue(nameof(Pitch), _data, _headers);
-
-        public float PitchRate => ValueSerializer.GetFloatValue(nameof(PitchRate), _data, _headers);
-
-        public float[] PitchRate_ST => ValueSerializer.GetFloatArrayValue(nameof(PitchRate_ST), _data, _headers);
-
-        public float PitOptRepairLeft => ValueSerializer.GetFloatValue(nameof(PitOptRepairLeft), _data, _headers);
-
-        public float PitRepairLeft => ValueSerializer.GetFloatValue(nameof(PitRepairLeft), _data, _headers);
-
-        public bool PitsOpen => ValueSerializer.GetBoolValue(nameof(PitsOpen), _data, _headers);
-
-        public bool PitstopActive => ValueSerializer.GetBoolValue(nameof(PitstopActive), _data, _headers);
-
-        public int PitSvFlags => ValueSerializer.GetIntValue(nameof(PitSvFlags), _data, _headers);
-
-        public float PitSvFuel => ValueSerializer.GetFloatValue(nameof(PitSvFuel), _data, _headers);
-
-        public float PitSvLFP => ValueSerializer.GetFloatValue(nameof(PitSvLFP), _data, _headers);
-
-        public float PitSvLRP => ValueSerializer.GetFloatValue(nameof(PitSvLRP), _data, _headers);
-
-        public float PitSvRFP => ValueSerializer.GetFloatValue(nameof(PitSvRFP), _data, _headers);
-
-        public float PitSvRRP => ValueSerializer.GetFloatValue(nameof(PitSvRRP), _data, _headers);
-
-        public int PlayerCarClassPosition => ValueSerializer.GetIntValue(nameof(PlayerCarClassPosition), _data, _headers);
-
-        public int PlayerCarDriverIncidentCount => ValueSerializer.GetIntValue(nameof(PlayerCarDriverIncidentCount), _data, _headers);
-
-        public int PlayerCarIdx => ValueSerializer.GetIntValue(nameof(PlayerCarIdx), _data, _headers);
-
-        public bool PlayerCarInPitStall => ValueSerializer.GetBoolValue(nameof(PlayerCarInPitStall), _data, _headers);
-
-        public int PlayerCarMyIncidentCount => ValueSerializer.GetIntValue(nameof(PlayerCarMyIncidentCount), _data, _headers);
-
-        public int PlayerCarPitSvStatus => ValueSerializer.GetIntValue(nameof(PlayerCarPitSvStatus), _data, _headers);
-
-        public int PlayerCarPosition => ValueSerializer.GetIntValue(nameof(PlayerCarPosition), _data, _headers);
-
-        public float PlayerCarPowerAdjust => ValueSerializer.GetFloatValue(nameof(PlayerCarPowerAdjust), _data, _headers);
-
-        public int PlayerCarTeamIncidentCount => ValueSerializer.GetIntValue(nameof(PlayerCarTeamIncidentCount), _data, _headers);
-
-        public float PlayerCarTowTime => ValueSerializer.GetFloatValue(nameof(PlayerCarTowTime), _data, _headers);
-
-        public float PlayerCarWeightPenalty => ValueSerializer.GetFloatValue(nameof(PlayerCarWeightPenalty), _data, _headers);
-
-        public int PlayerTrackSurface => ValueSerializer.GetIntValue(nameof(PlayerTrackSurface), _data, _headers);
-
-        public int PlayerTrackSurfaceMaterial => ValueSerializer.GetIntValue(nameof(PlayerTrackSurfaceMaterial), _data, _headers);
-
-        public bool PushToPass => ValueSerializer.GetBoolValue(nameof(PushToPass), _data, _headers);
-
-        public int RaceLaps => ValueSerializer.GetIntValue(nameof(RaceLaps), _data, _headers);
-
-        public int RadioTransmitCarIdx => ValueSerializer.GetIntValue(nameof(RadioTransmitCarIdx), _data, _headers);
-
-        public int RadioTransmitFrequencyIdx => ValueSerializer.GetIntValue(nameof(RadioTransmitFrequencyIdx), _data, _headers);
-
-        public int RadioTransmitRadioIdx => ValueSerializer.GetIntValue(nameof(RadioTransmitRadioIdx), _data, _headers);
-
-        public float RelativeHumidity => ValueSerializer.GetFloatValue(nameof(RelativeHumidity), _data, _headers);
-
-        public int ReplayFrameNum => ValueSerializer.GetIntValue(nameof(ReplayFrameNum), _data, _headers);
-
-        public int ReplayFrameNumEnd => ValueSerializer.GetIntValue(nameof(ReplayFrameNumEnd), _data, _headers);
-
-        public bool ReplayPlaySlowMotion => ValueSerializer.GetBoolValue(nameof(ReplayPlaySlowMotion), _data, _headers);
-
-        public int ReplayPlaySpeed => ValueSerializer.GetIntValue(nameof(ReplayPlaySpeed), _data, _headers);
-
-        public int ReplaySessionNum => ValueSerializer.GetIntValue(nameof(ReplaySessionNum), _data, _headers);
-
-        public double ReplaySessionTime => ValueSerializer.GetFloatValue(nameof(ReplaySessionTime), _data, _headers);
-
-        public float RFbrakeLinePress => ValueSerializer.GetFloatValue(nameof(RFbrakeLinePress), _data, _headers);
-
-        public float RFcoldPressure => ValueSerializer.GetFloatValue(nameof(RFcoldPressure), _data, _headers);
-
-        public float RFshockDefl => ValueSerializer.GetFloatValue(nameof(RFshockDefl), _data, _headers);
-
-        public float[] RFshockDefl_ST => ValueSerializer.GetFloatArrayValue(nameof(RFshockDefl_ST), _data, _headers);
-
-        public float RFshockVel => ValueSerializer.GetFloatValue(nameof(RFshockVel), _data, _headers);
-
-        public float[] RFshockVel_ST => ValueSerializer.GetFloatArrayValue(nameof(RFshockVel_ST), _data, _headers);
-
-        public float RFtempCL => ValueSerializer.GetFloatValue(nameof(RFtempCL), _data, _headers);
-
-        public float RFtempCM => ValueSerializer.GetFloatValue(nameof(RFtempCM), _data, _headers);
-
-        public float RFtempCR => ValueSerializer.GetFloatValue(nameof(RFtempCR), _data, _headers);
-
-        public float RFwearL => ValueSerializer.GetFloatValue(nameof(RFwearL), _data, _headers);
-
-        public float RFwearM => ValueSerializer.GetFloatValue(nameof(RFwearM), _data, _headers);
-
-        public float RFwearR => ValueSerializer.GetFloatValue(nameof(RFwearR), _data, _headers);
-
-        public float Roll => ValueSerializer.GetFloatValue(nameof(Roll), _data, _headers);
-
-        public float RollRate => ValueSerializer.GetFloatValue(nameof(RollRate), _data, _headers);
-
-        public float[] RollRate_ST => ValueSerializer.GetFloatArrayValue(nameof(RollRate_ST), _data, _headers);
-
-        public float RPM => ValueSerializer.GetFloatValue(nameof(RPM), _data, _headers);
-
-        public float RRbrakeLinePress => ValueSerializer.GetFloatValue(nameof(RRbrakeLinePress), _data, _headers);
-
-        public float RRcoldPressure => ValueSerializer.GetFloatValue(nameof(RRcoldPressure), _data, _headers);
-
-        public float RRshockDefl => ValueSerializer.GetFloatValue(nameof(RRshockDefl), _data, _headers);
-
-        public float[] RRshockDefl_ST => ValueSerializer.GetFloatArrayValue(nameof(RRshockDefl_ST), _data, _headers);
-
-        public float RRshockVel => ValueSerializer.GetFloatValue(nameof(RRshockVel), _data, _headers);
-
-        public float[] RRshockVel_ST => ValueSerializer.GetFloatArrayValue(nameof(RRshockVel_ST), _data, _headers);
-
-        public float RRtempCL => ValueSerializer.GetFloatValue(nameof(RRtempCL), _data, _headers);
-
-        public float RRtempCM => ValueSerializer.GetFloatValue(nameof(RRtempCM), _data, _headers);
-
-        public float RRtempCR => ValueSerializer.GetFloatValue(nameof(RRtempCR), _data, _headers);
-
-        public float RRwearL => ValueSerializer.GetFloatValue(nameof(RRwearL), _data, _headers);
-
-        public float RRwearM => ValueSerializer.GetFloatValue(nameof(RRwearM), _data, _headers);
-
-        public float RRwearR => ValueSerializer.GetFloatValue(nameof(RRwearR), _data, _headers);
-
-        public int SessionFlags => ValueSerializer.GetIntValue(nameof(SessionFlags), _data, _headers);
-
-        public int SessionLapsRemain => ValueSerializer.GetIntValue(nameof(SessionLapsRemain), _data, _headers);
-
-        public int SessionLapsRemainEx => ValueSerializer.GetIntValue(nameof(SessionLapsRemainEx), _data, _headers);
-
-        public int SessionNum => ValueSerializer.GetIntValue(nameof(SessionNum), _data, _headers);
-
-        public int SessionState => ValueSerializer.GetIntValue(nameof(SessionState), _data, _headers);
-
-        public int SessionTick => ValueSerializer.GetIntValue(nameof(SessionTick), _data, _headers);
-
-        public double SessionTime => ValueSerializer.GetFloatValue(nameof(SessionTime), _data, _headers);
-
-        public float SessionTimeOfDay => ValueSerializer.GetFloatValue(nameof(SessionTimeOfDay), _data, _headers);
-
-        public double SessionTimeRemain => ValueSerializer.GetFloatValue(nameof(SessionTimeRemain), _data, _headers);
-
-        public int SessionUniqueID => ValueSerializer.GetIntValue(nameof(SessionUniqueID), _data, _headers);
-
-        public float ShiftGrindRPM => ValueSerializer.GetFloatValue(nameof(ShiftGrindRPM), _data, _headers);
-
-        public float ShiftIndicatorPct => ValueSerializer.GetFloatValue(nameof(ShiftIndicatorPct), _data, _headers);
-
-        public float ShiftPowerPct => ValueSerializer.GetFloatValue(nameof(ShiftPowerPct), _data, _headers);
-
-        public int Skies => ValueSerializer.GetIntValue(nameof(Skies), _data, _headers);
-
-        public float Speed => ValueSerializer.GetFloatValue(nameof(Speed), _data, _headers);
-
-        public float SteeringWheelAngle => ValueSerializer.GetFloatValue(nameof(SteeringWheelAngle), _data, _headers);
-
-        public float SteeringWheelAngleMax => ValueSerializer.GetFloatValue(nameof(SteeringWheelAngleMax), _data, _headers);
-
-        public float SteeringWheelMaxForceNm => ValueSerializer.GetFloatValue(nameof(SteeringWheelMaxForceNm), _data, _headers);
-
-        public float SteeringWheelPctDamper => ValueSerializer.GetFloatValue(nameof(SteeringWheelPctDamper), _data, _headers);
-
-        public float SteeringWheelPctTorque => ValueSerializer.GetFloatValue(nameof(SteeringWheelPctTorque), _data, _headers);
-
-        public float SteeringWheelPctTorqueSign => ValueSerializer.GetFloatValue(nameof(SteeringWheelPctTorqueSign), _data, _headers);
-
-        public float SteeringWheelPctTorqueSignStops => ValueSerializer.GetFloatValue(nameof(SteeringWheelPctTorqueSignStops), _data, _headers);
-
-        public float SteeringWheelPeakForceNm => ValueSerializer.GetFloatValue(nameof(SteeringWheelPeakForceNm), _data, _headers);
-
-        public float SteeringWheelTorque => ValueSerializer.GetFloatValue(nameof(SteeringWheelTorque), _data, _headers);
-
-        public float[] SteeringWheelTorque_ST => ValueSerializer.GetFloatArrayValue(nameof(SteeringWheelTorque_ST), _data, _headers);
-
-        public bool SteeringWheelUseLinear => ValueSerializer.GetBoolValue(nameof(SteeringWheelUseLinear), _data, _headers);
-
-        public float Throttle => ValueSerializer.GetFloatValue(nameof(Throttle), _data, _headers);
-
-        public float ThrottleRaw => ValueSerializer.GetFloatValue(nameof(ThrottleRaw), _data, _headers);
-
-        public float TireLF_RumblePitch => ValueSerializer.GetFloatValue(nameof(TireLF_RumblePitch), _data, _headers);
-
-        public float TireLR_RumblePitch => ValueSerializer.GetFloatValue(nameof(TireLR_RumblePitch), _data, _headers);
-
-        public float TireRF_RumblePitch => ValueSerializer.GetFloatValue(nameof(TireRF_RumblePitch), _data, _headers);
-
-        public float TireRR_RumblePitch => ValueSerializer.GetFloatValue(nameof(TireRR_RumblePitch), _data, _headers);
-
-        public float TrackTemp => ValueSerializer.GetFloatValue(nameof(TrackTemp), _data, _headers);
-
-        public float TrackTempCrew => ValueSerializer.GetFloatValue(nameof(TrackTempCrew), _data, _headers);
-
-        public float VelocityX => ValueSerializer.GetFloatValue(nameof(VelocityX), _data, _headers);
-
-        public float[] VelocityX_ST => ValueSerializer.GetFloatArrayValue(nameof(VelocityX_ST), _data, _headers);
-
-        public float VelocityY => ValueSerializer.GetFloatValue(nameof(VelocityY), _data, _headers);
-
-        public float[] VelocityY_ST => ValueSerializer.GetFloatArrayValue(nameof(VelocityY_ST), _data, _headers);
-
-        public float VelocityZ => ValueSerializer.GetFloatValue(nameof(VelocityZ), _data, _headers);
-
-        public float[] VelocityZ_ST => ValueSerializer.GetFloatArrayValue(nameof(VelocityZ_ST), _data, _headers);
-
-        public float VertAccel => ValueSerializer.GetFloatValue(nameof(VertAccel), _data, _headers);
-
-        public float[] VertAccel_ST => ValueSerializer.GetFloatArrayValue(nameof(VertAccel_ST), _data, _headers);
-
-        public float Voltage => ValueSerializer.GetFloatValue(nameof(Voltage), _data, _headers);
-
-        public float WaterLevel => ValueSerializer.GetFloatValue(nameof(WaterLevel), _data, _headers);
-
-        public float WaterTemp => ValueSerializer.GetFloatValue(nameof(WaterTemp), _data, _headers);
-
-        public int WeatherType => ValueSerializer.GetIntValue(nameof(WeatherType), _data, _headers);
-
-        public float WindDir => ValueSerializer.GetFloatValue(nameof(WindDir), _data, _headers);
-
-        public float WindVel => ValueSerializer.GetFloatValue(nameof(WindVel), _data, _headers);
-
-        public float Yaw => ValueSerializer.GetFloatValue(nameof(Yaw), _data, _headers);
-
-        public float YawNorth => ValueSerializer.GetFloatValue(nameof(YawNorth), _data, _headers);
-
-        public float YawRate => ValueSerializer.GetFloatValue(nameof(YawRate), _data, _headers);
-
-        public float[] YawRate_ST => ValueSerializer.GetFloatArrayValue(nameof(YawRate_ST), _data, _headers);
-
+        private float? _airPressure;
+        public float AirPressure
+        {
+            get
+            {
+                if (!_airPressure.HasValue) _airPressure = ValueSerializer.GetFloatValue(nameof(AirPressure), _data, _headers);
+                return _airPressure.Value;
+            }
+        }
+        private float? _airTemp;
+        public float AirTemp
+        {
+            get
+            {
+                if (!_airTemp.HasValue) _airTemp = ValueSerializer.GetFloatValue(nameof(AirTemp), _data, _headers);
+                return _airTemp.Value;
+            }
+        }
+        private float? _brake;
+        public float Brake
+        {
+            get
+            {
+                if (!_brake.HasValue) _brake = ValueSerializer.GetFloatValue(nameof(Brake), _data, _headers);
+                return _brake.Value;
+            }
+        }
+        private float? _brakeRaw;
+        public float BrakeRaw
+        {
+            get
+            {
+                if (!_brakeRaw.HasValue) _brakeRaw = ValueSerializer.GetFloatValue(nameof(BrakeRaw), _data, _headers);
+                return _brakeRaw.Value;
+            }
+        }
+        private int? _camCameraNumber;
+        public int CamCameraNumber
+        {
+            get
+            {
+                if (!_camCameraNumber.HasValue) _camCameraNumber = ValueSerializer.GetIntValue(nameof(CamCameraNumber), _data, _headers);
+                return _camCameraNumber.Value;
+            }
+        }
+        private int? _camCameraState;
+        public int CamCameraState
+        {
+            get
+            {
+                if (!_camCameraState.HasValue) _camCameraState = ValueSerializer.GetIntValue(nameof(CamCameraState), _data, _headers);
+                return _camCameraState.Value;
+            }
+        }
+        private int? _camCarIdx;
+        public int CamCarIdx
+        {
+            get
+            {
+                if (!_camCarIdx.HasValue) _camCarIdx = ValueSerializer.GetIntValue(nameof(CamCarIdx), _data, _headers);
+                return _camCarIdx.Value;
+            }
+        }
+        private int? _camGroupNumber;
+        public int CamGroupNumber
+        {
+            get
+            {
+                if (!_camGroupNumber.HasValue) _camGroupNumber = ValueSerializer.GetIntValue(nameof(CamGroupNumber), _data, _headers);
+                return _camGroupNumber.Value;
+            }
+        }
+        private int? _carLeftRight;
+        public int CarLeftRight
+        {
+            get
+            {
+                if (!_carLeftRight.HasValue) _carLeftRight = ValueSerializer.GetIntValue(nameof(CarLeftRight), _data, _headers);
+                return _carLeftRight.Value;
+            }
+        }
+        private float? _clutch;
+        public float Clutch
+        {
+            get
+            {
+                if (!_clutch.HasValue) _clutch = ValueSerializer.GetFloatValue(nameof(Clutch), _data, _headers);
+                return _clutch.Value;
+            }
+        }
+        private float? _cpuUsageBG;
+        public float CpuUsageBG
+        {
+            get
+            {
+                if (!_cpuUsageBG.HasValue) _cpuUsageBG = ValueSerializer.GetFloatValue(nameof(CpuUsageBG), _data, _headers);
+                return _cpuUsageBG.Value;
+            }
+        }
+        private int? _dCDriversSoFar;
+        public int DCDriversSoFar
+        {
+            get
+            {
+                if (!_dCDriversSoFar.HasValue) _dCDriversSoFar = ValueSerializer.GetIntValue(nameof(DCDriversSoFar), _data, _headers);
+                return _dCDriversSoFar.Value;
+            }
+        }
+        private int? _dCLapStatus;
+        public int DCLapStatus
+        {
+            get
+            {
+                if (!_dCLapStatus.HasValue) _dCLapStatus = ValueSerializer.GetIntValue(nameof(DCLapStatus), _data, _headers);
+                return _dCLapStatus.Value;
+            }
+        }
+        public bool? _dcStarter;
+        public bool dcStarter
+        {
+            get
+            {
+                if (!_dcStarter.HasValue) _dcStarter = ValueSerializer.GetBoolValue(nameof(dcStarter), _data, _headers);
+                return _dcStarter.Value;
+            }
+        }
+        private int? _displayUnits;
+        public int DisplayUnits
+        {
+            get
+            {
+                if (!_displayUnits.HasValue) _displayUnits = ValueSerializer.GetIntValue(nameof(DisplayUnits), _data, _headers);
+                return _displayUnits.Value;
+            }
+        }
+        private float? _dpFastRepair;
+        public float dpFastRepair
+        {
+            get
+            {
+                if (!_dpFastRepair.HasValue) _dpFastRepair = ValueSerializer.GetFloatValue(nameof(dpFastRepair), _data, _headers);
+                return _dpFastRepair.Value;
+            }
+        }
+        private float? _dpFuelAddKg;
+        public float dpFuelAddKg
+        {
+            get
+            {
+                if (!_dpFuelAddKg.HasValue) _dpFuelAddKg = ValueSerializer.GetFloatValue(nameof(dpFuelAddKg), _data, _headers);
+                return _dpFuelAddKg.Value;
+            }
+        }
+        private float? _dpFuelFill;
+        public float dpFuelFill
+        {
+            get
+            {
+                if (!_dpFuelFill.HasValue) _dpFuelFill = ValueSerializer.GetFloatValue(nameof(dpFuelFill), _data, _headers);
+                return _dpFuelFill.Value;
+            }
+        }
+        private float? _dpLFTireChange;
+        public float dpLFTireChange
+        {
+            get
+            {
+                if (!_dpLFTireChange.HasValue) _dpLFTireChange = ValueSerializer.GetFloatValue(nameof(dpLFTireChange), _data, _headers);
+                return _dpLFTireChange.Value;
+            }
+        }
+        private float? _dpLFTireColdPress;
+        public float dpLFTireColdPress
+        {
+            get
+            {
+                if (!_dpLFTireColdPress.HasValue) _dpLFTireColdPress = ValueSerializer.GetFloatValue(nameof(dpLFTireColdPress), _data, _headers);
+                return _dpLFTireColdPress.Value;
+            }
+        }
+        private float? _dpLRTireChange;
+        public float dpLRTireChange
+        {
+            get
+            {
+                if (!_dpLRTireChange.HasValue) _dpLRTireChange = ValueSerializer.GetFloatValue(nameof(dpLRTireChange), _data, _headers);
+                return _dpLRTireChange.Value;
+            }
+        }
+        private float? _dpLRTireColdPress;
+        public float dpLRTireColdPress
+        {
+            get
+            {
+                if (!_dpLRTireColdPress.HasValue) _dpLRTireColdPress = ValueSerializer.GetFloatValue(nameof(dpLRTireColdPress), _data, _headers);
+                return _dpLRTireColdPress.Value;
+            }
+        }
+        private float? _dpRFTireChange;
+        public float dpRFTireChange
+        {
+            get
+            {
+                if (!_dpRFTireChange.HasValue) _dpRFTireChange = ValueSerializer.GetFloatValue(nameof(dpRFTireChange), _data, _headers);
+                return _dpRFTireChange.Value;
+            }
+        }
+        private float? _dpRFTireColdPress;
+        public float dpRFTireColdPress
+        {
+            get
+            {
+                if (!_dpRFTireColdPress.HasValue) _dpRFTireColdPress = ValueSerializer.GetFloatValue(nameof(dpRFTireColdPress), _data, _headers);
+                return _dpRFTireColdPress.Value;
+            }
+        }
+        private float? _dpRRTireChange;
+        public float dpRRTireChange
+        {
+            get
+            {
+                if (!_dpRRTireChange.HasValue) _dpRRTireChange = ValueSerializer.GetFloatValue(nameof(dpRRTireChange), _data, _headers);
+                return _dpRRTireChange.Value;
+            }
+        }
+        private float? _dpRRTireColdPress;
+        public float dpRRTireColdPress
+        {
+            get
+            {
+                if (!_dpRRTireColdPress.HasValue) _dpRRTireColdPress = ValueSerializer.GetFloatValue(nameof(dpRRTireColdPress), _data, _headers);
+                return _dpRRTireColdPress.Value;
+            }
+        }
+        private float? _dpWindshieldTearoff;
+        public float dpWindshieldTearoff
+        {
+            get
+            {
+                if (!_dpWindshieldTearoff.HasValue) _dpWindshieldTearoff = ValueSerializer.GetFloatValue(nameof(dpWindshieldTearoff), _data, _headers);
+                return _dpWindshieldTearoff.Value;
+            }
+        }
+        public bool? _driverMarker;
+        public bool DriverMarker
+        {
+            get
+            {
+                if (!_driverMarker.HasValue) _driverMarker = ValueSerializer.GetBoolValue(nameof(DriverMarker), _data, _headers);
+                return _driverMarker.Value;
+            }
+        }
+        private int? _engineWarnings;
+        public int EngineWarnings
+        {
+            get
+            {
+                if (!_engineWarnings.HasValue) _engineWarnings = ValueSerializer.GetIntValue(nameof(EngineWarnings), _data, _headers);
+                return _engineWarnings.Value;
+            }
+        }
+        private int? _enterExitReset;
+        public int EnterExitReset
+        {
+            get
+            {
+                if (!_enterExitReset.HasValue) _enterExitReset = ValueSerializer.GetIntValue(nameof(EnterExitReset), _data, _headers);
+                return _enterExitReset.Value;
+            }
+        }
+        private int? _fastRepairAvailable;
+        public int FastRepairAvailable
+        {
+            get
+            {
+                if (!_fastRepairAvailable.HasValue) _fastRepairAvailable = ValueSerializer.GetIntValue(nameof(FastRepairAvailable), _data, _headers);
+                return _fastRepairAvailable.Value;
+            }
+        }
+        private int? _fastRepairUsed;
+        public int FastRepairUsed
+        {
+            get
+            {
+                if (!_fastRepairUsed.HasValue) _fastRepairUsed = ValueSerializer.GetIntValue(nameof(FastRepairUsed), _data, _headers);
+                return _fastRepairUsed.Value;
+            }
+        }
+        private float? _fogLevel;
+        public float FogLevel
+        {
+            get
+            {
+                if (!_fogLevel.HasValue) _fogLevel = ValueSerializer.GetFloatValue(nameof(FogLevel), _data, _headers);
+                return _fogLevel.Value;
+            }
+        }
+        private float? _frameRate;
+        public float FrameRate
+        {
+            get
+            {
+                if (!_frameRate.HasValue) _frameRate = ValueSerializer.GetFloatValue(nameof(FrameRate), _data, _headers);
+                return _frameRate.Value;
+            }
+        }
+        private float? _fuelLevel;
+        public float FuelLevel
+        {
+            get
+            {
+                if (!_fuelLevel.HasValue) _fuelLevel = ValueSerializer.GetFloatValue(nameof(FuelLevel), _data, _headers);
+                return _fuelLevel.Value;
+            }
+        }
+        private float? _fuelLevelPct;
+        public float FuelLevelPct
+        {
+            get
+            {
+                if (!_fuelLevelPct.HasValue) _fuelLevelPct = ValueSerializer.GetFloatValue(nameof(FuelLevelPct), _data, _headers);
+                return _fuelLevelPct.Value;
+            }
+        }
+        private float? _fuelPress;
+        public float FuelPress
+        {
+            get
+            {
+                if (!_fuelPress.HasValue) _fuelPress = ValueSerializer.GetFloatValue(nameof(FuelPress), _data, _headers);
+                return _fuelPress.Value;
+            }
+        }
+        private float? _fuelUsePerHour;
+        public float FuelUsePerHour
+        {
+            get
+            {
+                if (!_fuelUsePerHour.HasValue) _fuelUsePerHour = ValueSerializer.GetFloatValue(nameof(FuelUsePerHour), _data, _headers);
+                return _fuelUsePerHour.Value;
+            }
+        }
+        private int? _gear;
+        public int Gear
+        {
+            get
+            {
+                if (!_gear.HasValue) _gear = ValueSerializer.GetIntValue(nameof(Gear), _data, _headers);
+                return _gear.Value;
+            }
+        }
+        private float? _handbrakeRaw;
+        public float HandbrakeRaw
+        {
+            get
+            {
+                if (!_handbrakeRaw.HasValue) _handbrakeRaw = ValueSerializer.GetFloatValue(nameof(HandbrakeRaw), _data, _headers);
+                return _handbrakeRaw.Value;
+            }
+        }
+        public bool? _isDiskLoggingActive;
+        public bool IsDiskLoggingActive
+        {
+            get
+            {
+                if (!_isDiskLoggingActive.HasValue) _isDiskLoggingActive = ValueSerializer.GetBoolValue(nameof(IsDiskLoggingActive), _data, _headers);
+                return _isDiskLoggingActive.Value;
+            }
+        }
+        public bool? _isDiskLoggingEnabled;
+        public bool IsDiskLoggingEnabled
+        {
+            get
+            {
+                if (!_isDiskLoggingEnabled.HasValue) _isDiskLoggingEnabled = ValueSerializer.GetBoolValue(nameof(IsDiskLoggingEnabled), _data, _headers);
+                return _isDiskLoggingEnabled.Value;
+            }
+        }
+        public bool? _isInGarage;
+        public bool IsInGarage
+        {
+            get
+            {
+                if (!_isInGarage.HasValue) _isInGarage = ValueSerializer.GetBoolValue(nameof(IsInGarage), _data, _headers);
+                return _isInGarage.Value;
+            }
+        }
+        public bool? _isOnTrack;
+        public bool IsOnTrack
+        {
+            get
+            {
+                if (!_isOnTrack.HasValue) _isOnTrack = ValueSerializer.GetBoolValue(nameof(IsOnTrack), _data, _headers);
+                return _isOnTrack.Value;
+            }
+        }
+        public bool? _isOnTrackCar;
+        public bool IsOnTrackCar
+        {
+            get
+            {
+                if (!_isOnTrackCar.HasValue) _isOnTrackCar = ValueSerializer.GetBoolValue(nameof(IsOnTrackCar), _data, _headers);
+                return _isOnTrackCar.Value;
+            }
+        }
+        public bool? _isReplayPlaying;
+        public bool IsReplayPlaying
+        {
+            get
+            {
+                if (!_isReplayPlaying.HasValue) _isReplayPlaying = ValueSerializer.GetBoolValue(nameof(IsReplayPlaying), _data, _headers);
+                return _isReplayPlaying.Value;
+            }
+        }
+        private int? _lap;
+        public int Lap
+        {
+            get
+            {
+                if (!_lap.HasValue) _lap = ValueSerializer.GetIntValue(nameof(Lap), _data, _headers);
+                return _lap.Value;
+            }
+        }
+        private int? _lapBestLap;
+        public int LapBestLap
+        {
+            get
+            {
+                if (!_lapBestLap.HasValue) _lapBestLap = ValueSerializer.GetIntValue(nameof(LapBestLap), _data, _headers);
+                return _lapBestLap.Value;
+            }
+        }
+        private float? _lapBestLapTime;
+        public float LapBestLapTime
+        {
+            get
+            {
+                if (!_lapBestLapTime.HasValue) _lapBestLapTime = ValueSerializer.GetFloatValue(nameof(LapBestLapTime), _data, _headers);
+                return _lapBestLapTime.Value;
+            }
+        }
+        private int? _lapBestNLapLap;
+        public int LapBestNLapLap
+        {
+            get
+            {
+                if (!_lapBestNLapLap.HasValue) _lapBestNLapLap = ValueSerializer.GetIntValue(nameof(LapBestNLapLap), _data, _headers);
+                return _lapBestNLapLap.Value;
+            }
+        }
+        private float? _lapBestNLapTime;
+        public float LapBestNLapTime
+        {
+            get
+            {
+                if (!_lapBestNLapTime.HasValue) _lapBestNLapTime = ValueSerializer.GetFloatValue(nameof(LapBestNLapTime), _data, _headers);
+                return _lapBestNLapTime.Value;
+            }
+        }
+        private int? _lapCompleted;
+        public int LapCompleted
+        {
+            get
+            {
+                if (!_lapCompleted.HasValue) _lapCompleted = ValueSerializer.GetIntValue(nameof(LapCompleted), _data, _headers);
+                return _lapCompleted.Value;
+            }
+        }
+        private float? _lapCurrentLapTime;
+        public float LapCurrentLapTime
+        {
+            get
+            {
+                if (!_lapCurrentLapTime.HasValue) _lapCurrentLapTime = ValueSerializer.GetFloatValue(nameof(LapCurrentLapTime), _data, _headers);
+                return _lapCurrentLapTime.Value;
+            }
+        }
+        private float? _lapDeltaToBestLap;
+        public float LapDeltaToBestLap
+        {
+            get
+            {
+                if (!_lapDeltaToBestLap.HasValue) _lapDeltaToBestLap = ValueSerializer.GetFloatValue(nameof(LapDeltaToBestLap), _data, _headers);
+                return _lapDeltaToBestLap.Value;
+            }
+        }
+        private float? _lapDeltaToBestLap_DD;
+        public float LapDeltaToBestLap_DD
+        {
+            get
+            {
+                if (!_lapDeltaToBestLap_DD.HasValue) _lapDeltaToBestLap_DD = ValueSerializer.GetFloatValue(nameof(LapDeltaToBestLap_DD), _data, _headers);
+                return _lapDeltaToBestLap_DD.Value;
+            }
+        }
+        public bool? _lapDeltaToBestLap_OK;
+        public bool LapDeltaToBestLap_OK
+        {
+            get
+            {
+                if (!_lapDeltaToBestLap_OK.HasValue) _lapDeltaToBestLap_OK = ValueSerializer.GetBoolValue(nameof(LapDeltaToBestLap_OK), _data, _headers);
+                return _lapDeltaToBestLap_OK.Value;
+            }
+        }
+        private float? _lapDeltaToOptimalLap;
+        public float LapDeltaToOptimalLap
+        {
+            get
+            {
+                if (!_lapDeltaToOptimalLap.HasValue) _lapDeltaToOptimalLap = ValueSerializer.GetFloatValue(nameof(LapDeltaToOptimalLap), _data, _headers);
+                return _lapDeltaToOptimalLap.Value;
+            }
+        }
+        private float? _lapDeltaToOptimalLap_DD;
+        public float LapDeltaToOptimalLap_DD
+        {
+            get
+            {
+                if (!_lapDeltaToOptimalLap_DD.HasValue) _lapDeltaToOptimalLap_DD = ValueSerializer.GetFloatValue(nameof(LapDeltaToOptimalLap_DD), _data, _headers);
+                return _lapDeltaToOptimalLap_DD.Value;
+            }
+        }
+        public bool? _lapDeltaToOptimalLap_OK;
+        public bool LapDeltaToOptimalLap_OK
+        {
+            get
+            {
+                if (!_lapDeltaToOptimalLap_OK.HasValue) _lapDeltaToOptimalLap_OK = ValueSerializer.GetBoolValue(nameof(LapDeltaToOptimalLap_OK), _data, _headers);
+                return _lapDeltaToOptimalLap_OK.Value;
+            }
+        }
+        private float? _lapDeltaToSessionBestLap;
+        public float LapDeltaToSessionBestLap
+        {
+            get
+            {
+                if (!_lapDeltaToSessionBestLap.HasValue) _lapDeltaToSessionBestLap = ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionBestLap), _data, _headers);
+                return _lapDeltaToSessionBestLap.Value;
+            }
+        }
+        private float? _lapDeltaToSessionBestLap_DD;
+        public float LapDeltaToSessionBestLap_DD
+        {
+            get
+            {
+                if (!_lapDeltaToSessionBestLap_DD.HasValue) _lapDeltaToSessionBestLap_DD = ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionBestLap_DD), _data, _headers);
+                return _lapDeltaToSessionBestLap_DD.Value;
+            }
+        }
+        public bool? _lapDeltaToSessionBestLap_OK;
+        public bool LapDeltaToSessionBestLap_OK
+        {
+            get
+            {
+                if (!_lapDeltaToSessionBestLap_OK.HasValue) _lapDeltaToSessionBestLap_OK = ValueSerializer.GetBoolValue(nameof(LapDeltaToSessionBestLap_OK), _data, _headers);
+                return _lapDeltaToSessionBestLap_OK.Value;
+            }
+        }
+        private float? _lapDeltaToSessionLastlLap;
+        public float LapDeltaToSessionLastlLap
+        {
+            get
+            {
+                if (!_lapDeltaToSessionLastlLap.HasValue) _lapDeltaToSessionLastlLap = ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionLastlLap), _data, _headers);
+                return _lapDeltaToSessionLastlLap.Value;
+            }
+        }
+        private float? _lapDeltaToSessionLastlLap_DD;
+        public float LapDeltaToSessionLastlLap_DD
+        {
+            get
+            {
+                if (!_lapDeltaToSessionLastlLap_DD.HasValue) _lapDeltaToSessionLastlLap_DD = ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionLastlLap_DD), _data, _headers);
+                return _lapDeltaToSessionLastlLap_DD.Value;
+            }
+        }
+        public bool? _lapDeltaToSessionLastlLap_OK;
+        public bool LapDeltaToSessionLastlLap_OK
+        {
+            get
+            {
+                if (!_lapDeltaToSessionLastlLap_OK.HasValue) _lapDeltaToSessionLastlLap_OK = ValueSerializer.GetBoolValue(nameof(LapDeltaToSessionLastlLap_OK), _data, _headers);
+                return _lapDeltaToSessionLastlLap_OK.Value;
+            }
+        }
+        private float? _lapDeltaToSessionOptimalLap;
+        public float LapDeltaToSessionOptimalLap
+        {
+            get
+            {
+                if (!_lapDeltaToSessionOptimalLap.HasValue) _lapDeltaToSessionOptimalLap = ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionOptimalLap), _data, _headers);
+                return _lapDeltaToSessionOptimalLap.Value;
+            }
+        }
+        private float? _lapDeltaToSessionOptimalLap_DD;
+        public float LapDeltaToSessionOptimalLap_DD
+        {
+            get
+            {
+                if (!_lapDeltaToSessionOptimalLap_DD.HasValue) _lapDeltaToSessionOptimalLap_DD = ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionOptimalLap_DD), _data, _headers);
+                return _lapDeltaToSessionOptimalLap_DD.Value;
+            }
+        }
+        public bool? _lapDeltaToSessionOptimalLap_OK;
+        public bool LapDeltaToSessionOptimalLap_OK
+        {
+            get
+            {
+                if (!_lapDeltaToSessionOptimalLap_OK.HasValue) _lapDeltaToSessionOptimalLap_OK = ValueSerializer.GetBoolValue(nameof(LapDeltaToSessionOptimalLap_OK), _data, _headers);
+                return _lapDeltaToSessionOptimalLap_OK.Value;
+            }
+        }
+        private float? _lapDist;
+        public float LapDist
+        {
+            get
+            {
+                if (!_lapDist.HasValue) _lapDist = ValueSerializer.GetFloatValue(nameof(LapDist), _data, _headers);
+                return _lapDist.Value;
+            }
+        }
+        private float? _lapDistPct;
+        public float LapDistPct
+        {
+            get
+            {
+                if (!_lapDistPct.HasValue) _lapDistPct = ValueSerializer.GetFloatValue(nameof(LapDistPct), _data, _headers);
+                return _lapDistPct.Value;
+            }
+        }
+        private int? _lapLasNLapSeq;
+        public int LapLasNLapSeq
+        {
+            get
+            {
+                if (!_lapLasNLapSeq.HasValue) _lapLasNLapSeq = ValueSerializer.GetIntValue(nameof(LapLasNLapSeq), _data, _headers);
+                return _lapLasNLapSeq.Value;
+            }
+        }
+        private float? _lapLastLapTime;
+        public float LapLastLapTime
+        {
+            get
+            {
+                if (!_lapLastLapTime.HasValue) _lapLastLapTime = ValueSerializer.GetFloatValue(nameof(LapLastLapTime), _data, _headers);
+                return _lapLastLapTime.Value;
+            }
+        }
+        private float? _lapLastNLapTime;
+        public float LapLastNLapTime
+        {
+            get
+            {
+                if (!_lapLastNLapTime.HasValue) _lapLastNLapTime = ValueSerializer.GetFloatValue(nameof(LapLastNLapTime), _data, _headers);
+                return _lapLastNLapTime.Value;
+            }
+        }
+        private float? _latAccel;
+        public float LatAccel
+        {
+            get
+            {
+                if (!_latAccel.HasValue) _latAccel = ValueSerializer.GetFloatValue(nameof(LatAccel), _data, _headers);
+                return _latAccel.Value;
+            }
+        }
+        private float[] _latAccel_ST;
+        public float[] LatAccel_ST
+        {
+            get
+            {
+                if (_latAccel_ST == null) _latAccel_ST = ValueSerializer.GetFloatArrayValue(nameof(LatAccel_ST), _data, _headers);
+                return _latAccel_ST;
+            }
+        }
+        private float? _lFbrakeLinePress;
+        public float LFbrakeLinePress
+        {
+            get
+            {
+                if (!_lFbrakeLinePress.HasValue) _lFbrakeLinePress = ValueSerializer.GetFloatValue(nameof(LFbrakeLinePress), _data, _headers);
+                return _lFbrakeLinePress.Value;
+            }
+        }
+        private float? _lFcoldPressure;
+        public float LFcoldPressure
+        {
+            get
+            {
+                if (!_lFcoldPressure.HasValue) _lFcoldPressure = ValueSerializer.GetFloatValue(nameof(LFcoldPressure), _data, _headers);
+                return _lFcoldPressure.Value;
+            }
+        }
+        private float? _lFshockDefl;
+        public float LFshockDefl
+        {
+            get
+            {
+                if (!_lFshockDefl.HasValue) _lFshockDefl = ValueSerializer.GetFloatValue(nameof(LFshockDefl), _data, _headers);
+                return _lFshockDefl.Value;
+            }
+        }
+        private float[] _lFshockDefl_ST;
+        public float[] LFshockDefl_ST
+        {
+            get
+            {
+                if (_lFshockDefl_ST == null) _lFshockDefl_ST = ValueSerializer.GetFloatArrayValue(nameof(LFshockDefl_ST), _data, _headers);
+                return _lFshockDefl_ST;
+            }
+        }
+        private float? _lFshockVel;
+        public float LFshockVel
+        {
+            get
+            {
+                if (!_lFshockVel.HasValue) _lFshockVel = ValueSerializer.GetFloatValue(nameof(LFshockVel), _data, _headers);
+                return _lFshockVel.Value;
+            }
+        }
+        private float[] _lFshockVel_ST;
+        public float[] LFshockVel_ST
+        {
+            get
+            {
+                if (_lFshockVel_ST == null) _lFshockVel_ST = ValueSerializer.GetFloatArrayValue(nameof(LFshockVel_ST), _data, _headers);
+                return _lFshockVel_ST;
+            }
+        }
+        private float? _lFtempCL;
+        public float LFtempCL
+        {
+            get
+            {
+                if (!_lFtempCL.HasValue) _lFtempCL = ValueSerializer.GetFloatValue(nameof(LFtempCL), _data, _headers);
+                return _lFtempCL.Value;
+            }
+        }
+        private float? _lFtempCM;
+        public float LFtempCM
+        {
+            get
+            {
+                if (!_lFtempCM.HasValue) _lFtempCM = ValueSerializer.GetFloatValue(nameof(LFtempCM), _data, _headers);
+                return _lFtempCM.Value;
+            }
+        }
+        private float? _lFtempCR;
+        public float LFtempCR
+        {
+            get
+            {
+                if (!_lFtempCR.HasValue) _lFtempCR = ValueSerializer.GetFloatValue(nameof(LFtempCR), _data, _headers);
+                return _lFtempCR.Value;
+            }
+        }
+        private float? _lFwearL;
+        public float LFwearL
+        {
+            get
+            {
+                if (!_lFwearL.HasValue) _lFwearL = ValueSerializer.GetFloatValue(nameof(LFwearL), _data, _headers);
+                return _lFwearL.Value;
+            }
+        }
+        private float? _lFwearM;
+        public float LFwearM
+        {
+            get
+            {
+                if (!_lFwearM.HasValue) _lFwearM = ValueSerializer.GetFloatValue(nameof(LFwearM), _data, _headers);
+                return _lFwearM.Value;
+            }
+        }
+        private float? _lFwearR;
+        public float LFwearR
+        {
+            get
+            {
+                if (!_lFwearR.HasValue) _lFwearR = ValueSerializer.GetFloatValue(nameof(LFwearR), _data, _headers);
+                return _lFwearR.Value;
+            }
+        }
+        public bool? _loadNumTextures;
+        public bool LoadNumTextures
+        {
+            get
+            {
+                if (!_loadNumTextures.HasValue) _loadNumTextures = ValueSerializer.GetBoolValue(nameof(LoadNumTextures), _data, _headers);
+                return _loadNumTextures.Value;
+            }
+        }
+        private float? _longAccel;
+        public float LongAccel
+        {
+            get
+            {
+                if (!_longAccel.HasValue) _longAccel = ValueSerializer.GetFloatValue(nameof(LongAccel), _data, _headers);
+                return _longAccel.Value;
+            }
+        }
+        private float[] _longAccel_ST;
+        public float[] LongAccel_ST
+        {
+            get
+            {
+                if (_longAccel_ST == null) _longAccel_ST = ValueSerializer.GetFloatArrayValue(nameof(LongAccel_ST), _data, _headers);
+                return _longAccel_ST;
+            }
+        }
+        private float? _lRbrakeLinePress;
+        public float LRbrakeLinePress
+        {
+            get
+            {
+                if (!_lRbrakeLinePress.HasValue) _lRbrakeLinePress = ValueSerializer.GetFloatValue(nameof(LRbrakeLinePress), _data, _headers);
+                return _lRbrakeLinePress.Value;
+            }
+        }
+        private float? _lRcoldPressure;
+        public float LRcoldPressure
+        {
+            get
+            {
+                if (!_lRcoldPressure.HasValue) _lRcoldPressure = ValueSerializer.GetFloatValue(nameof(LRcoldPressure), _data, _headers);
+                return _lRcoldPressure.Value;
+            }
+        }
+        private float? _lRshockDefl;
+        public float LRshockDefl
+        {
+            get
+            {
+                if (!_lRshockDefl.HasValue) _lRshockDefl = ValueSerializer.GetFloatValue(nameof(LRshockDefl), _data, _headers);
+                return _lRshockDefl.Value;
+            }
+        }
+        private float[] _lRshockDefl_ST;
+        public float[] LRshockDefl_ST
+        {
+            get
+            {
+                if (_lRshockDefl_ST == null) _lRshockDefl_ST = ValueSerializer.GetFloatArrayValue(nameof(LRshockDefl_ST), _data, _headers);
+                return _lRshockDefl_ST;
+            }
+        }
+        private float? _lRshockVel;
+        public float LRshockVel
+        {
+            get
+            {
+                if (!_lRshockVel.HasValue) _lRshockVel = ValueSerializer.GetFloatValue(nameof(LRshockVel), _data, _headers);
+                return _lRshockVel.Value;
+            }
+        }
+        private float[] _lRshockVel_ST;
+        public float[] LRshockVel_ST
+        {
+            get
+            {
+                if (_lRshockVel_ST == null) _lRshockVel_ST = ValueSerializer.GetFloatArrayValue(nameof(LRshockVel_ST), _data, _headers);
+                return _lRshockVel_ST;
+            }
+        }
+        private float? _lRtempCL;
+        public float LRtempCL
+        {
+            get
+            {
+                if (!_lRtempCL.HasValue) _lRtempCL = ValueSerializer.GetFloatValue(nameof(LRtempCL), _data, _headers);
+                return _lRtempCL.Value;
+            }
+        }
+        private float? _lRtempCM;
+        public float LRtempCM
+        {
+            get
+            {
+                if (!_lRtempCM.HasValue) _lRtempCM = ValueSerializer.GetFloatValue(nameof(LRtempCM), _data, _headers);
+                return _lRtempCM.Value;
+            }
+        }
+        private float? _lRtempCR;
+        public float LRtempCR
+        {
+            get
+            {
+                if (!_lRtempCR.HasValue) _lRtempCR = ValueSerializer.GetFloatValue(nameof(LRtempCR), _data, _headers);
+                return _lRtempCR.Value;
+            }
+        }
+        private float? _lRwearL;
+        public float LRwearL
+        {
+            get
+            {
+                if (!_lRwearL.HasValue) _lRwearL = ValueSerializer.GetFloatValue(nameof(LRwearL), _data, _headers);
+                return _lRwearL.Value;
+            }
+        }
+        private float? _lRwearM;
+        public float LRwearM
+        {
+            get
+            {
+                if (!_lRwearM.HasValue) _lRwearM = ValueSerializer.GetFloatValue(nameof(LRwearM), _data, _headers);
+                return _lRwearM.Value;
+            }
+        }
+        private float? _lRwearR;
+        public float LRwearR
+        {
+            get
+            {
+                if (!_lRwearR.HasValue) _lRwearR = ValueSerializer.GetFloatValue(nameof(LRwearR), _data, _headers);
+                return _lRwearR.Value;
+            }
+        }
+        private float? _manifoldPress;
+        public float ManifoldPress
+        {
+            get
+            {
+                if (!_manifoldPress.HasValue) _manifoldPress = ValueSerializer.GetFloatValue(nameof(ManifoldPress), _data, _headers);
+                return _manifoldPress.Value;
+            }
+        }
+        public bool? _manualBoost;
+        public bool ManualBoost
+        {
+            get
+            {
+                if (!_manualBoost.HasValue) _manualBoost = ValueSerializer.GetBoolValue(nameof(ManualBoost), _data, _headers);
+                return _manualBoost.Value;
+            }
+        }
+        public bool? _manualNoBoost;
+        public bool ManualNoBoost
+        {
+            get
+            {
+                if (!_manualNoBoost.HasValue) _manualNoBoost = ValueSerializer.GetBoolValue(nameof(ManualNoBoost), _data, _headers);
+                return _manualNoBoost.Value;
+            }
+        }
+        private float? _oilLevel;
+        public float OilLevel
+        {
+            get
+            {
+                if (!_oilLevel.HasValue) _oilLevel = ValueSerializer.GetFloatValue(nameof(OilLevel), _data, _headers);
+                return _oilLevel.Value;
+            }
+        }
+        private float? _oilPress;
+        public float OilPress
+        {
+            get
+            {
+                if (!_oilPress.HasValue) _oilPress = ValueSerializer.GetFloatValue(nameof(OilPress), _data, _headers);
+                return _oilPress.Value;
+            }
+        }
+        private float? _oilTemp;
+        public float OilTemp
+        {
+            get
+            {
+                if (!_oilTemp.HasValue) _oilTemp = ValueSerializer.GetFloatValue(nameof(OilTemp), _data, _headers);
+                return _oilTemp.Value;
+            }
+        }
+        public bool? _okToReloadTextures;
+        public bool OkToReloadTextures
+        {
+            get
+            {
+                if (!_okToReloadTextures.HasValue) _okToReloadTextures = ValueSerializer.GetBoolValue(nameof(OkToReloadTextures), _data, _headers);
+                return _okToReloadTextures.Value;
+            }
+        }
+        public bool? _onPitRoad;
+        public bool OnPitRoad
+        {
+            get
+            {
+                if (!_onPitRoad.HasValue) _onPitRoad = ValueSerializer.GetBoolValue(nameof(OnPitRoad), _data, _headers);
+                return _onPitRoad.Value;
+            }
+        }
+        private float? _pitch;
+        public float Pitch
+        {
+            get
+            {
+                if (!_pitch.HasValue) _pitch = ValueSerializer.GetFloatValue(nameof(Pitch), _data, _headers);
+                return _pitch.Value;
+            }
+        }
+        private float? _pitchRate;
+        public float PitchRate
+        {
+            get
+            {
+                if (!_pitchRate.HasValue) _pitchRate = ValueSerializer.GetFloatValue(nameof(PitchRate), _data, _headers);
+                return _pitchRate.Value;
+            }
+        }
+        private float[] _pitchRate_ST;
+        public float[] PitchRate_ST
+        {
+            get
+            {
+                if (_pitchRate_ST == null) _pitchRate_ST = ValueSerializer.GetFloatArrayValue(nameof(PitchRate_ST), _data, _headers);
+                return _pitchRate_ST;
+            }
+        }
+        private float? _pitOptRepairLeft;
+        public float PitOptRepairLeft
+        {
+            get
+            {
+                if (!_pitOptRepairLeft.HasValue) _pitOptRepairLeft = ValueSerializer.GetFloatValue(nameof(PitOptRepairLeft), _data, _headers);
+                return _pitOptRepairLeft.Value;
+            }
+        }
+        private float? _pitRepairLeft;
+        public float PitRepairLeft
+        {
+            get
+            {
+                if (!_pitRepairLeft.HasValue) _pitRepairLeft = ValueSerializer.GetFloatValue(nameof(PitRepairLeft), _data, _headers);
+                return _pitRepairLeft.Value;
+            }
+        }
+        public bool? _pitsOpen;
+        public bool PitsOpen
+        {
+            get
+            {
+                if (!_pitsOpen.HasValue) _pitsOpen = ValueSerializer.GetBoolValue(nameof(PitsOpen), _data, _headers);
+                return _pitsOpen.Value;
+            }
+        }
+        public bool? _pitstopActive;
+        public bool PitstopActive
+        {
+            get
+            {
+                if (!_pitstopActive.HasValue) _pitstopActive = ValueSerializer.GetBoolValue(nameof(PitstopActive), _data, _headers);
+                return _pitstopActive.Value;
+            }
+        }
+        private int? _pitSvFlags;
+        public int PitSvFlags
+        {
+            get
+            {
+                if (!_pitSvFlags.HasValue) _pitSvFlags = ValueSerializer.GetIntValue(nameof(PitSvFlags), _data, _headers);
+                return _pitSvFlags.Value;
+            }
+        }
+        private float? _pitSvFuel;
+        public float PitSvFuel
+        {
+            get
+            {
+                if (!_pitSvFuel.HasValue) _pitSvFuel = ValueSerializer.GetFloatValue(nameof(PitSvFuel), _data, _headers);
+                return _pitSvFuel.Value;
+            }
+        }
+        private float? _pitSvLFP;
+        public float PitSvLFP
+        {
+            get
+            {
+                if (!_pitSvLFP.HasValue) _pitSvLFP = ValueSerializer.GetFloatValue(nameof(PitSvLFP), _data, _headers);
+                return _pitSvLFP.Value;
+            }
+        }
+        private float? _pitSvLRP;
+        public float PitSvLRP
+        {
+            get
+            {
+                if (!_pitSvLRP.HasValue) _pitSvLRP = ValueSerializer.GetFloatValue(nameof(PitSvLRP), _data, _headers);
+                return _pitSvLRP.Value;
+            }
+        }
+        private float? _pitSvRFP;
+        public float PitSvRFP
+        {
+            get
+            {
+                if (!_pitSvRFP.HasValue) _pitSvRFP = ValueSerializer.GetFloatValue(nameof(PitSvRFP), _data, _headers);
+                return _pitSvRFP.Value;
+            }
+        }
+        private float? _pitSvRRP;
+        public float PitSvRRP
+        {
+            get
+            {
+                if (!_pitSvRRP.HasValue) _pitSvRRP = ValueSerializer.GetFloatValue(nameof(PitSvRRP), _data, _headers);
+                return _pitSvRRP.Value;
+            }
+        }
+        private int? _playerCarClassPosition;
+        public int PlayerCarClassPosition
+        {
+            get
+            {
+                if (!_playerCarClassPosition.HasValue) _playerCarClassPosition = ValueSerializer.GetIntValue(nameof(PlayerCarClassPosition), _data, _headers);
+                return _playerCarClassPosition.Value;
+            }
+        }
+        private int? _playerCarDriverIncidentCount;
+        public int PlayerCarDriverIncidentCount
+        {
+            get
+            {
+                if (!_playerCarDriverIncidentCount.HasValue) _playerCarDriverIncidentCount = ValueSerializer.GetIntValue(nameof(PlayerCarDriverIncidentCount), _data, _headers);
+                return _playerCarDriverIncidentCount.Value;
+            }
+        }
+        private int? _playerCarIdx;
+        public int PlayerCarIdx
+        {
+            get
+            {
+                if (!_playerCarIdx.HasValue) _playerCarIdx = ValueSerializer.GetIntValue(nameof(PlayerCarIdx), _data, _headers);
+                return _playerCarIdx.Value;
+            }
+        }
+        public bool? _playerCarInPitStall;
+        public bool PlayerCarInPitStall
+        {
+            get
+            {
+                if (!_playerCarInPitStall.HasValue) _playerCarInPitStall = ValueSerializer.GetBoolValue(nameof(PlayerCarInPitStall), _data, _headers);
+                return _playerCarInPitStall.Value;
+            }
+        }
+        private int? _playerCarMyIncidentCount;
+        public int PlayerCarMyIncidentCount
+        {
+            get
+            {
+                if (!_playerCarMyIncidentCount.HasValue) _playerCarMyIncidentCount = ValueSerializer.GetIntValue(nameof(PlayerCarMyIncidentCount), _data, _headers);
+                return _playerCarMyIncidentCount.Value;
+            }
+        }
+        private int? _playerCarPitSvStatus;
+        public int PlayerCarPitSvStatus
+        {
+            get
+            {
+                if (!_playerCarPitSvStatus.HasValue) _playerCarPitSvStatus = ValueSerializer.GetIntValue(nameof(PlayerCarPitSvStatus), _data, _headers);
+                return _playerCarPitSvStatus.Value;
+            }
+        }
+        private int? _playerCarPosition;
+        public int PlayerCarPosition
+        {
+            get
+            {
+                if (!_playerCarPosition.HasValue) _playerCarPosition = ValueSerializer.GetIntValue(nameof(PlayerCarPosition), _data, _headers);
+                return _playerCarPosition.Value;
+            }
+        }
+        private float? _playerCarPowerAdjust;
+        public float PlayerCarPowerAdjust
+        {
+            get
+            {
+                if (!_playerCarPowerAdjust.HasValue) _playerCarPowerAdjust = ValueSerializer.GetFloatValue(nameof(PlayerCarPowerAdjust), _data, _headers);
+                return _playerCarPowerAdjust.Value;
+            }
+        }
+        private int? _playerCarTeamIncidentCount;
+        public int PlayerCarTeamIncidentCount
+        {
+            get
+            {
+                if (!_playerCarTeamIncidentCount.HasValue) _playerCarTeamIncidentCount = ValueSerializer.GetIntValue(nameof(PlayerCarTeamIncidentCount), _data, _headers);
+                return _playerCarTeamIncidentCount.Value;
+            }
+        }
+        private float? _playerCarTowTime;
+        public float PlayerCarTowTime
+        {
+            get
+            {
+                if (!_playerCarTowTime.HasValue) _playerCarTowTime = ValueSerializer.GetFloatValue(nameof(PlayerCarTowTime), _data, _headers);
+                return _playerCarTowTime.Value;
+            }
+        }
+        private float? _playerCarWeightPenalty;
+        public float PlayerCarWeightPenalty
+        {
+            get
+            {
+                if (!_playerCarWeightPenalty.HasValue) _playerCarWeightPenalty = ValueSerializer.GetFloatValue(nameof(PlayerCarWeightPenalty), _data, _headers);
+                return _playerCarWeightPenalty.Value;
+            }
+        }
+        private int? _playerTrackSurface;
+        public int PlayerTrackSurface
+        {
+            get
+            {
+                if (!_playerTrackSurface.HasValue) _playerTrackSurface = ValueSerializer.GetIntValue(nameof(PlayerTrackSurface), _data, _headers);
+                return _playerTrackSurface.Value;
+            }
+        }
+        private int? _playerTrackSurfaceMaterial;
+        public int PlayerTrackSurfaceMaterial
+        {
+            get
+            {
+                if (!_playerTrackSurfaceMaterial.HasValue) _playerTrackSurfaceMaterial = ValueSerializer.GetIntValue(nameof(PlayerTrackSurfaceMaterial), _data, _headers);
+                return _playerTrackSurfaceMaterial.Value;
+            }
+        }
+        public bool? _pushToPass;
+        public bool PushToPass
+        {
+            get
+            {
+                if (!_pushToPass.HasValue) _pushToPass = ValueSerializer.GetBoolValue(nameof(PushToPass), _data, _headers);
+                return _pushToPass.Value;
+            }
+        }
+        private int? _raceLaps;
+        public int RaceLaps
+        {
+            get
+            {
+                if (!_raceLaps.HasValue) _raceLaps = ValueSerializer.GetIntValue(nameof(RaceLaps), _data, _headers);
+                return _raceLaps.Value;
+            }
+        }
+        private int? _radioTransmitCarIdx;
+        public int RadioTransmitCarIdx
+        {
+            get
+            {
+                if (!_radioTransmitCarIdx.HasValue) _radioTransmitCarIdx = ValueSerializer.GetIntValue(nameof(RadioTransmitCarIdx), _data, _headers);
+                return _radioTransmitCarIdx.Value;
+            }
+        }
+        private int? _radioTransmitFrequencyIdx;
+        public int RadioTransmitFrequencyIdx
+        {
+            get
+            {
+                if (!_radioTransmitFrequencyIdx.HasValue) _radioTransmitFrequencyIdx = ValueSerializer.GetIntValue(nameof(RadioTransmitFrequencyIdx), _data, _headers);
+                return _radioTransmitFrequencyIdx.Value;
+            }
+        }
+        private int? _radioTransmitRadioIdx;
+        public int RadioTransmitRadioIdx
+        {
+            get
+            {
+                if (!_radioTransmitRadioIdx.HasValue) _radioTransmitRadioIdx = ValueSerializer.GetIntValue(nameof(RadioTransmitRadioIdx), _data, _headers);
+                return _radioTransmitRadioIdx.Value;
+            }
+        }
+        private float? _relativeHumidity;
+        public float RelativeHumidity
+        {
+            get
+            {
+                if (!_relativeHumidity.HasValue) _relativeHumidity = ValueSerializer.GetFloatValue(nameof(RelativeHumidity), _data, _headers);
+                return _relativeHumidity.Value;
+            }
+        }
+        private int? _replayFrameNum;
+        public int ReplayFrameNum
+        {
+            get
+            {
+                if (!_replayFrameNum.HasValue) _replayFrameNum = ValueSerializer.GetIntValue(nameof(ReplayFrameNum), _data, _headers);
+                return _replayFrameNum.Value;
+            }
+        }
+        private int? _replayFrameNumEnd;
+        public int ReplayFrameNumEnd
+        {
+            get
+            {
+                if (!_replayFrameNumEnd.HasValue) _replayFrameNumEnd = ValueSerializer.GetIntValue(nameof(ReplayFrameNumEnd), _data, _headers);
+                return _replayFrameNumEnd.Value;
+            }
+        }
+        public bool? _replayPlaySlowMotion;
+        public bool ReplayPlaySlowMotion
+        {
+            get
+            {
+                if (!_replayPlaySlowMotion.HasValue) _replayPlaySlowMotion = ValueSerializer.GetBoolValue(nameof(ReplayPlaySlowMotion), _data, _headers);
+                return _replayPlaySlowMotion.Value;
+            }
+        }
+        private int? _replayPlaySpeed;
+        public int ReplayPlaySpeed
+        {
+            get
+            {
+                if (!_replayPlaySpeed.HasValue) _replayPlaySpeed = ValueSerializer.GetIntValue(nameof(ReplayPlaySpeed), _data, _headers);
+                return _replayPlaySpeed.Value;
+            }
+        }
+        private int? _replaySessionNum;
+        public int ReplaySessionNum
+        {
+            get
+            {
+                if (!_replaySessionNum.HasValue) _replaySessionNum = ValueSerializer.GetIntValue(nameof(ReplaySessionNum), _data, _headers);
+                return _replaySessionNum.Value;
+            }
+        }
+        public double? _replaySessionTime;
+        public double ReplaySessionTime
+        {
+            get
+            {
+                if (!_replaySessionTime.HasValue) _replaySessionTime = ValueSerializer.GetDoubleValue(nameof(ReplaySessionTime), _data, _headers);
+                return _replaySessionTime.Value;
+            }
+        }
+        private float? _rFbrakeLinePress;
+        public float RFbrakeLinePress
+        {
+            get
+            {
+                if (!_rFbrakeLinePress.HasValue) _rFbrakeLinePress = ValueSerializer.GetFloatValue(nameof(RFbrakeLinePress), _data, _headers);
+                return _rFbrakeLinePress.Value;
+            }
+        }
+        private float? _rFcoldPressure;
+        public float RFcoldPressure
+        {
+            get
+            {
+                if (!_rFcoldPressure.HasValue) _rFcoldPressure = ValueSerializer.GetFloatValue(nameof(RFcoldPressure), _data, _headers);
+                return _rFcoldPressure.Value;
+            }
+        }
+        private float? _rFshockDefl;
+        public float RFshockDefl
+        {
+            get
+            {
+                if (!_rFshockDefl.HasValue) _rFshockDefl = ValueSerializer.GetFloatValue(nameof(RFshockDefl), _data, _headers);
+                return _rFshockDefl.Value;
+            }
+        }
+        private float[] _rFshockDefl_ST;
+        public float[] RFshockDefl_ST
+        {
+            get
+            {
+                if (_rFshockDefl_ST == null) _rFshockDefl_ST = ValueSerializer.GetFloatArrayValue(nameof(RFshockDefl_ST), _data, _headers);
+                return _rFshockDefl_ST;
+            }
+        }
+        private float? _rFshockVel;
+        public float RFshockVel
+        {
+            get
+            {
+                if (!_rFshockVel.HasValue) _rFshockVel = ValueSerializer.GetFloatValue(nameof(RFshockVel), _data, _headers);
+                return _rFshockVel.Value;
+            }
+        }
+        private float[] _rFshockVel_ST;
+        public float[] RFshockVel_ST
+        {
+            get
+            {
+                if (_rFshockVel_ST == null) _rFshockVel_ST = ValueSerializer.GetFloatArrayValue(nameof(RFshockVel_ST), _data, _headers);
+                return _rFshockVel_ST;
+            }
+        }
+        private float? _rFtempCL;
+        public float RFtempCL
+        {
+            get
+            {
+                if (!_rFtempCL.HasValue) _rFtempCL = ValueSerializer.GetFloatValue(nameof(RFtempCL), _data, _headers);
+                return _rFtempCL.Value;
+            }
+        }
+        private float? _rFtempCM;
+        public float RFtempCM
+        {
+            get
+            {
+                if (!_rFtempCM.HasValue) _rFtempCM = ValueSerializer.GetFloatValue(nameof(RFtempCM), _data, _headers);
+                return _rFtempCM.Value;
+            }
+        }
+        private float? _rFtempCR;
+        public float RFtempCR
+        {
+            get
+            {
+                if (!_rFtempCR.HasValue) _rFtempCR = ValueSerializer.GetFloatValue(nameof(RFtempCR), _data, _headers);
+                return _rFtempCR.Value;
+            }
+        }
+        private float? _rFwearL;
+        public float RFwearL
+        {
+            get
+            {
+                if (!_rFwearL.HasValue) _rFwearL = ValueSerializer.GetFloatValue(nameof(RFwearL), _data, _headers);
+                return _rFwearL.Value;
+            }
+        }
+        private float? _rFwearM;
+        public float RFwearM
+        {
+            get
+            {
+                if (!_rFwearM.HasValue) _rFwearM = ValueSerializer.GetFloatValue(nameof(RFwearM), _data, _headers);
+                return _rFwearM.Value;
+            }
+        }
+        private float? _rFwearR;
+        public float RFwearR
+        {
+            get
+            {
+                if (!_rFwearR.HasValue) _rFwearR = ValueSerializer.GetFloatValue(nameof(RFwearR), _data, _headers);
+                return _rFwearR.Value;
+            }
+        }
+        private float? _roll;
+        public float Roll
+        {
+            get
+            {
+                if (!_roll.HasValue) _roll = ValueSerializer.GetFloatValue(nameof(Roll), _data, _headers);
+                return _roll.Value;
+            }
+        }
+        private float? _rollRate;
+        public float RollRate
+        {
+            get
+            {
+                if (!_rollRate.HasValue) _rollRate = ValueSerializer.GetFloatValue(nameof(RollRate), _data, _headers);
+                return _rollRate.Value;
+            }
+        }
+        private float[] _rollRate_ST;
+        public float[] RollRate_ST
+        {
+            get
+            {
+                if (_rollRate_ST == null) _rollRate_ST = ValueSerializer.GetFloatArrayValue(nameof(RollRate_ST), _data, _headers);
+                return _rollRate_ST;
+            }
+        }
+        private float? _rPM;
+        public float RPM
+        {
+            get
+            {
+                if (!_rPM.HasValue) _rPM = ValueSerializer.GetFloatValue(nameof(RPM), _data, _headers);
+                return _rPM.Value;
+            }
+        }
+        private float? _rRbrakeLinePress;
+        public float RRbrakeLinePress
+        {
+            get
+            {
+                if (!_rRbrakeLinePress.HasValue) _rRbrakeLinePress = ValueSerializer.GetFloatValue(nameof(RRbrakeLinePress), _data, _headers);
+                return _rRbrakeLinePress.Value;
+            }
+        }
+        private float? _rRcoldPressure;
+        public float RRcoldPressure
+        {
+            get
+            {
+                if (!_rRcoldPressure.HasValue) _rRcoldPressure = ValueSerializer.GetFloatValue(nameof(RRcoldPressure), _data, _headers);
+                return _rRcoldPressure.Value;
+            }
+        }
+        private float? _rRshockDefl;
+        public float RRshockDefl
+        {
+            get
+            {
+                if (!_rRshockDefl.HasValue) _rRshockDefl = ValueSerializer.GetFloatValue(nameof(RRshockDefl), _data, _headers);
+                return _rRshockDefl.Value;
+            }
+        }
+        private float[] _rRshockDefl_ST;
+        public float[] RRshockDefl_ST
+        {
+            get
+            {
+                if (_rRshockDefl_ST == null) _rRshockDefl_ST = ValueSerializer.GetFloatArrayValue(nameof(RRshockDefl_ST), _data, _headers);
+                return _rRshockDefl_ST;
+            }
+        }
+        private float? _rRshockVel;
+        public float RRshockVel
+        {
+            get
+            {
+                if (!_rRshockVel.HasValue) _rRshockVel = ValueSerializer.GetFloatValue(nameof(RRshockVel), _data, _headers);
+                return _rRshockVel.Value;
+            }
+        }
+        private float[] _rRshockVel_ST;
+        public float[] RRshockVel_ST
+        {
+            get
+            {
+                if (_rRshockVel_ST == null) _rRshockVel_ST = ValueSerializer.GetFloatArrayValue(nameof(RRshockVel_ST), _data, _headers);
+                return _rRshockVel_ST;
+            }
+        }
+        private float? _rRtempCL;
+        public float RRtempCL
+        {
+            get
+            {
+                if (!_rRtempCL.HasValue) _rRtempCL = ValueSerializer.GetFloatValue(nameof(RRtempCL), _data, _headers);
+                return _rRtempCL.Value;
+            }
+        }
+        private float? _rRtempCM;
+        public float RRtempCM
+        {
+            get
+            {
+                if (!_rRtempCM.HasValue) _rRtempCM = ValueSerializer.GetFloatValue(nameof(RRtempCM), _data, _headers);
+                return _rRtempCM.Value;
+            }
+        }
+        private float? _rRtempCR;
+        public float RRtempCR
+        {
+            get
+            {
+                if (!_rRtempCR.HasValue) _rRtempCR = ValueSerializer.GetFloatValue(nameof(RRtempCR), _data, _headers);
+                return _rRtempCR.Value;
+            }
+        }
+        private float? _rRwearL;
+        public float RRwearL
+        {
+            get
+            {
+                if (!_rRwearL.HasValue) _rRwearL = ValueSerializer.GetFloatValue(nameof(RRwearL), _data, _headers);
+                return _rRwearL.Value;
+            }
+        }
+        private float? _rRwearM;
+        public float RRwearM
+        {
+            get
+            {
+                if (!_rRwearM.HasValue) _rRwearM = ValueSerializer.GetFloatValue(nameof(RRwearM), _data, _headers);
+                return _rRwearM.Value;
+            }
+        }
+        private float? _rRwearR;
+        public float RRwearR
+        {
+            get
+            {
+                if (!_rRwearR.HasValue) _rRwearR = ValueSerializer.GetFloatValue(nameof(RRwearR), _data, _headers);
+                return _rRwearR.Value;
+            }
+        }
+        private int? _sessionFlags;
+        public int SessionFlags
+        {
+            get
+            {
+                if (!_sessionFlags.HasValue) _sessionFlags = ValueSerializer.GetIntValue(nameof(SessionFlags), _data, _headers);
+                return _sessionFlags.Value;
+            }
+        }
+        private int? _sessionLapsRemain;
+        public int SessionLapsRemain
+        {
+            get
+            {
+                if (!_sessionLapsRemain.HasValue) _sessionLapsRemain = ValueSerializer.GetIntValue(nameof(SessionLapsRemain), _data, _headers);
+                return _sessionLapsRemain.Value;
+            }
+        }
+        private int? _sessionLapsRemainEx;
+        public int SessionLapsRemainEx
+        {
+            get
+            {
+                if (!_sessionLapsRemainEx.HasValue) _sessionLapsRemainEx = ValueSerializer.GetIntValue(nameof(SessionLapsRemainEx), _data, _headers);
+                return _sessionLapsRemainEx.Value;
+            }
+        }
+        private int? _sessionNum;
+        public int SessionNum
+        {
+            get
+            {
+                if (!_sessionNum.HasValue) _sessionNum = ValueSerializer.GetIntValue(nameof(SessionNum), _data, _headers);
+                return _sessionNum.Value;
+            }
+        }
+        private int? _sessionState;
+        public int SessionState
+        {
+            get
+            {
+                if (!_sessionState.HasValue) _sessionState = ValueSerializer.GetIntValue(nameof(SessionState), _data, _headers);
+                return _sessionState.Value;
+            }
+        }
+        private int? _sessionTick;
+        public int SessionTick
+        {
+            get
+            {
+                if (!_sessionTick.HasValue) _sessionTick = ValueSerializer.GetIntValue(nameof(SessionTick), _data, _headers);
+                return _sessionTick.Value;
+            }
+        }
+        public double? _sessionTime;
+        public double SessionTime
+        {
+            get
+            {
+                if (!_sessionTime.HasValue) _sessionTime = ValueSerializer.GetDoubleValue(nameof(SessionTime), _data, _headers);
+                return _sessionTime.Value;
+            }
+        }
+        private float? _sessionTimeOfDay;
+        public float SessionTimeOfDay
+        {
+            get
+            {
+                if (!_sessionTimeOfDay.HasValue) _sessionTimeOfDay = ValueSerializer.GetFloatValue(nameof(SessionTimeOfDay), _data, _headers);
+                return _sessionTimeOfDay.Value;
+            }
+        }
+        public double? _sessionTimeRemain;
+        public double SessionTimeRemain
+        {
+            get
+            {
+                if (!_sessionTimeRemain.HasValue) _sessionTimeRemain = ValueSerializer.GetDoubleValue(nameof(SessionTimeRemain), _data, _headers);
+                return _sessionTimeRemain.Value;
+            }
+        }
+        private int? _sessionUniqueID;
+        public int SessionUniqueID
+        {
+            get
+            {
+                if (!_sessionUniqueID.HasValue) _sessionUniqueID = ValueSerializer.GetIntValue(nameof(SessionUniqueID), _data, _headers);
+                return _sessionUniqueID.Value;
+            }
+        }
+        private float? _shiftGrindRPM;
+        public float ShiftGrindRPM
+        {
+            get
+            {
+                if (!_shiftGrindRPM.HasValue) _shiftGrindRPM = ValueSerializer.GetFloatValue(nameof(ShiftGrindRPM), _data, _headers);
+                return _shiftGrindRPM.Value;
+            }
+        }
+        private float? _shiftIndicatorPct;
+        public float ShiftIndicatorPct
+        {
+            get
+            {
+                if (!_shiftIndicatorPct.HasValue) _shiftIndicatorPct = ValueSerializer.GetFloatValue(nameof(ShiftIndicatorPct), _data, _headers);
+                return _shiftIndicatorPct.Value;
+            }
+        }
+        private float? _shiftPowerPct;
+        public float ShiftPowerPct
+        {
+            get
+            {
+                if (!_shiftPowerPct.HasValue) _shiftPowerPct = ValueSerializer.GetFloatValue(nameof(ShiftPowerPct), _data, _headers);
+                return _shiftPowerPct.Value;
+            }
+        }
+        private int? _skies;
+        public int Skies
+        {
+            get
+            {
+                if (!_skies.HasValue) _skies = ValueSerializer.GetIntValue(nameof(Skies), _data, _headers);
+                return _skies.Value;
+            }
+        }
+        private float? _speed;
+        public float Speed
+        {
+            get
+            {
+                if (!_speed.HasValue) _speed = ValueSerializer.GetFloatValue(nameof(Speed), _data, _headers);
+                return _speed.Value;
+            }
+        }
+        private float? _steeringWheelAngle;
+        public float SteeringWheelAngle
+        {
+            get
+            {
+                if (!_steeringWheelAngle.HasValue) _steeringWheelAngle = ValueSerializer.GetFloatValue(nameof(SteeringWheelAngle), _data, _headers);
+                return _steeringWheelAngle.Value;
+            }
+        }
+        private float? _steeringWheelAngleMax;
+        public float SteeringWheelAngleMax
+        {
+            get
+            {
+                if (!_steeringWheelAngleMax.HasValue) _steeringWheelAngleMax = ValueSerializer.GetFloatValue(nameof(SteeringWheelAngleMax), _data, _headers);
+                return _steeringWheelAngleMax.Value;
+            }
+        }
+        private float? _steeringWheelMaxForceNm;
+        public float SteeringWheelMaxForceNm
+        {
+            get
+            {
+                if (!_steeringWheelMaxForceNm.HasValue) _steeringWheelMaxForceNm = ValueSerializer.GetFloatValue(nameof(SteeringWheelMaxForceNm), _data, _headers);
+                return _steeringWheelMaxForceNm.Value;
+            }
+        }
+        private float? _steeringWheelPctDamper;
+        public float SteeringWheelPctDamper
+        {
+            get
+            {
+                if (!_steeringWheelPctDamper.HasValue) _steeringWheelPctDamper = ValueSerializer.GetFloatValue(nameof(SteeringWheelPctDamper), _data, _headers);
+                return _steeringWheelPctDamper.Value;
+            }
+        }
+        private float? _steeringWheelPctTorque;
+        public float SteeringWheelPctTorque
+        {
+            get
+            {
+                if (!_steeringWheelPctTorque.HasValue) _steeringWheelPctTorque = ValueSerializer.GetFloatValue(nameof(SteeringWheelPctTorque), _data, _headers);
+                return _steeringWheelPctTorque.Value;
+            }
+        }
+        private float? _steeringWheelPctTorqueSign;
+        public float SteeringWheelPctTorqueSign
+        {
+            get
+            {
+                if (!_steeringWheelPctTorqueSign.HasValue) _steeringWheelPctTorqueSign = ValueSerializer.GetFloatValue(nameof(SteeringWheelPctTorqueSign), _data, _headers);
+                return _steeringWheelPctTorqueSign.Value;
+            }
+        }
+        private float? _steeringWheelPctTorqueSignStops;
+        public float SteeringWheelPctTorqueSignStops
+        {
+            get
+            {
+                if (!_steeringWheelPctTorqueSignStops.HasValue) _steeringWheelPctTorqueSignStops = ValueSerializer.GetFloatValue(nameof(SteeringWheelPctTorqueSignStops), _data, _headers);
+                return _steeringWheelPctTorqueSignStops.Value;
+            }
+        }
+        private float? _steeringWheelPeakForceNm;
+        public float SteeringWheelPeakForceNm
+        {
+            get
+            {
+                if (!_steeringWheelPeakForceNm.HasValue) _steeringWheelPeakForceNm = ValueSerializer.GetFloatValue(nameof(SteeringWheelPeakForceNm), _data, _headers);
+                return _steeringWheelPeakForceNm.Value;
+            }
+        }
+        private float? _steeringWheelTorque;
+        public float SteeringWheelTorque
+        {
+            get
+            {
+                if (!_steeringWheelTorque.HasValue) _steeringWheelTorque = ValueSerializer.GetFloatValue(nameof(SteeringWheelTorque), _data, _headers);
+                return _steeringWheelTorque.Value;
+            }
+        }
+        private float[] _steeringWheelTorque_ST;
+        public float[] SteeringWheelTorque_ST
+        {
+            get
+            {
+                if (_steeringWheelTorque_ST == null) _steeringWheelTorque_ST = ValueSerializer.GetFloatArrayValue(nameof(SteeringWheelTorque_ST), _data, _headers);
+                return _steeringWheelTorque_ST;
+            }
+        }
+        public bool? _steeringWheelUseLinear;
+        public bool SteeringWheelUseLinear
+        {
+            get
+            {
+                if (!_steeringWheelUseLinear.HasValue) _steeringWheelUseLinear = ValueSerializer.GetBoolValue(nameof(SteeringWheelUseLinear), _data, _headers);
+                return _steeringWheelUseLinear.Value;
+            }
+        }
+        private float? _throttle;
+        public float Throttle
+        {
+            get
+            {
+                if (!_throttle.HasValue) _throttle = ValueSerializer.GetFloatValue(nameof(Throttle), _data, _headers);
+                return _throttle.Value;
+            }
+        }
+        private float? _throttleRaw;
+        public float ThrottleRaw
+        {
+            get
+            {
+                if (!_throttleRaw.HasValue) _throttleRaw = ValueSerializer.GetFloatValue(nameof(ThrottleRaw), _data, _headers);
+                return _throttleRaw.Value;
+            }
+        }
+        private float? _tireLF_RumblePitch;
+        public float TireLF_RumblePitch
+        {
+            get
+            {
+                if (!_tireLF_RumblePitch.HasValue) _tireLF_RumblePitch = ValueSerializer.GetFloatValue(nameof(TireLF_RumblePitch), _data, _headers);
+                return _tireLF_RumblePitch.Value;
+            }
+        }
+        private float? _tireLR_RumblePitch;
+        public float TireLR_RumblePitch
+        {
+            get
+            {
+                if (!_tireLR_RumblePitch.HasValue) _tireLR_RumblePitch = ValueSerializer.GetFloatValue(nameof(TireLR_RumblePitch), _data, _headers);
+                return _tireLR_RumblePitch.Value;
+            }
+        }
+        private float? _tireRF_RumblePitch;
+        public float TireRF_RumblePitch
+        {
+            get
+            {
+                if (!_tireRF_RumblePitch.HasValue) _tireRF_RumblePitch = ValueSerializer.GetFloatValue(nameof(TireRF_RumblePitch), _data, _headers);
+                return _tireRF_RumblePitch.Value;
+            }
+        }
+        private float? _tireRR_RumblePitch;
+        public float TireRR_RumblePitch
+        {
+            get
+            {
+                if (!_tireRR_RumblePitch.HasValue) _tireRR_RumblePitch = ValueSerializer.GetFloatValue(nameof(TireRR_RumblePitch), _data, _headers);
+                return _tireRR_RumblePitch.Value;
+            }
+        }
+        private float? _trackTemp;
+        public float TrackTemp
+        {
+            get
+            {
+                if (!_trackTemp.HasValue) _trackTemp = ValueSerializer.GetFloatValue(nameof(TrackTemp), _data, _headers);
+                return _trackTemp.Value;
+            }
+        }
+        private float? _trackTempCrew;
+        public float TrackTempCrew
+        {
+            get
+            {
+                if (!_trackTempCrew.HasValue) _trackTempCrew = ValueSerializer.GetFloatValue(nameof(TrackTempCrew), _data, _headers);
+                return _trackTempCrew.Value;
+            }
+        }
+        private float? _velocityX;
+        public float VelocityX
+        {
+            get
+            {
+                if (!_velocityX.HasValue) _velocityX = ValueSerializer.GetFloatValue(nameof(VelocityX), _data, _headers);
+                return _velocityX.Value;
+            }
+        }
+        private float[] _velocityX_ST;
+        public float[] VelocityX_ST
+        {
+            get
+            {
+                if (_velocityX_ST == null) _velocityX_ST = ValueSerializer.GetFloatArrayValue(nameof(VelocityX_ST), _data, _headers);
+                return _velocityX_ST;
+            }
+        }
+        private float? _velocityY;
+        public float VelocityY
+        {
+            get
+            {
+                if (!_velocityY.HasValue) _velocityY = ValueSerializer.GetFloatValue(nameof(VelocityY), _data, _headers);
+                return _velocityY.Value;
+            }
+        }
+        private float[] _velocityY_ST;
+        public float[] VelocityY_ST
+        {
+            get
+            {
+                if (_velocityY_ST == null) _velocityY_ST = ValueSerializer.GetFloatArrayValue(nameof(VelocityY_ST), _data, _headers);
+                return _velocityY_ST;
+            }
+        }
+        private float? _velocityZ;
+        public float VelocityZ
+        {
+            get
+            {
+                if (!_velocityZ.HasValue) _velocityZ = ValueSerializer.GetFloatValue(nameof(VelocityZ), _data, _headers);
+                return _velocityZ.Value;
+            }
+        }
+        private float[] _velocityZ_ST;
+        public float[] VelocityZ_ST
+        {
+            get
+            {
+                if (_velocityZ_ST == null) _velocityZ_ST = ValueSerializer.GetFloatArrayValue(nameof(VelocityZ_ST), _data, _headers);
+                return _velocityZ_ST;
+            }
+        }
+        private float? _vertAccel;
+        public float VertAccel
+        {
+            get
+            {
+                if (!_vertAccel.HasValue) _vertAccel = ValueSerializer.GetFloatValue(nameof(VertAccel), _data, _headers);
+                return _vertAccel.Value;
+            }
+        }
+        private float[] _vertAccel_ST;
+        public float[] VertAccel_ST
+        {
+            get
+            {
+                if (_vertAccel_ST == null) _vertAccel_ST = ValueSerializer.GetFloatArrayValue(nameof(VertAccel_ST), _data, _headers);
+                return _vertAccel_ST;
+            }
+        }
+        private float? _voltage;
+        public float Voltage
+        {
+            get
+            {
+                if (!_voltage.HasValue) _voltage = ValueSerializer.GetFloatValue(nameof(Voltage), _data, _headers);
+                return _voltage.Value;
+            }
+        }
+        private float? _waterLevel;
+        public float WaterLevel
+        {
+            get
+            {
+                if (!_waterLevel.HasValue) _waterLevel = ValueSerializer.GetFloatValue(nameof(WaterLevel), _data, _headers);
+                return _waterLevel.Value;
+            }
+        }
+        private float? _waterTemp;
+        public float WaterTemp
+        {
+            get
+            {
+                if (!_waterTemp.HasValue) _waterTemp = ValueSerializer.GetFloatValue(nameof(WaterTemp), _data, _headers);
+                return _waterTemp.Value;
+            }
+        }
+        private int? _weatherType;
+        public int WeatherType
+        {
+            get
+            {
+                if (!_weatherType.HasValue) _weatherType = ValueSerializer.GetIntValue(nameof(WeatherType), _data, _headers);
+                return _weatherType.Value;
+            }
+        }
+        private float? _windDir;
+        public float WindDir
+        {
+            get
+            {
+                if (!_windDir.HasValue) _windDir = ValueSerializer.GetFloatValue(nameof(WindDir), _data, _headers);
+                return _windDir.Value;
+            }
+        }
+        private float? _windVel;
+        public float WindVel
+        {
+            get
+            {
+                if (!_windVel.HasValue) _windVel = ValueSerializer.GetFloatValue(nameof(WindVel), _data, _headers);
+                return _windVel.Value;
+            }
+        }
+        private float? _yaw;
+        public float Yaw
+        {
+            get
+            {
+                if (!_yaw.HasValue) _yaw = ValueSerializer.GetFloatValue(nameof(Yaw), _data, _headers);
+                return _yaw.Value;
+            }
+        }
+        private float? _yawNorth;
+        public float YawNorth
+        {
+            get
+            {
+                if (!_yawNorth.HasValue) _yawNorth = ValueSerializer.GetFloatValue(nameof(YawNorth), _data, _headers);
+                return _yawNorth.Value;
+            }
+        }
+        private float? _yawRate;
+        public float YawRate
+        {
+            get
+            {
+                if (!_yawRate.HasValue) _yawRate = ValueSerializer.GetFloatValue(nameof(YawRate), _data, _headers);
+                return _yawRate.Value;
+            }
+        }
+        private float[] _yawRate_ST;
+        public float[] YawRate_ST
+        {
+            get
+            {
+                if (_yawRate_ST == null) _yawRate_ST = ValueSerializer.GetFloatArrayValue(nameof(YawRate_ST), _data, _headers);
+                return _yawRate_ST;
+            }
+        }
 
     }
 }
