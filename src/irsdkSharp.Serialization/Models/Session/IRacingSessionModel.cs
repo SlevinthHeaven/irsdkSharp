@@ -23,7 +23,8 @@ namespace irsdkSharp.Serialization.Models.Session
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.InnerException.Message);
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
                 return null;
             }
         }
