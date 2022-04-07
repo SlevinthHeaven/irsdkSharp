@@ -2,8 +2,6 @@
 using irsdkSharp.Serialization.Models.Session;
 using System;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace irsdkSharp.ConsoleTest
 {
@@ -17,12 +15,25 @@ namespace irsdkSharp.ConsoleTest
         {
             sdk = new IRacingSDK();
             sdk.OnDataChanged += Sdk_OnDataChanged;
+            sdk.OnDisconnected += Sdk_OnDisconnected;
+            sdk.OnConnected += Sdk_OnConnected;
             Console.ReadLine();
         }
 
-        private static void Sdk_OnDataChanged(object sender, EventArgs e)
+        private static void Sdk_OnConnected()
+        {
+            Console.WriteLine("Connected");
+        }
+
+        private static void Sdk_OnDisconnected()
+        {
+            Console.WriteLine("Disconnected");
+        }
+
+        private static void Sdk_OnDataChanged()
         {
             var currentlyConnected = sdk.IsConnected();
+
             if (currentlyConnected)
             {
                 // Is the session info updated?

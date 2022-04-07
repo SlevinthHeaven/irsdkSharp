@@ -32,7 +32,9 @@ namespace irsdkSharp
         protected Dictionary<string, VarHeader> VarHeaders;
 
         //events
-        public event EventHandler OnDataChanged;
+        public event Action OnDataChanged;
+        public event Action OnConnected;
+        public event Action OnDisconnected;
 
         public static MemoryMappedViewAccessor GetFileMapView(IRacingSDK racingSDK)
         {
@@ -98,17 +100,19 @@ namespace irsdkSharp
                 {
                     if (!IsConnected() && !IsStarted && Header == null)
                     {
-                        iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
-                        FileMapView = iRacingFile.CreateViewAccessor();
-
-                        _hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
-                        _gameLoopEvent = new AutoResetEvent(false)
+                        if (iRacingFile == null)
                         {
-                            SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
-                        };
+                            iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
+                            FileMapView = iRacingFile.CreateViewAccessor();
 
-                        IsStarted = true;
-                        _logger?.LogDebug("Connected Starting");
+                            _hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
+                            _gameLoopEvent = new AutoResetEvent(false)
+                            {
+                                SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
+                            };
+
+                            IsStarted = true;
+                        }
                     }
                 }
                 catch (FileNotFoundException ex)
@@ -135,12 +139,33 @@ namespace irsdkSharp
                 {
                     try
                     {
-                        _gameLoopEvent.WaitOne();
-                        if (Header == null) Header = new IRacingSdkHeader(FileMapView);
-                        if (IsConnected() && VarHeaders == null) GetVarHeaders();
-                        if (!IsConnected() && VarHeaders != null) VarHeaders = null;
+                        var valid = _gameLoopEvent.WaitOne(1000);
 
-                        OnDataChanged?.Invoke(this, new EventArgs());
+                        if (valid)
+                        {
+                            if (Header == null)
+                            {
+                                Header = new IRacingSdkHeader(FileMapView);
+                                OnConnected?.Invoke();
+                            }
+                            if (VarHeaders == null)
+                            { 
+                                GetVarHeaders();
+                            }
+                            OnDataChanged?.Invoke();
+                        }
+                        else
+                        {
+                            if (Header != null)
+                            {
+                                Header = null;
+                                OnDisconnected?.Invoke();
+                            }
+                            if (VarHeaders != null)
+                            {
+                                VarHeaders = null;
+                            }
+                        }
                     }
                     catch
                     {
