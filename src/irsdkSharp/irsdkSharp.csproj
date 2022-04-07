@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <LangVersion>9.0</LangVersion>
-	<TargetFrameworks>net5.0</TargetFrameworks>
+	<TargetFrameworks>net6.0</TargetFrameworks>
     <PackageId>irsdkSharp</PackageId>
-    <VersionPrefix>0.8.0</VersionPrefix>
+    <VersionPrefix>0.8.5</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
