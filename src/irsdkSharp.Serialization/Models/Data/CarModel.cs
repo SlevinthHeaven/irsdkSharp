@@ -59,6 +59,7 @@ namespace irsdkSharp.Serialization.Models.Data
             _carIdxTrackSurfaceMaterial = carIdxTrackSurfaceMaterial;
         }
 
+
         public int CarIdx { get; }
 
         private int? _carIdxBestLapNum;
@@ -242,6 +243,96 @@ namespace irsdkSharp.Serialization.Models.Data
                                                                             ? BitConverter.ToInt32(_data, header.Offset + (4 * CarIdx))
                                                                             : -1;
                 return _carIdxTrackSurfaceMaterial.Value;
+            }
+        }
+
+        private int? _carIdxClass;
+        public int CarIdxClass
+        {
+            get
+            {
+                if (!_carIdxClass.HasValue) _carIdxClass = ValueSerializer.GetIntValue(nameof(CarIdxClass), _data, _headers, CarIdx);
+                return _carIdxClass.Value;
+            }
+        }
+
+        private int? _carIdxTireCompound;
+        public int CarIdxTireCompound
+        {
+            get
+            {
+                if (!_carIdxTireCompound.HasValue) _carIdxTireCompound = ValueSerializer.GetIntValue(nameof(CarIdxTireCompound), _data, _headers, CarIdx);
+                return _carIdxTireCompound.Value;
+            }
+        }
+
+        private int? _carIdxQualTireCompound;
+        public int CarIdxQualTireCompound
+        {
+            get
+            {
+                if (!_carIdxQualTireCompound.HasValue) _carIdxQualTireCompound = ValueSerializer.GetIntValue(nameof(CarIdxQualTireCompound), _data, _headers, CarIdx);
+                return _carIdxQualTireCompound.Value;
+            }
+        }
+
+        private bool? _carIdxQualTireCompoundLocked;
+        public bool CarIdxQualTireCompoundLocked
+        {
+            get
+            {
+                if (!_carIdxQualTireCompoundLocked.HasValue) _carIdxQualTireCompoundLocked = ValueSerializer.GetBoolValue(nameof(CarIdxQualTireCompoundLocked), _data, _headers, CarIdx);
+                return _carIdxQualTireCompoundLocked.Value;
+            }
+        }
+
+        private int? _carIdxFastRepairsUsed;
+        public int CarIdxFastRepairsUsed
+        {
+            get
+            {
+                if (!_carIdxFastRepairsUsed.HasValue) _carIdxFastRepairsUsed = ValueSerializer.GetIntValue(nameof(CarIdxFastRepairsUsed), _data, _headers, CarIdx);
+                return _carIdxFastRepairsUsed.Value;
+            }
+        }
+
+        private int? _carIdxSessionFlags;
+        public int CarIdxSessionFlags
+        {
+            get
+            {
+                if (!_carIdxSessionFlags.HasValue) _carIdxSessionFlags = ValueSerializer.GetIntValue(nameof(CarIdxSessionFlags), _data, _headers, CarIdx);
+                return _carIdxSessionFlags.Value;
+            }
+        }
+
+        private int? _carIdxPaceLine;
+        public int CarIdxPaceLine
+        {
+            get
+            {
+                if (!_carIdxPaceLine.HasValue) _carIdxPaceLine = ValueSerializer.GetIntValue(nameof(CarIdxPaceLine), _data, _headers, CarIdx);
+                return _carIdxPaceLine.Value;
+            }
+        }
+
+        private int? _carIdxPaceRow;
+        public int CarIdxPaceRow
+        {
+            get
+            {
+                if (!_carIdxPaceRow.HasValue) _carIdxPaceRow = ValueSerializer.GetIntValue(nameof(CarIdxPaceRow), _data, _headers, CarIdx);
+                return _carIdxPaceRow.Value;
+            }
+        }
+
+        private int? _carIdxPaceFlags;
+        public int CarIdxPaceFlags
+        {
+            get
+            {
+                if (!_carIdxPaceFlags.HasValue) _carIdxPaceFlags = ValueSerializer.GetIntValue(nameof(CarIdxPaceFlags), _data, _headers, CarIdx);
+                return _carIdxPaceFlags.Value;
             }
         }
     }
