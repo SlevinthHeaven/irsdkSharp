@@ -601,31 +601,31 @@ namespace irsdkSharp.Serialization.Models.Data
                 return _lapDeltaToSessionBestLap_OK.Value;
             }
         }
-        private float? _lapDeltaToSessionLastlLap;
-        public float LapDeltaToSessionLastlLap
+        private float? _lapDeltaToSessionLastLap;
+        public float LapDeltaToSessionLastLap
         {
             get
             {
-                if (!_lapDeltaToSessionLastlLap.HasValue) _lapDeltaToSessionLastlLap = ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionLastlLap), _data, _headers);
-                return _lapDeltaToSessionLastlLap.Value;
+                if (!_lapDeltaToSessionLastLap.HasValue) _lapDeltaToSessionLastLap = ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionLastLap), _data, _headers);
+                return _lapDeltaToSessionLastLap.Value;
             }
         }
-        private float? _lapDeltaToSessionLastlLap_DD;
-        public float LapDeltaToSessionLastlLap_DD
+        private float? _lapDeltaToSessionLastLap_DD;
+        public float LapDeltaToSessionLastLap_DD
         {
             get
             {
-                if (!_lapDeltaToSessionLastlLap_DD.HasValue) _lapDeltaToSessionLastlLap_DD = ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionLastlLap_DD), _data, _headers);
-                return _lapDeltaToSessionLastlLap_DD.Value;
+                if (!_lapDeltaToSessionLastLap_DD.HasValue) _lapDeltaToSessionLastLap_DD = ValueSerializer.GetFloatValue(nameof(LapDeltaToSessionLastLap_DD), _data, _headers);
+                return _lapDeltaToSessionLastLap_DD.Value;
             }
         }
-        private bool? _lapDeltaToSessionLastlLap_OK;
-        public bool LapDeltaToSessionLastlLap_OK
+        private bool? _lapDeltaToSessionLastLap_OK;
+        public bool LapDeltaToSessionLastLap_OK
         {
             get
             {
-                if (!_lapDeltaToSessionLastlLap_OK.HasValue) _lapDeltaToSessionLastlLap_OK = ValueSerializer.GetBoolValue(nameof(LapDeltaToSessionLastlLap_OK), _data, _headers);
-                return _lapDeltaToSessionLastlLap_OK.Value;
+                if (!_lapDeltaToSessionLastLap_OK.HasValue) _lapDeltaToSessionLastLap_OK = ValueSerializer.GetBoolValue(nameof(LapDeltaToSessionLastLap_OK), _data, _headers);
+                return _lapDeltaToSessionLastLap_OK.Value;
             }
         }
         private float? _lapDeltaToSessionOptimalLap;
