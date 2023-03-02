@@ -208,8 +208,11 @@ namespace irsdkSharp
 
         public object? GetData(string name)
         {
-            if (!IsConnected) return null;
-            if (!VarHeaders?.TryGetValue(name, out var requestedHeader) ?? true) return null;
+            if (!IsConnected) 
+                return null;
+            
+            if (VarHeaders == null || !VarHeaders.TryGetValue(name, out var requestedHeader))    
+                return null;
 
             int varOffset = requestedHeader.Offset;
             int count = requestedHeader.Count;
@@ -279,12 +282,8 @@ namespace irsdkSharp
             }
         }
 
-        public string GetSessionInfo() =>
-            (IsConnected) switch
-            {
-                true => FileMapView.ReadString(Header.SessionInfoOffset, Header.SessionInfoLength),
-                _ => null
-            };
+        public string? GetSessionInfo()
+            => (Header == null) ? null : FileMapView?.ReadString(Header.SessionInfoOffset, Header.SessionInfoLength);
 
         IntPtr GetBroadcastMessageID()
         {
