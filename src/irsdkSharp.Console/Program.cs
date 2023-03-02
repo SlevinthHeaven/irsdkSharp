@@ -7,16 +7,26 @@ namespace irsdkSharp.ConsoleTest
 {
     class Program
     {
-        private static IrSdk sdk;
+        private static readonly IrSdk Sdk = new();
+        
         private static IRacingSessionModel _session;
         private static int _DriverId = -1;
         private static int _lastUpdate = -1;
         static void Main(string[] args)
         {
-            sdk = new IrSdk();
-            sdk.OnDataChanged += Sdk_OnDataChanged;
-            sdk.OnDisconnected += Sdk_OnDisconnected;
-            sdk.OnConnected += Sdk_OnConnected;
+            Sdk.OnDataChanged += Sdk_OnDataChanged;
+            Sdk.OnDisconnected += Sdk_OnDisconnected;
+            Sdk.OnConnected += Sdk_OnConnected;
+            
+            Console.WriteLine("Starting...");
+            Sdk.Start();
+            Console.WriteLine("Started");
+
+            Console.ReadLine();
+            
+            Sdk.Stop();
+            Console.WriteLine("Stopped");
+            
             Console.ReadLine();
         }
 
@@ -32,25 +42,25 @@ namespace irsdkSharp.ConsoleTest
 
         private static void Sdk_OnDataChanged(object sender, EventArgs eventArgs)
         {
-            var currentlyConnected = sdk.IsConnected();
+            var currentlyConnected = Sdk.IsConnected();
 
             if (currentlyConnected)
             {
                 // Is the session info updated?
-                int newUpdate = sdk.Header.SessionInfoUpdate;
+                int newUpdate = Sdk.Header.SessionInfoUpdate;
                 if (newUpdate != _lastUpdate)
                 {
                     _lastUpdate = newUpdate;
-                    _session = sdk.GetSerializedSessionInfo();
+                    _session = Sdk.GetSerializedSessionInfo();
                 }
 
                 if (_DriverId == -1)
                 {
-                    _DriverId = (int)sdk.GetData("PlayerCarIdx");
+                    _DriverId = (int)Sdk.GetData("PlayerCarIdx");
                     Console.WriteLine(_DriverId);
                 }
 
-                var data = sdk.GetSerializedData();
+                var data = Sdk.GetSerializedData();
 
                 if (data != null && _session != null)
                 {

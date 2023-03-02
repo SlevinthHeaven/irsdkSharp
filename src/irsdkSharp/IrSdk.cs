@@ -16,15 +16,48 @@ namespace irsdkSharp
 {
     public class IrSdk
     {
+        public const int DefaultUpdateFrequency = 10;
         private const char TrimChar = '\0';
         
         private readonly Encoding _encoding;
         private readonly ILogger<IrSdk>? _logger;
         
+        private int _updateFrequency = DefaultUpdateFrequency;
         private MemoryMappedFile _iRacingFile;
+        private CancellationTokenSource? _loopCancellationSource;
 
         #region Properties
-        public bool IsStarted { get; private set; } = false;
+        /// <summary>
+        /// Update delay in milliseconds based on the <see cref="UpdateFrequency"/>
+        /// </summary>
+        protected int WaitDelay => (int)Math.Round(1000 / (double)UpdateFrequency);
+        
+        /// <summary>
+        /// Updates per second (1-60)
+        /// </summary>
+        public int UpdateFrequency
+        {
+            get => _updateFrequency;
+            set
+            {
+                if (value <= 0 || value > 60)
+                    throw new ArgumentOutOfRangeException(nameof(value), 
+                        "The UpdateFrequency must be between 1 and 60");
+                
+                _updateFrequency = value;
+            }
+        }
+        
+        /// <summary>
+        /// The delay between a connection check when the sim is not connected
+        /// </summary>
+        public int CheckConnectionDelay { get; set; } = 5000;
+        
+        /// <summary>
+        /// If the data loop has been started
+        /// </summary>
+        public bool IsStarted => _loopCancellationSource != null && !_loopCancellationSource.IsCancellationRequested;
+        
         public IRacingSdkHeader? Header { get; private set; } = null;
         public MemoryMappedViewAccessor? FileMapView { get; private set; }
         public Dictionary<string, VarHeader>? VarHeaders { get; private set; }
@@ -42,132 +75,106 @@ namespace irsdkSharp
         public event EventHandler? OnConnected;
         public event EventHandler? OnDisconnected;
         #endregion
-        
-        private AutoResetEvent _gameLoopEvent;
-        private IntPtr _hEvent;
-        private readonly CancellationTokenSource _waitValidDataLoopCancellation;
-        private readonly CancellationToken _waitValidDataLoopCancellationToken;
 
-        private readonly CancellationTokenSource _connectionLoopCancellation;
-        private readonly CancellationToken _connectionLoopCancellationToken;
-
-        public IrSdk()
+        public IrSdk(bool autoStart = false)
         {
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
-
-            _waitValidDataLoopCancellation = new CancellationTokenSource();
-            _waitValidDataLoopCancellationToken = _waitValidDataLoopCancellation.Token;
-            Task.Run(WaitValidDataLoop, _waitValidDataLoopCancellationToken);
-
-            _connectionLoopCancellation = new CancellationTokenSource();
-            _connectionLoopCancellationToken = _connectionLoopCancellation.Token;
-            Task.Run(ConnectionLoop, _waitValidDataLoopCancellationToken);
+            
+            if (autoStart)
+                Start();
         }
 
-        public IrSdk(ILogger<IrSdk> logger) : this()
+        public IrSdk(ILogger<IrSdk> logger, bool autoStart = false) : this(autoStart)
         {
             _logger = logger;
         }
 
-        public IrSdk(MemoryMappedViewAccessor accessor)
+        public IrSdk(MemoryMappedViewAccessor accessor) : this(false)
         {
-            // Register CP1252 encoding
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            _encoding = Encoding.GetEncoding(1252);
-
             FileMapView = accessor;
 
             Header = new IRacingSdkHeader(FileMapView);
             GetVarHeaders();
-            IsStarted = true;
         }
 
-        private void ConnectionLoop()
+        public void Start(int updateFrequency)
         {
-            while (true)
-            {
-                if (_connectionLoopCancellationToken.IsCancellationRequested) break;
-                try
-                {
-                    if (!IsConnected() && !IsStarted && Header == null)
-                    {
-                        if (_iRacingFile == null)
-                        {
-                            _iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
-                            FileMapView = _iRacingFile.CreateViewAccessor();
-
-                            _hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
-                            _gameLoopEvent = new AutoResetEvent(false)
-                            {
-                                SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
-                            };
-
-                            IsStarted = true;
-                        }
-                    }
-                }
-                catch (FileNotFoundException ex)
-                {
-                    IsStarted = false;
-                    Header = null;
-                    VarHeaders = null;
-                    _logger?.LogDebug($"Not Connected {ex.Message}");
-                }
-                finally
-                {
-                    Thread.Sleep(1000);
-                }
-
-            }
+            UpdateFrequency = updateFrequency;
+            Start();
         }
-
-        private void WaitValidDataLoop()
+        
+        public void Start()
         {
-            while (true)
+            if (IsStarted) 
+                return;
+            
+            _loopCancellationSource = new();
+            
+            Task.Factory.StartNew(() => 
+                Loop(_loopCancellationSource.Token), _loopCancellationSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }
+        
+        public void Stop()
+        {
+            _loopCancellationSource?.Cancel();
+            _loopCancellationSource?.Dispose();
+            _loopCancellationSource = null;
+        }
+        
+        private async void Loop(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
             {
-                if (_waitValidDataLoopCancellationToken.IsCancellationRequested) break;
-                if (IsStarted)
+                if (!IsConnected() && _iRacingFile == null)
                 {
                     try
                     {
-                        var valid = _gameLoopEvent.WaitOne(1000);
-
-                        if (valid)
-                        {
-                            if (Header == null)
-                            {
-                                Header = new IRacingSdkHeader(FileMapView);
-                                OnConnected?.Invoke(this, EventArgs.Empty);
-                            }
-                            if (VarHeaders == null)
-                            { 
-                                GetVarHeaders();
-                            }
-                            OnDataChanged?.Invoke(this, EventArgs.Empty);
-                        }
-                        else
-                        {
-                            if (Header != null)
-                            {
-                                Header = null;
-                                OnDisconnected?.Invoke(this, EventArgs.Empty);
-                            }
-                            if (VarHeaders != null)
-                            {
-                                VarHeaders = null;
-                            }
-                        }
+                        _iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
+                        FileMapView = _iRacingFile.CreateViewAccessor();
                     }
-                    catch
+                    catch (FileNotFoundException ex)
                     {
+                        if (Header != null)
+                            OnDisconnected?.Invoke(this, EventArgs.Empty);
+                        
+                        Header = null;
+                        VarHeaders = null;
+                        
+                        _logger?.LogWarning($"Not connected to iRacing ({ex.Message})");
+                        
+                        await SafeDelay(CheckConnectionDelay, token);
+                        continue;
                     }
-                } 
-                else
-                {
-                    Thread.Sleep(1000);
                 }
+                
+                if (Header == null)
+                {
+                    Header = new IRacingSdkHeader(FileMapView);
+                    OnConnected?.Invoke(this, EventArgs.Empty);
+                }
+                
+                if (VarHeaders == null)
+                { 
+                    GetVarHeaders();
+                }
+                
+                OnDataChanged?.Invoke(this, EventArgs.Empty);
+                
+                await SafeDelay(WaitDelay, token);
+            }
+        }
+        
+        private static async Task SafeDelay(int delay, CancellationToken token)
+        {
+            try
+            {
+                await Task.Delay(delay, token);
+            }
+            catch (OperationCanceledException)
+            {
+                // Ignore
             }
         }
 
@@ -195,7 +202,7 @@ namespace irsdkSharp
 
         public object GetData(string name)
         {
-            if (!IsStarted || Header == null) return null;
+            if (!IsConnected()) return null;
             if (!VarHeaders.TryGetValue(name, out var requestedHeader)) return null;
 
             int varOffset = requestedHeader.Offset;
@@ -267,7 +274,7 @@ namespace irsdkSharp
         }
 
         public string GetSessionInfo() =>
-            (IsStarted && Header != null) switch
+            (IsConnected()) switch
             {
                 true => FileMapView.ReadString(Header.SessionInfoOffset, Header.SessionInfoLength),
                 _ => null
@@ -275,7 +282,7 @@ namespace irsdkSharp
 
         public bool IsConnected()
         {
-            if (IsStarted && Header != null)
+            if (Header != null)
             {
                 return (Header.Status & 1) > 0;
             }
