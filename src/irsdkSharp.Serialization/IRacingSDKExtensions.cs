@@ -9,12 +9,12 @@ namespace irsdkSharp.Serialization
 {
     public static class IRacingSDKExtensions
     {
-        public static Data GetData(this IRacingSDK racingSdk) 
+        public static Data GetData(this IRacingSdk racingSdk) 
         {
             return new Data(racingSdk);
         }
 
-        public static IRacingSessionModel GetSerializedSessionInfo(this IRacingSDK racingSdk)
+        public static IRacingSessionModel GetSerializedSessionInfo(this IRacingSdk racingSdk)
         {
             var sessionInfo = racingSdk.GetSessionInfo();
 
@@ -26,7 +26,7 @@ namespace irsdkSharp.Serialization
             return IRacingSessionModel.Serialize(sessionInfo);
         }
 
-        public static IRacingDataModel GetSerializedData(this IRacingSDK racingSdk)
+        public static IRacingDataModel GetSerializedData(this IRacingSdk racingSdk)
         {
             if (racingSdk.IsConnected)
             {
@@ -37,7 +37,7 @@ namespace irsdkSharp.Serialization
             return null;
         }
 
-        public static List<PositionModel> GetPositionsNew(this IRacingSDK racingSdk)
+        public static List<PositionModel> GetPositionsNew(this IRacingSdk racingSdk)
         {
             if (racingSdk.IsConnected)
             {
@@ -94,7 +94,7 @@ namespace irsdkSharp.Serialization
             return null;
         }
       
-        public static List<CarModel> GetPositions(this IRacingSDK racingSdk, out double sessionTime)
+        public static List<CarModel> GetPositions(this IRacingSdk racingSdk, out double sessionTime)
         {
             if (racingSdk.IsConnected)
             {

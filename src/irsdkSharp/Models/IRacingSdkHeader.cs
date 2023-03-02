@@ -69,12 +69,12 @@ namespace irsdkSharp.Models
                 int positionOffset = VarHeaderOffset + (i * VarHeader.Size);
                 
                 int type = _mapView.ReadInt32(positionOffset);
-                int offset = _mapView.ReadInt32(positionOffset + IrSdkConstants.VarOffsetOffset);
-                int count = _mapView.ReadInt32(positionOffset + IrSdkConstants.VarCountOffset);
+                int offset = _mapView.ReadInt32(positionOffset + Constants.VarOffsetOffset);
+                int count = _mapView.ReadInt32(positionOffset + Constants.VarCountOffset);
                 
-                string name = ReadVarHeaderString(positionOffset + IrSdkConstants.VarNameOffset, IrSdkConstants.MaxString, encoding);
-                string desc = ReadVarHeaderString(positionOffset + IrSdkConstants.VarDescOffset, IrSdkConstants.MaxDesc, encoding);
-                string unit = ReadVarHeaderString(positionOffset + IrSdkConstants.VarUnitOffset, IrSdkConstants.MaxString, encoding);
+                string name = ReadVarHeaderString(positionOffset + Constants.VarNameOffset, Constants.MaxString, encoding);
+                string desc = ReadVarHeaderString(positionOffset + Constants.VarDescOffset, Constants.MaxDesc, encoding);
+                string unit = ReadVarHeaderString(positionOffset + Constants.VarUnitOffset, Constants.MaxString, encoding);
 
                 varHeaders[name] = new VarHeader(type, offset, count, name, desc, unit);  
             }
@@ -88,7 +88,7 @@ namespace irsdkSharp.Models
             
             _mapView.ReadArray(position, bytes, 0, count);
             
-            return encoding.GetString(bytes).TrimEnd(IrSdkConstants.EndChar);
+            return encoding.GetString(bytes).TrimEnd(Constants.EndChar);
         }
     }
 }

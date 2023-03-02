@@ -13,7 +13,7 @@ namespace irsdkSharp.Extensions
             {
                 var c = (char)accessor.ReadByte(offset + i);
                 
-                if (c == IrSdkConstants.EndChar)
+                if (c == Constants.EndChar)
                     break;
                 
                 sb.Append(c);

@@ -1,6 +1,6 @@
 ﻿namespace irsdkSharp;
 
-public static class IrSdkDefaults
+public static class IRacingSdkDefaults
 {
     public const int DefaultUpdateFrequency = 10;
     public const int MaxUpdateFrequency = 60;

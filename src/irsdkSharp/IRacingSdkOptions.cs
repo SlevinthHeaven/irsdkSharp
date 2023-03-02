@@ -5,15 +5,15 @@ namespace irsdkSharp;
 /// <summary>
 /// Options for the iRacing SDK
 /// </summary>
-public class IrSdkOptions
+public class IRacingSdkOptions
 {
     /// <summary>
     /// The default sdk options.
     /// </summary>
-    public static readonly IrSdkOptions Default = new();
+    public static readonly IRacingSdkOptions Default = new();
     
-    private int _updateFrequency = IrSdkDefaults.DefaultUpdateFrequency;
-    private int _checkConnectionDelay = IrSdkDefaults.DefaultCheckConnectionDelay;
+    private int _updateFrequency = IRacingSdkDefaults.DefaultUpdateFrequency;
+    private int _checkConnectionDelay = IRacingSdkDefaults.DefaultCheckConnectionDelay;
 
     internal int UpdateDelay => 1000 / UpdateFrequency;
     
@@ -25,7 +25,7 @@ public class IrSdkOptions
         get => _updateFrequency;
         set
         {
-            if (value <= 0 || value > IrSdkDefaults.MaxUpdateFrequency)
+            if (value <= 0 || value > IRacingSdkDefaults.MaxUpdateFrequency)
                 throw new ArgumentOutOfRangeException(nameof(value), 
                     "The UpdateFrequency must be between 1 and 60");
                 

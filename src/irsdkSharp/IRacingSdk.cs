@@ -13,11 +13,11 @@ using System.IO;
 
 namespace irsdkSharp
 {
-    public class IRacingSDK : IDisposable
+    public class IRacingSdk : IDisposable
     {
         private readonly Encoding _encoding;
-        private readonly ILogger<IRacingSDK>? _logger;
-        private readonly IrSdkOptions _options;
+        private readonly ILogger<IRacingSdk>? _logger;
+        private readonly IRacingSdkOptions _options;
 
         private MemoryMappedFile? _iRacingFile;
         private CancellationTokenSource? _loopCancellationSource;
@@ -28,7 +28,7 @@ namespace irsdkSharp
         /// <summary>
         /// Options for the SDK.
         /// </summary>
-        public IrSdkOptions Options => _options;
+        public IRacingSdkOptions Options => _options;
 
         /// <summary>
         /// If the data loop has been started.
@@ -38,7 +38,7 @@ namespace irsdkSharp
             get
             {
                 if (_isDisposed)
-                    throw new ObjectDisposedException(nameof(IRacingSDK));
+                    throw new ObjectDisposedException(nameof(IRacingSdk));
                 
                 return _loopCancellationSource != null && !_loopCancellationSource.IsCancellationRequested;
             }
@@ -52,7 +52,7 @@ namespace irsdkSharp
             get
             {
                 if (_isDisposed)
-                    throw new ObjectDisposedException(nameof(IRacingSDK));
+                    throw new ObjectDisposedException(nameof(IRacingSdk));
                 
                 if (Header != null)
                     return (Header.Status & 1) > 0;
@@ -72,13 +72,13 @@ namespace irsdkSharp
         public event EventHandler? OnDisconnected;
         #endregion
 
-        public IRacingSDK(IrSdkOptions? options, ILogger<IRacingSDK>? logger, bool autoStart = false)
+        public IRacingSdk(IRacingSdkOptions? options, ILogger<IRacingSdk>? logger, bool autoStart = false)
         {
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
             
-            _options = options ?? IrSdkOptions.Default;
+            _options = options ?? IRacingSdkOptions.Default;
             
             if (logger != null)
                 _logger = logger;
@@ -87,19 +87,19 @@ namespace irsdkSharp
                 Start();
         }
         
-        public IRacingSDK(bool autoStart = false) : this(null, null, autoStart)
+        public IRacingSdk(bool autoStart = false) : this(null, null, autoStart)
         {
         }
         
-        public IRacingSDK(IrSdkOptions? options, bool autoStart = false) : this(options, null, autoStart)
+        public IRacingSdk(IRacingSdkOptions? options, bool autoStart = false) : this(options, null, autoStart)
         {
         }
 
-        public IRacingSDK(ILogger<IRacingSDK> logger, bool autoStart = false) : this(null, logger, autoStart)
+        public IRacingSdk(ILogger<IRacingSdk> logger, bool autoStart = false) : this(null, logger, autoStart)
         {
         }
 
-        public IRacingSDK(MemoryMappedViewAccessor accessor) : this(null, null, false)
+        public IRacingSdk(MemoryMappedViewAccessor accessor) : this(null, null, false)
         {
             FileMapView = accessor;
 
@@ -115,7 +115,7 @@ namespace irsdkSharp
         public void Start()
         {
             if (_isDisposed)
-                throw new ObjectDisposedException(nameof(IRacingSDK));
+                throw new ObjectDisposedException(nameof(IRacingSdk));
             
             if (IsStarted) 
                 return;
@@ -129,7 +129,7 @@ namespace irsdkSharp
         public void Stop()
         {
             if (_isDisposed)
-                throw new ObjectDisposedException(nameof(IRacingSDK));
+                throw new ObjectDisposedException(nameof(IRacingSdk));
             
             _loopCancellationSource?.Cancel();
             _loopCancellationSource?.Dispose();
@@ -164,7 +164,7 @@ namespace irsdkSharp
                 {
                     try
                     {
-                        _iRacingFile = MemoryMappedFile.OpenExisting(IrSdkConstants.MemMapFileName);
+                        _iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
                         FileMapView = _iRacingFile.CreateViewAccessor();
                     }
                     catch (FileNotFoundException ex)
@@ -220,7 +220,7 @@ namespace irsdkSharp
                     {
                         byte[] data = new byte[count];
                         FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                        return _encoding.GetString(data).TrimEnd(IrSdkConstants.EndChar);
+                        return _encoding.GetString(data).TrimEnd(Constants.EndChar);
                     }
                 case VarType.irBool:
                     {
@@ -288,12 +288,12 @@ namespace irsdkSharp
 
         IntPtr GetBroadcastMessageID()
         {
-            return RegisterWindowMessage(IrSdkConstants.BroadcastMessageName);
+            return RegisterWindowMessage(Constants.BroadcastMessageName);
         }
 
         IntPtr GetPadCarNumID()
         {
-            return RegisterWindowMessage(IrSdkConstants.PadCarNumName);
+            return RegisterWindowMessage(Constants.PadCarNumName);
         }
 
         public int BroadcastMessage(BroadcastMessageTypes msg, int var1, int var2, int var3)

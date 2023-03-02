@@ -7,7 +7,7 @@ namespace irsdkSharp.ConsoleTest
 {
     class Program
     {
-        private static readonly IRacingSDK Sdk = new();
+        private static readonly IRacingSdk Sdk = new();
         
         private static IRacingSessionModel _session;
         private static int _DriverId = -1;

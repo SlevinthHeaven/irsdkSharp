@@ -16,7 +16,7 @@ namespace irsdkSharp.Tests
 {
     public class Tests
     {
-        IRacingSDK sdk;
+        IRacingSdk sdk;
         IRacingDataModel data;
         IRacingSessionModel session;
 
@@ -24,7 +24,7 @@ namespace irsdkSharp.Tests
         public void Setup()
         {
             var memMap = MemoryMappedFile.CreateFromFile(Path.Combine("testdata", "session.ibt"));
-            sdk = new IRacingSDK(memMap.CreateViewAccessor());
+            sdk = new IRacingSdk(memMap.CreateViewAccessor());
         }
 
 

@@ -1,6 +1,6 @@
 ﻿namespace irsdkSharp
 {
-    internal static class IrSdkConstants
+    internal static class Constants
     {
         public const uint DesiredAccess = 2031619;
         public const string DataValidEventName = "Local\\IRSDKDataValidEvent";
