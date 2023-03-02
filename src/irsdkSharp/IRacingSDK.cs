@@ -13,10 +13,10 @@ using System.IO;
 
 namespace irsdkSharp
 {
-    public class IrSdk : IDisposable
+    public class IRacingSDK : IDisposable
     {
         private readonly Encoding _encoding;
-        private readonly ILogger<IrSdk>? _logger;
+        private readonly ILogger<IRacingSDK>? _logger;
         private readonly IrSdkOptions _options;
 
         private MemoryMappedFile? _iRacingFile;
@@ -38,7 +38,7 @@ namespace irsdkSharp
             get
             {
                 if (_isDisposed)
-                    throw new ObjectDisposedException(nameof(IrSdk));
+                    throw new ObjectDisposedException(nameof(IRacingSDK));
                 
                 return _loopCancellationSource != null && !_loopCancellationSource.IsCancellationRequested;
             }
@@ -52,7 +52,7 @@ namespace irsdkSharp
             get
             {
                 if (_isDisposed)
-                    throw new ObjectDisposedException(nameof(IrSdk));
+                    throw new ObjectDisposedException(nameof(IRacingSDK));
                 
                 if (Header != null)
                     return (Header.Status & 1) > 0;
@@ -72,7 +72,7 @@ namespace irsdkSharp
         public event EventHandler? OnDisconnected;
         #endregion
 
-        public IrSdk(IrSdkOptions? options, ILogger<IrSdk>? logger, bool autoStart = false)
+        public IRacingSDK(IrSdkOptions? options, ILogger<IRacingSDK>? logger, bool autoStart = false)
         {
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -87,19 +87,19 @@ namespace irsdkSharp
                 Start();
         }
         
-        public IrSdk(bool autoStart = false) : this(null, null, autoStart)
+        public IRacingSDK(bool autoStart = false) : this(null, null, autoStart)
         {
         }
         
-        public IrSdk(IrSdkOptions? options, bool autoStart = false) : this(options, null, autoStart)
+        public IRacingSDK(IrSdkOptions? options, bool autoStart = false) : this(options, null, autoStart)
         {
         }
 
-        public IrSdk(ILogger<IrSdk> logger, bool autoStart = false) : this(null, logger, autoStart)
+        public IRacingSDK(ILogger<IRacingSDK> logger, bool autoStart = false) : this(null, logger, autoStart)
         {
         }
 
-        public IrSdk(MemoryMappedViewAccessor accessor) : this(null, null, false)
+        public IRacingSDK(MemoryMappedViewAccessor accessor) : this(null, null, false)
         {
             FileMapView = accessor;
 
@@ -115,7 +115,7 @@ namespace irsdkSharp
         public void Start()
         {
             if (_isDisposed)
-                throw new ObjectDisposedException(nameof(IrSdk));
+                throw new ObjectDisposedException(nameof(IRacingSDK));
             
             if (IsStarted) 
                 return;
@@ -129,7 +129,7 @@ namespace irsdkSharp
         public void Stop()
         {
             if (_isDisposed)
-                throw new ObjectDisposedException(nameof(IrSdk));
+                throw new ObjectDisposedException(nameof(IRacingSDK));
             
             _loopCancellationSource?.Cancel();
             _loopCancellationSource?.Dispose();

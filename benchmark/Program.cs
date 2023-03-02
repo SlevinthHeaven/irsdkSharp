@@ -14,13 +14,13 @@ namespace irsdkSharp.Benchmark
     [MemoryDiagnoser]
     public class Runner
     {
-        private readonly IrSdk sdk;
+        private readonly IRacingSDK sdk;
         private readonly IRacingDataModel _dataModel;
         private readonly Data _data;
         public Runner()
         {
             var memMap = MemoryMappedFile.CreateFromFile(Path.Combine("data", "session.ibt"));
-            sdk = new IrSdk(memMap.CreateViewAccessor());
+            sdk = new IRacingSDK(memMap.CreateViewAccessor());
 
             _dataModel = sdk.GetSerializedData();
             _data = sdk.GetData();

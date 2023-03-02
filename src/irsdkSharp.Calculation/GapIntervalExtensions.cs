@@ -167,13 +167,13 @@ namespace irsdkSharp.Calculation
             return results;
         }
 
-        public static List<CarGapIntervalModel> CalculateGapsAndIntervals(this IrSdk irSdk)
+        public static List<CarGapIntervalModel> CalculateGapsAndIntervals(this IRacingSDK racingSdk)
         {
-            var sessionModel = irSdk.GetSerializedSessionInfo();
+            var sessionModel = racingSdk.GetSerializedSessionInfo();
 
             if(sessionModel == null) return null;
 
-            var dataModel = irSdk.GetSerializedData();
+            var dataModel = racingSdk.GetSerializedData();
 
             if(dataModel == null) return null;
 

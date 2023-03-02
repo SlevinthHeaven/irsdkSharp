@@ -9,14 +9,14 @@ namespace irsdkSharp.Serialization
 {
     public static class IRacingSDKExtensions
     {
-        public static Data GetData(this IrSdk irSdk) 
+        public static Data GetData(this IRacingSDK racingSdk) 
         {
-            return new Data(irSdk);
+            return new Data(racingSdk);
         }
 
-        public static IRacingSessionModel GetSerializedSessionInfo(this IrSdk irSdk)
+        public static IRacingSessionModel GetSerializedSessionInfo(this IRacingSDK racingSdk)
         {
-            var sessionInfo = irSdk.GetSessionInfo();
+            var sessionInfo = racingSdk.GetSessionInfo();
 
             if (sessionInfo == null)
             {
@@ -26,22 +26,22 @@ namespace irsdkSharp.Serialization
             return IRacingSessionModel.Serialize(sessionInfo);
         }
 
-        public static IRacingDataModel GetSerializedData(this IrSdk irSdk)
+        public static IRacingDataModel GetSerializedData(this IRacingSDK racingSdk)
         {
-            if (irSdk.IsConnected)
+            if (racingSdk.IsConnected)
             {
-                var data = new byte[irSdk.Header.BufferLength];
-                irSdk.FileMapView.ReadArray(irSdk.Header.Offset, data, 0, irSdk.Header.BufferLength);
-                return IRacingDataModel.Serialize(data, irSdk.VarHeaders);
+                var data = new byte[racingSdk.Header.BufferLength];
+                racingSdk.FileMapView.ReadArray(racingSdk.Header.Offset, data, 0, racingSdk.Header.BufferLength);
+                return IRacingDataModel.Serialize(data, racingSdk.VarHeaders);
             }
             return null;
         }
 
-        public static List<PositionModel> GetPositionsNew(this IrSdk irSdk)
+        public static List<PositionModel> GetPositionsNew(this IRacingSDK racingSdk)
         {
-            if (irSdk.IsConnected)
+            if (racingSdk.IsConnected)
             {
-                var data = new Data(irSdk);
+                var data = new Data(racingSdk);
                 var tick = data.SessionTick;
                 var CarIdxBestLapNum = data.CarIdxBestLapNum;
                 var CarIdxBestLapTime = data.CarIdxBestLapTime;
@@ -94,14 +94,14 @@ namespace irsdkSharp.Serialization
             return null;
         }
       
-        public static List<CarModel> GetPositions(this IrSdk irSdk, out double sessionTime)
+        public static List<CarModel> GetPositions(this IRacingSDK racingSdk, out double sessionTime)
         {
-            if (irSdk.IsConnected)
+            if (racingSdk.IsConnected)
             {
-                var data = new byte[irSdk.Header.BufferLength];
-                irSdk.FileMapView.ReadArray(irSdk.Header.Offset, data, 0, irSdk.Header.BufferLength);
-                sessionTime = (double)irSdk.GetData("SessionTime");
-                return IRacingDataModel.SerializeCars(data, irSdk.VarHeaders);
+                var data = new byte[racingSdk.Header.BufferLength];
+                racingSdk.FileMapView.ReadArray(racingSdk.Header.Offset, data, 0, racingSdk.Header.BufferLength);
+                sessionTime = (double)racingSdk.GetData("SessionTime");
+                return IRacingDataModel.SerializeCars(data, racingSdk.VarHeaders);
             }
             sessionTime = 0;
             return null;
