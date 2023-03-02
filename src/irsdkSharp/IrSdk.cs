@@ -14,7 +14,7 @@ using System.IO;
 
 namespace irsdkSharp
 {
-    public class IRacingSDK
+    public class IrSdk
     {
         private readonly Encoding _encoding;
         private readonly char[] trimChars = { '\0' };
@@ -36,21 +36,21 @@ namespace irsdkSharp
         public event Action OnConnected;
         public event Action OnDisconnected;
 
-        public static MemoryMappedViewAccessor GetFileMapView(IRacingSDK racingSDK)
+        public static MemoryMappedViewAccessor GetFileMapView(IrSdk irSdk)
         {
-            return racingSDK.FileMapView;
+            return irSdk.FileMapView;
         }
 
-        public static Dictionary<string, VarHeader> GetVarHeaders(IRacingSDK racingSDK)
+        public static Dictionary<string, VarHeader> GetVarHeaders(IrSdk irSdk)
         {
-            return racingSDK.VarHeaders;
+            return irSdk.VarHeaders;
         }
 
         public IRacingSdkHeader Header = null;
 
         private AutoResetEvent _gameLoopEvent;
         private IntPtr _hEvent;
-        private readonly ILogger<IRacingSDK> _logger;
+        private readonly ILogger<IrSdk> _logger;
         private readonly CancellationTokenSource _waitValidDataLoopCancellation;
         private readonly CancellationToken _waitValidDataLoopCancellationToken;
 
@@ -58,7 +58,7 @@ namespace irsdkSharp
         private readonly CancellationTokenSource _connectionLoopCancellation;
         private readonly CancellationToken _connectionLoopCancellationToken;
 
-        public IRacingSDK()
+        public IrSdk()
         {
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -73,12 +73,12 @@ namespace irsdkSharp
             Task.Run(ConnectionLoop, _waitValidDataLoopCancellationToken);
         }
 
-        public IRacingSDK(ILogger<IRacingSDK> logger) : this()
+        public IrSdk(ILogger<IrSdk> logger) : this()
         {
             _logger = logger;
         }
 
-        public IRacingSDK(MemoryMappedViewAccessor accessor)
+        public IrSdk(MemoryMappedViewAccessor accessor)
         {
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

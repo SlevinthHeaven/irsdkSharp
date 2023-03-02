@@ -7,13 +7,13 @@ namespace irsdkSharp.ConsoleTest
 {
     class Program
     {
-        private static IRacingSDK sdk;
+        private static IrSdk sdk;
         private static IRacingSessionModel _session;
         private static int _DriverId = -1;
         private static int _lastUpdate = -1;
         static void Main(string[] args)
         {
-            sdk = new IRacingSDK();
+            sdk = new IrSdk();
             sdk.OnDataChanged += Sdk_OnDataChanged;
             sdk.OnDisconnected += Sdk_OnDisconnected;
             sdk.OnConnected += Sdk_OnConnected;

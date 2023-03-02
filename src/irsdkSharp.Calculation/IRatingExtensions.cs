@@ -147,11 +147,11 @@ namespace irsdkSharp.Calculation
             return result;
         }
 
-        public static Dictionary<int, double> CalculateIRatingGains(this IRacingSDK racingSDK)
+        public static Dictionary<int, double> CalculateIRatingGains(this IrSdk irSdk)
         {
-            var sessionModel = racingSDK.GetSerializedSessionInfo();
+            var sessionModel = irSdk.GetSerializedSessionInfo();
 
-            var dataModel = racingSDK.GetSerializedData();
+            var dataModel = irSdk.GetSerializedData();
 
             return CalculateIRatingGains(dataModel, sessionModel);
         }

@@ -89,13 +89,13 @@ namespace irsdkSharp.Calculation
             return relatives;
         }
 
-        public static List<CarRelativeModel> CalculateRelatives(this IRacingSDK racingSDK)
+        public static List<CarRelativeModel> CalculateRelatives(this IrSdk irSdk)
         {
-            var sessionModel = racingSDK.GetSerializedSessionInfo();
+            var sessionModel = irSdk.GetSerializedSessionInfo();
 
             if (sessionModel == null) return null;
 
-            var dataModel = racingSDK.GetSerializedData();
+            var dataModel = irSdk.GetSerializedData();
 
             if (dataModel == null) return null;
 
