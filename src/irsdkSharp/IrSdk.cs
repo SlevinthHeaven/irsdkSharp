@@ -38,9 +38,9 @@ namespace irsdkSharp
         public const int VarUnitOffset = 112;
 
         #region Events
-        public event Action OnDataChanged;
-        public event Action OnConnected;
-        public event Action OnDisconnected;
+        public event EventHandler? OnDataChanged;
+        public event EventHandler? OnConnected;
+        public event EventHandler? OnDisconnected;
         #endregion
         
         private AutoResetEvent _gameLoopEvent;
@@ -139,20 +139,20 @@ namespace irsdkSharp
                             if (Header == null)
                             {
                                 Header = new IRacingSdkHeader(FileMapView);
-                                OnConnected?.Invoke();
+                                OnConnected?.Invoke(this, EventArgs.Empty);
                             }
                             if (VarHeaders == null)
                             { 
                                 GetVarHeaders();
                             }
-                            OnDataChanged?.Invoke();
+                            OnDataChanged?.Invoke(this, EventArgs.Empty);
                         }
                         else
                         {
                             if (Header != null)
                             {
                                 Header = null;
-                                OnDisconnected?.Invoke();
+                                OnDisconnected?.Invoke(this, EventArgs.Empty);
                             }
                             if (VarHeaders != null)
                             {

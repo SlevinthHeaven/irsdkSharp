@@ -20,17 +20,17 @@ namespace irsdkSharp.ConsoleTest
             Console.ReadLine();
         }
 
-        private static void Sdk_OnConnected()
+        private static void Sdk_OnConnected(object sender, EventArgs eventArgs)
         {
             Console.WriteLine("Connected");
         }
 
-        private static void Sdk_OnDisconnected()
+        private static void Sdk_OnDisconnected(object sender, EventArgs eventArgs)
         {
             Console.WriteLine("Disconnected");
         }
 
-        private static void Sdk_OnDataChanged()
+        private static void Sdk_OnDataChanged(object sender, EventArgs eventArgs)
         {
             var currentlyConnected = sdk.IsConnected();
 
