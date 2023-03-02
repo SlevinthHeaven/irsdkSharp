@@ -152,6 +152,8 @@ namespace irsdkSharp
             Header = null;
             
             _varHeaders = null;
+            
+            _isDisposed = true;
         }
         
         private async void Loop(CancellationToken token)
