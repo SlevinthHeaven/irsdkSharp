@@ -28,7 +28,7 @@ namespace irsdkSharp.Serialization
 
         public static IRacingDataModel GetSerializedData(this IrSdk irSdk)
         {
-            if (irSdk.IsConnected())
+            if (irSdk.IsConnected)
             {
                 var data = new byte[irSdk.Header.BufferLength];
                 irSdk.FileMapView.ReadArray(irSdk.Header.Offset, data, 0, irSdk.Header.BufferLength);
@@ -39,7 +39,7 @@ namespace irsdkSharp.Serialization
 
         public static List<PositionModel> GetPositionsNew(this IrSdk irSdk)
         {
-            if (irSdk.IsConnected())
+            if (irSdk.IsConnected)
             {
                 var data = new Data(irSdk);
                 var tick = data.SessionTick;
@@ -96,7 +96,7 @@ namespace irsdkSharp.Serialization
       
         public static List<CarModel> GetPositions(this IrSdk irSdk, out double sessionTime)
         {
-            if (irSdk.IsConnected())
+            if (irSdk.IsConnected)
             {
                 var data = new byte[irSdk.Header.BufferLength];
                 irSdk.FileMapView.ReadArray(irSdk.Header.Offset, data, 0, irSdk.Header.BufferLength);

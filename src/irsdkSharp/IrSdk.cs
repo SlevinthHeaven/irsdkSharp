@@ -6,7 +6,6 @@ using irsdkSharp.Enums;
 using irsdkSharp.Models;
 using System.Threading;
 using System.Text;
-using Microsoft.Win32.SafeHandles;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using irsdkSharp.Extensions;
@@ -16,59 +15,42 @@ namespace irsdkSharp
 {
     public class IrSdk
     {
-        public const int DefaultUpdateFrequency = 10;
-        private const char TrimChar = '\0';
-        
         private readonly Encoding _encoding;
         private readonly ILogger<IrSdk>? _logger;
+        private readonly IrSdkOptions _options;
         
-        private int _updateFrequency = DefaultUpdateFrequency;
-        private MemoryMappedFile _iRacingFile;
+        private MemoryMappedFile? _iRacingFile;
         private CancellationTokenSource? _loopCancellationSource;
 
         #region Properties
         /// <summary>
-        /// Update delay in milliseconds based on the <see cref="UpdateFrequency"/>
+        /// Options for the SDK.
         /// </summary>
-        protected int WaitDelay => (int)Math.Round(1000 / (double)UpdateFrequency);
+        public IrSdkOptions Options => _options;
         
         /// <summary>
-        /// Updates per second (1-60)
-        /// </summary>
-        public int UpdateFrequency
-        {
-            get => _updateFrequency;
-            set
-            {
-                if (value <= 0 || value > 60)
-                    throw new ArgumentOutOfRangeException(nameof(value), 
-                        "The UpdateFrequency must be between 1 and 60");
-                
-                _updateFrequency = value;
-            }
-        }
-        
-        /// <summary>
-        /// The delay between a connection check when the sim is not connected
-        /// </summary>
-        public int CheckConnectionDelay { get; set; } = 5000;
-        
-        /// <summary>
-        /// If the data loop has been started
+        /// If the data loop has been started.
         /// </summary>
         public bool IsStarted => _loopCancellationSource != null && !_loopCancellationSource.IsCancellationRequested;
-        
+
+        /// <summary>
+        /// If the sim is connected.
+        /// </summary>
+        public bool IsConnected
+        {
+            get
+            {
+                if (Header != null)
+                    return (Header.Status & 1) > 0;
+
+                return false;
+            }
+        }
+
         public IRacingSdkHeader? Header { get; private set; } = null;
         public MemoryMappedViewAccessor? FileMapView { get; private set; }
         public Dictionary<string, VarHeader>? VarHeaders { get; private set; }
         #endregion
-
-        //VarHeader offsets
-        public const int VarOffsetOffset = 4;
-        public const int VarCountOffset = 8;
-        public const int VarNameOffset = 16;
-        public const int VarDescOffset = 48;
-        public const int VarUnitOffset = 112;
 
         #region Events
         public event EventHandler? OnDataChanged;
@@ -76,22 +58,34 @@ namespace irsdkSharp
         public event EventHandler? OnDisconnected;
         #endregion
 
-        public IrSdk(bool autoStart = false)
+        public IrSdk(IrSdkOptions? options, ILogger<IrSdk>? logger, bool autoStart = false)
         {
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
             
+            _options = options ?? IrSdkOptions.Default;
+            
+            if (logger != null)
+                _logger = logger;
+            
             if (autoStart)
                 Start();
         }
-
-        public IrSdk(ILogger<IrSdk> logger, bool autoStart = false) : this(autoStart)
+        
+        public IrSdk(bool autoStart = false) : this(null, null, autoStart)
         {
-            _logger = logger;
+        }
+        
+        public IrSdk(IrSdkOptions? options, bool autoStart = false) : this(options, null, autoStart)
+        {
         }
 
-        public IrSdk(MemoryMappedViewAccessor accessor) : this(false)
+        public IrSdk(ILogger<IrSdk> logger, bool autoStart = false) : this(null, logger, autoStart)
+        {
+        }
+
+        public IrSdk(MemoryMappedViewAccessor accessor) : this(null, null, false)
         {
             FileMapView = accessor;
 
@@ -101,7 +95,7 @@ namespace irsdkSharp
 
         public void Start(int updateFrequency)
         {
-            UpdateFrequency = updateFrequency;
+            Options.UpdateFrequency = updateFrequency;
             Start();
         }
         
@@ -127,11 +121,11 @@ namespace irsdkSharp
         {
             while (!token.IsCancellationRequested)
             {
-                if (!IsConnected() && _iRacingFile == null)
+                if (!IsConnected && _iRacingFile == null)
                 {
                     try
                     {
-                        _iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
+                        _iRacingFile = MemoryMappedFile.OpenExisting(IrSdkConstants.MemMapFileName);
                         FileMapView = _iRacingFile.CreateViewAccessor();
                     }
                     catch (FileNotFoundException ex)
@@ -144,7 +138,7 @@ namespace irsdkSharp
                         
                         _logger?.LogWarning($"Not connected to iRacing ({ex.Message})");
                         
-                        await SafeDelay(CheckConnectionDelay, token);
+                        await SafeDelay(Options.CheckConnectionDelay, token);
                         continue;
                     }
                 }
@@ -162,7 +156,7 @@ namespace irsdkSharp
                 
                 OnDataChanged?.Invoke(this, EventArgs.Empty);
                 
-                await SafeDelay(WaitDelay, token);
+                await SafeDelay(Options.UpdateDelay, token);
             }
         }
         
@@ -184,17 +178,17 @@ namespace irsdkSharp
             for (int i = 0; i < Header.VarCount; i++)
             {
                 int type = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size)));
-                int offset = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarOffsetOffset));
-                int count = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarCountOffset));
-                byte[] name = new byte[Constants.MaxString];
-                byte[] desc = new byte[Constants.MaxDesc];
-                byte[] unit = new byte[Constants.MaxString];
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarNameOffset), name, 0, Constants.MaxString);
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarDescOffset), desc, 0, Constants.MaxDesc);
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarUnitOffset), unit, 0, Constants.MaxString);
-                string nameStr = _encoding.GetString(name).TrimEnd(TrimChar);
-                string descStr = _encoding.GetString(desc).TrimEnd(TrimChar);
-                string unitStr = _encoding.GetString(unit).TrimEnd(TrimChar);
+                int offset = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size) + IrSdkConstants.VarOffsetOffset));
+                int count = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size) + IrSdkConstants.VarCountOffset));
+                byte[] name = new byte[IrSdkConstants.MaxString];
+                byte[] desc = new byte[IrSdkConstants.MaxDesc];
+                byte[] unit = new byte[IrSdkConstants.MaxString];
+                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + IrSdkConstants.VarNameOffset), name, 0, IrSdkConstants.MaxString);
+                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + IrSdkConstants.VarDescOffset), desc, 0, IrSdkConstants.MaxDesc);
+                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + IrSdkConstants.VarUnitOffset), unit, 0, IrSdkConstants.MaxString);
+                string nameStr = _encoding.GetString(name).TrimEnd(IrSdkConstants.TrimChar);
+                string descStr = _encoding.GetString(desc).TrimEnd(IrSdkConstants.TrimChar);
+                string unitStr = _encoding.GetString(unit).TrimEnd(IrSdkConstants.TrimChar);
                 var header = new VarHeader(type, offset, count, nameStr, descStr, unitStr);
                 VarHeaders[header.Name] = header;  
             }
@@ -202,7 +196,7 @@ namespace irsdkSharp
 
         public object GetData(string name)
         {
-            if (!IsConnected()) return null;
+            if (!IsConnected) return null;
             if (!VarHeaders.TryGetValue(name, out var requestedHeader)) return null;
 
             int varOffset = requestedHeader.Offset;
@@ -214,7 +208,7 @@ namespace irsdkSharp
                     {
                         byte[] data = new byte[count];
                         FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                        return _encoding.GetString(data).TrimEnd(TrimChar);
+                        return _encoding.GetString(data).TrimEnd(IrSdkConstants.TrimChar);
                     }
                 case VarType.irBool:
                     {
@@ -274,29 +268,20 @@ namespace irsdkSharp
         }
 
         public string GetSessionInfo() =>
-            (IsConnected()) switch
+            (IsConnected) switch
             {
                 true => FileMapView.ReadString(Header.SessionInfoOffset, Header.SessionInfoLength),
                 _ => null
             };
 
-        public bool IsConnected()
-        {
-            if (Header != null)
-            {
-                return (Header.Status & 1) > 0;
-            }
-            return false;
-        }
-
         IntPtr GetBroadcastMessageID()
         {
-            return RegisterWindowMessage(Constants.BroadcastMessageName);
+            return RegisterWindowMessage(IrSdkConstants.BroadcastMessageName);
         }
 
         IntPtr GetPadCarNumID()
         {
-            return RegisterWindowMessage(Constants.PadCarNumName);
+            return RegisterWindowMessage(IrSdkConstants.PadCarNumName);
         }
 
         public int BroadcastMessage(BroadcastMessageTypes msg, int var1, int var2, int var3)
@@ -328,19 +313,9 @@ namespace irsdkSharp
         [DllImport("Kernel32.dll", CharSet = CharSet.Auto)]
         private static extern IntPtr OpenEvent(UInt32 dwDesiredAccess, Boolean bInheritHandle, String lpName);
 
-        public int MakeLong(short lowPart, short highPart)
+        private static int MakeLong(short lowPart, short highPart)
         {
             return (int)(((ushort)lowPart) | (uint)(highPart << 16));
-        }
-
-        public static short HiWord(int dword)
-        {
-            return (short)(dword >> 16);
-        }
-
-        public static short LoWord(int dword)
-        {
-            return (short)dword;
         }
     }
 }

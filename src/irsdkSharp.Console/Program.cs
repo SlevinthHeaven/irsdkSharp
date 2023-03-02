@@ -42,7 +42,7 @@ namespace irsdkSharp.ConsoleTest
 
         private static void Sdk_OnDataChanged(object sender, EventArgs eventArgs)
         {
-            var currentlyConnected = Sdk.IsConnected();
+            var currentlyConnected = Sdk.IsConnected;
 
             if (currentlyConnected)
             {
