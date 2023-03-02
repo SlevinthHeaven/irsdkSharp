@@ -30,11 +30,9 @@ namespace irsdkSharp.Serialization
         {
             if (irSdk.IsConnected())
             {
-                var fileView = IrSdk.GetFileMapView(irSdk);
-                var headers = IrSdk.GetVarHeaders(irSdk);
                 var data = new byte[irSdk.Header.BufferLength];
-                fileView.ReadArray(irSdk.Header.Offset, data, 0, irSdk.Header.BufferLength);
-                return IRacingDataModel.Serialize(data, headers);
+                irSdk.FileMapView.ReadArray(irSdk.Header.Offset, data, 0, irSdk.Header.BufferLength);
+                return IRacingDataModel.Serialize(data, irSdk.VarHeaders);
             }
             return null;
         }
@@ -100,12 +98,10 @@ namespace irsdkSharp.Serialization
         {
             if (irSdk.IsConnected())
             {
-                var fileView = IrSdk.GetFileMapView(irSdk);
-                var headers = IrSdk.GetVarHeaders(irSdk);
                 var data = new byte[irSdk.Header.BufferLength];
-                fileView.ReadArray(irSdk.Header.Offset, data, 0, irSdk.Header.BufferLength);
+                irSdk.FileMapView.ReadArray(irSdk.Header.Offset, data, 0, irSdk.Header.BufferLength);
                 sessionTime = (double)irSdk.GetData("SessionTime");
-                return IRacingDataModel.SerializeCars(data, headers);
+                return IRacingDataModel.SerializeCars(data, irSdk.VarHeaders);
             }
             sessionTime = 0;
             return null;
