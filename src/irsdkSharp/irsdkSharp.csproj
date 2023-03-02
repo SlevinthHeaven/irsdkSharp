@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>11</LangVersion>
 	<TargetFrameworks>net6.0</TargetFrameworks>
     <PackageId>irsdkSharp</PackageId>
     <VersionPrefix>0.9.0</VersionPrefix>
@@ -19,6 +19,7 @@
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
     <AssemblyName>irsdkSharp</AssemblyName>
     <RootNamespace>irsdkSharp</RootNamespace>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
