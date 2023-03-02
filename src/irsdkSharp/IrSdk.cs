@@ -13,7 +13,7 @@ using System.IO;
 
 namespace irsdkSharp
 {
-    public class IrSdk
+    public class IrSdk : IDisposable
     {
         private readonly Encoding _encoding;
         private readonly ILogger<IrSdk>? _logger;
@@ -22,17 +22,27 @@ namespace irsdkSharp
         private MemoryMappedFile? _iRacingFile;
         private CancellationTokenSource? _loopCancellationSource;
         private Dictionary<string, VarHeader>? _varHeaders;
+        private bool _isDisposed = false;
 
         #region Properties
         /// <summary>
         /// Options for the SDK.
         /// </summary>
         public IrSdkOptions Options => _options;
-        
+
         /// <summary>
         /// If the data loop has been started.
         /// </summary>
-        public bool IsStarted => _loopCancellationSource != null && !_loopCancellationSource.IsCancellationRequested;
+        public bool IsStarted
+        {
+            get
+            {
+                if (_isDisposed)
+                    throw new ObjectDisposedException(nameof(IrSdk));
+                
+                return _loopCancellationSource != null && !_loopCancellationSource.IsCancellationRequested;
+            }
+        }
 
         /// <summary>
         /// If the sim is connected.
@@ -41,6 +51,9 @@ namespace irsdkSharp
         {
             get
             {
+                if (_isDisposed)
+                    throw new ObjectDisposedException(nameof(IrSdk));
+                
                 if (Header != null)
                     return (Header.Status & 1) > 0;
 
@@ -101,6 +114,9 @@ namespace irsdkSharp
         
         public void Start()
         {
+            if (_isDisposed)
+                throw new ObjectDisposedException(nameof(IrSdk));
+            
             if (IsStarted) 
                 return;
             
@@ -112,9 +128,30 @@ namespace irsdkSharp
         
         public void Stop()
         {
+            if (_isDisposed)
+                throw new ObjectDisposedException(nameof(IrSdk));
+            
             _loopCancellationSource?.Cancel();
             _loopCancellationSource?.Dispose();
             _loopCancellationSource = null;
+        }
+        
+        public void Dispose()
+        {
+            if (_isDisposed)
+                return;
+            
+            Stop();
+            
+            FileMapView?.Dispose();
+            FileMapView = null;
+            
+            _iRacingFile?.Dispose();
+            _iRacingFile = null;
+            
+            Header = null;
+            
+            _varHeaders = null;
         }
         
         private async void Loop(CancellationToken token)
