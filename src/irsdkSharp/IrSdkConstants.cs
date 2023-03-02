@@ -20,6 +20,6 @@
         public const int VarDescOffset = 48;
         public const int VarUnitOffset = 112;
     
-        public const char TrimChar = '\0';
+        public const char EndChar = '\0';
     }
 }

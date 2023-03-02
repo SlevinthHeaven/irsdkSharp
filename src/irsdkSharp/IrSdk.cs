@@ -18,9 +18,10 @@ namespace irsdkSharp
         private readonly Encoding _encoding;
         private readonly ILogger<IrSdk>? _logger;
         private readonly IrSdkOptions _options;
-        
+
         private MemoryMappedFile? _iRacingFile;
         private CancellationTokenSource? _loopCancellationSource;
+        private Dictionary<string, VarHeader>? _varHeaders;
 
         #region Properties
         /// <summary>
@@ -47,9 +48,9 @@ namespace irsdkSharp
             }
         }
 
-        public IRacingSdkHeader? Header { get; private set; } = null;
+        public IRacingSdkHeader? Header { get; private set; }
         public MemoryMappedViewAccessor? FileMapView { get; private set; }
-        public Dictionary<string, VarHeader>? VarHeaders { get; private set; }
+        public Dictionary<string, VarHeader>? VarHeaders => _varHeaders ??= Header?.GetVarHeaders(_encoding);
         #endregion
 
         #region Events
@@ -90,7 +91,6 @@ namespace irsdkSharp
             FileMapView = accessor;
 
             Header = new IRacingSdkHeader(FileMapView);
-            GetVarHeaders();
         }
 
         public void Start(int updateFrequency)
@@ -134,7 +134,7 @@ namespace irsdkSharp
                             OnDisconnected?.Invoke(this, EventArgs.Empty);
                         
                         Header = null;
-                        VarHeaders = null;
+                        _varHeaders = null;
                         
                         _logger?.LogWarning($"Not connected to iRacing ({ex.Message})");
                         
@@ -147,11 +147,6 @@ namespace irsdkSharp
                 {
                     Header = new IRacingSdkHeader(FileMapView);
                     OnConnected?.Invoke(this, EventArgs.Empty);
-                }
-                
-                if (VarHeaders == null)
-                { 
-                    GetVarHeaders();
                 }
                 
                 OnDataChanged?.Invoke(this, EventArgs.Empty);
@@ -172,32 +167,10 @@ namespace irsdkSharp
             }
         }
 
-        private void GetVarHeaders()
-        {
-            VarHeaders = new Dictionary<string, VarHeader>(Header.VarCount);
-            for (int i = 0; i < Header.VarCount; i++)
-            {
-                int type = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size)));
-                int offset = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size) + IrSdkConstants.VarOffsetOffset));
-                int count = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size) + IrSdkConstants.VarCountOffset));
-                byte[] name = new byte[IrSdkConstants.MaxString];
-                byte[] desc = new byte[IrSdkConstants.MaxDesc];
-                byte[] unit = new byte[IrSdkConstants.MaxString];
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + IrSdkConstants.VarNameOffset), name, 0, IrSdkConstants.MaxString);
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + IrSdkConstants.VarDescOffset), desc, 0, IrSdkConstants.MaxDesc);
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + IrSdkConstants.VarUnitOffset), unit, 0, IrSdkConstants.MaxString);
-                string nameStr = _encoding.GetString(name).TrimEnd(IrSdkConstants.TrimChar);
-                string descStr = _encoding.GetString(desc).TrimEnd(IrSdkConstants.TrimChar);
-                string unitStr = _encoding.GetString(unit).TrimEnd(IrSdkConstants.TrimChar);
-                var header = new VarHeader(type, offset, count, nameStr, descStr, unitStr);
-                VarHeaders[header.Name] = header;  
-            }
-        }
-
-        public object GetData(string name)
+        public object? GetData(string name)
         {
             if (!IsConnected) return null;
-            if (!VarHeaders.TryGetValue(name, out var requestedHeader)) return null;
+            if (!VarHeaders?.TryGetValue(name, out var requestedHeader) ?? true) return null;
 
             int varOffset = requestedHeader.Offset;
             int count = requestedHeader.Count;
@@ -208,7 +181,7 @@ namespace irsdkSharp
                     {
                         byte[] data = new byte[count];
                         FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                        return _encoding.GetString(data).TrimEnd(IrSdkConstants.TrimChar);
+                        return _encoding.GetString(data).TrimEnd(IrSdkConstants.EndChar);
                     }
                 case VarType.irBool:
                     {
