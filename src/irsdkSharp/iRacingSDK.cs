@@ -28,24 +28,26 @@ namespace irsdkSharp
 
         #region Fields
         private readonly Encoding _encoding;
+        private readonly ILogger<IRacingSDK>? _logger;
 
         private bool IsStarted = false;
 
         MemoryMappedFile iRacingFile;
-        
-        protected MemoryMappedViewAccessor FileMapView;
-        protected Dictionary<string, VarHeader> VarHeaders;
-        
-        public IRacingSdkHeader Header = null;
 
+        // TODO: Change to only use one CTS
         private AutoResetEvent _gameLoopEvent;
         private IntPtr _hEvent;
-        private readonly ILogger<IRacingSDK> _logger;
         private readonly CancellationTokenSource _waitValidDataLoopCancellation;
         private readonly CancellationToken _waitValidDataLoopCancellationToken;
-        
         private readonly CancellationTokenSource _connectionLoopCancellation;
         private readonly CancellationToken _connectionLoopCancellationToken;
+        #endregion
+
+        #region Properties
+        public IRacingSdkHeader? Header { get; private set; } = null;
+        
+        public MemoryMappedViewAccessor FileMapView { get; protected set; }
+        public Dictionary<string, VarHeader> VarHeaders { get; protected set; }
         #endregion
 
         #region Events
@@ -54,15 +56,13 @@ namespace irsdkSharp
         public event Action OnDisconnected;
         #endregion
 
-        public static MemoryMappedViewAccessor GetFileMapView(IRacingSDK racingSDK)
-        {
-            return racingSDK.FileMapView;
-        }
+        [Obsolete("Use the getter of FileMapView instead.")]
+        public static MemoryMappedViewAccessor GetFileMapView(IRacingSDK racingSDK) 
+            => racingSDK.FileMapView;
 
+        [Obsolete("Use the getter of VarHeaders instead.")]
         public static Dictionary<string, VarHeader> GetVarHeaders(IRacingSDK racingSDK)
-        {
-            return racingSDK.VarHeaders;
-        }
+            => racingSDK.VarHeaders;
 
         public IRacingSDK()
         {
