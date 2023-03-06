@@ -11,9 +11,11 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using irsdkSharp.Extensions;
 using System.IO;
+using System.Runtime.Versioning;
 
 namespace irsdkSharp
 {
+    [SupportedOSPlatform("windows")]
     public class IRacingSDK
     {
         #region Constants
