@@ -59,8 +59,19 @@ namespace irsdkSharp
         [Obsolete("Use the Disconnected event instead.", true)]
         public event Action OnDisconnected;
 
+        /// <summary>
+        /// Invoked every time the SDK reads the data from iRacing. Not necessarily new data.
+        /// </summary>
         public event EventHandler? DataChanged;
+        
+        /// <summary>
+        /// Invoked when the SDK starts receiving data from iRacing.
+        /// </summary>
         public event EventHandler? Connected;
+        
+        /// <summary>
+        /// Invoked when the SDK stops receiving data from iRacing.
+        /// </summary>
         public event EventHandler? Disconnected;
         #endregion
 
