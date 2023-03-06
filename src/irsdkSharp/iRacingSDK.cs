@@ -6,7 +6,6 @@ using irsdkSharp.Enums;
 using irsdkSharp.Models;
 using System.Threading;
 using System.Text;
-using Microsoft.Win32.SafeHandles;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using irsdkSharp.Extensions;
@@ -15,6 +14,9 @@ using System.Runtime.Versioning;
 
 namespace irsdkSharp
 {
+    /// <summary>
+    /// Connects to the iRacing SDK.
+    /// </summary>
     [SupportedOSPlatform("windows")]
     public class IRacingSDK : IDisposable
     {
@@ -24,7 +26,7 @@ namespace irsdkSharp
         
         private MemoryMappedFile? _iRacingFile;
         private Dictionary<string, VarHeader>? _varHeaders;
-        private bool _disposed = false;
+        private bool _disposed;
         
         private CancellationTokenSource? _loopCancellationSource;
         #endregion
@@ -49,14 +51,25 @@ namespace irsdkSharp
         #endregion
 
         #region Events
+#pragma warning disable CS0067
+        /// <summary>
+        /// Not used anymore. Use the DataChanged event instead.
+        /// </summary>
         [Obsolete("Use the DataChanged event instead.", true)]
-        public event Action OnDataChanged;
+        public event Action OnDataChanged = null!;
         
+        /// <summary>
+        /// Not used anymore. Use the DataChanged event instead.
+        /// </summary>
         [Obsolete("Use the Connected event instead.", true)]
-        public event Action OnConnected;
+        public event Action OnConnected = null!;
         
+        /// <summary>
+        /// Not used anymore. Use the DataChanged event instead.
+        /// </summary>
         [Obsolete("Use the Disconnected event instead.", true)]
-        public event Action OnDisconnected;
+        public event Action OnDisconnected = null!;
+#pragma warning restore CS0067
 
         /// <summary>
         /// Invoked every time the SDK reads the data from iRacing. Not necessarily new data.
@@ -74,14 +87,29 @@ namespace irsdkSharp
         public event EventHandler? Disconnected;
         #endregion
 
+        /// <summary>
+        /// Not used anymore. Use the getter of FileMapView instead.
+        /// </summary>
+        /// <param name="racingSdk">The Sdk.</param>
+        /// <returns>The FileMapView property of the <paramref name="racingSdk"/>.</returns>
         [Obsolete("Use the getter of FileMapView instead.")]
-        public static MemoryMappedViewAccessor GetFileMapView(IRacingSDK racingSDK) 
-            => racingSDK.FileMapView;
+        public static MemoryMappedViewAccessor? GetFileMapView(IRacingSDK racingSdk) 
+            => racingSdk.FileMapView;
 
+        /// <summary>
+        /// Not used anymore. Use the getter of VarHeaders instead.
+        /// </summary>
+        /// <param name="racingSdk">The Sdk.</param>
+        /// <returns>The VarHeaders property of the <paramref name="racingSdk"/>.</returns>
         [Obsolete("Use the getter of VarHeaders instead.")]
-        public static Dictionary<string, VarHeader> GetVarHeaders(IRacingSDK racingSDK)
-            => racingSDK.VarHeaders;
+        public static Dictionary<string, VarHeader>? GetVarHeaders(IRacingSDK racingSdk)
+            => racingSdk.VarHeaders;
 
+        /// <summary>
+        /// Creates a new instance of the SDK.
+        /// </summary>
+        /// <param name="options">The options used when the Sdk is started.</param>
+        /// <param name="autoStart">Whether or not the Sdk should be auto started on initialization.</param>
         public IRacingSDK(IRacingSdkOptions? options, ILogger<IRacingSDK>? logger, bool autoStart = true)
         {
             // Register CP1252 encoding
@@ -96,14 +124,27 @@ namespace irsdkSharp
                 Start();
         }
         
+        /// <summary>
+        /// Creates a new instance of the SDK.
+        /// </summary>
+        /// <param name="autoStart">Whether or not the Sdk should be auto started on initialization.</param>
         public IRacingSDK(bool autoStart = true) : this(null, null, autoStart)
         {
         }
         
+        /// <summary>
+        /// Creates a new instance of the SDK.
+        /// </summary>
+        /// <param name="options">The options used when the Sdk is started.</param>
+        /// <param name="autoStart">Whether or not the Sdk should be auto started on initialization.</param>
         public IRacingSDK(IRacingSdkOptions? options, bool autoStart = true) : this(options, null, autoStart)
         {
         }
 
+        /// <summary>
+        /// Creates a new instance of the SDK.
+        /// </summary>
+        /// <param name="autoStart">Whether or not the Sdk should be auto started on initialization.</param>
         public IRacingSDK(ILogger<IRacingSDK> logger, bool autoStart = true) : this(null, logger, autoStart)
         {
         }
@@ -115,12 +156,21 @@ namespace irsdkSharp
             Header = new IRacingSdkHeader(FileMapView);
         }
         
+        /// <summary>
+        /// Start listening for data from iRacing.
+        /// </summary>
+        /// <param name="updateFrequency">Set the update per second (1-60).</param>
+        /// <exception cref="ObjectDisposedException"/>
         public void Start(int updateFrequency)
         {
             Options.UpdateFrequency = updateFrequency;
             Start();
         }
         
+        /// <summary>
+        /// Start listening for data from iRacing.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException"/>
         public void Start()
         {
             if (_disposed)
@@ -133,8 +183,14 @@ namespace irsdkSharp
             
             Task.Factory.StartNew(() => 
                 Loop(_loopCancellationSource.Token), _loopCancellationSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            
+            _logger?.LogInformation("Started the Sdk.");
         }
         
+        /// <summary>
+        /// Stop listening for data from iRacing.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException"/>
         public void Stop()
         {
             if (_disposed)
@@ -143,12 +199,17 @@ namespace irsdkSharp
             _loopCancellationSource?.Cancel();
             _loopCancellationSource?.Dispose();
             _loopCancellationSource = null;
+            
+            _logger?.LogInformation("Stopped the Sdk.");
         }
 
+        /// <summary>
+        /// Dispose the Sdk.
+        /// </summary>
         public void Dispose()
         {
             if (_disposed) return;
-            
+
             Stop();
             
             FileMapView?.Dispose();
@@ -162,6 +223,8 @@ namespace irsdkSharp
             _varHeaders = null;
             
             _disposed = true;
+            
+            GC.SuppressFinalize(this);
         }
         
         private async void Loop(CancellationToken token)
@@ -178,19 +241,26 @@ namespace irsdkSharp
                     catch (FileNotFoundException ex)
                     {
                         if (Header != null)
+                        {
                             Disconnected?.Invoke(this, EventArgs.Empty);
+                            _logger?.LogWarning($"Disconnected from iRacing ({ex.Message})");
+                        }
+                        else
+                        {
+                            _logger?.LogWarning($"Not connected to iRacing ({ex.Message})");
+                        }
                         
                         Header = null;
                         _varHeaders = null;
-                        
-                        _logger?.LogWarning($"Not connected to iRacing ({ex.Message})");
-                        
+
                         try
                         {
+                            _logger?.LogInformation($"Waiting {Options.CheckConnectionDelay} ms before retrying to connect to iRacing.");
                             await Task.Delay(Options.CheckConnectionDelay, token);
                         }
                         catch (OperationCanceledException)
                         {
+                            _logger?.LogTrace("The CancellationToken was cancelled while waiting for next connect retry to iRacing.");
                             break;
                         }
                         continue;
@@ -201,19 +271,25 @@ namespace irsdkSharp
                 {
                     Header = new IRacingSdkHeader(FileMapView);
                     Connected?.Invoke(this, EventArgs.Empty);
+                    _logger?.LogInformation("Connected to iRacing.");
                 }
                 
                 DataChanged?.Invoke(this, EventArgs.Empty);
+                _logger?.LogDebug("Data changed.");
                 
                 try
                 {
+                    _logger?.LogTrace($"Waiting {Options.UpdateDelay} ms before next update.");
                     await Task.Delay(Options.UpdateDelay, token);
                 }
                 catch (OperationCanceledException)
                 {
+                    _logger?.LogTrace("The CancellationToken was cancelled while waiting for next update.");
                     break;
                 }
             }
+            
+            _logger?.LogDebug("Exited the Sdk loop.");
         }
 
         public object? GetData(string name)
