@@ -23,6 +23,8 @@ namespace irsdkSharp
         private readonly ILogger<IRacingSDK>? _logger;
         
         private MemoryMappedFile? _iRacingFile;
+        private Dictionary<string, VarHeader>? _varHeaders;
+        
         private bool _isStarted = false;
 
         // TODO: Change to only use one CTS
@@ -37,7 +39,7 @@ namespace irsdkSharp
         #region Properties
         public IRacingSdkHeader? Header { get; private set; }
         public MemoryMappedViewAccessor? FileMapView { get; protected set; }
-        public Dictionary<string, VarHeader>? VarHeaders { get; protected set; }
+        public Dictionary<string, VarHeader>? VarHeaders => _varHeaders ??= Header?.GetVarHeaders(_encoding);
         #endregion
 
         #region Events
@@ -99,7 +101,6 @@ namespace irsdkSharp
             FileMapView = accessor;
 
             Header = new IRacingSdkHeader(FileMapView);
-            VarHeaders = Header.GetVarHeaders(_encoding);
             _isStarted = true;
         }
 
@@ -131,7 +132,7 @@ namespace irsdkSharp
                 {
                     _isStarted = false;
                     Header = null;
-                    VarHeaders = null;
+                    _varHeaders = null;
                     _logger?.LogDebug($"Not Connected {ex.Message}");
                 }
                 finally
@@ -160,10 +161,6 @@ namespace irsdkSharp
                                 Header = new IRacingSdkHeader(FileMapView);
                                 Connected?.Invoke(this, EventArgs.Empty);
                             }
-                            if (VarHeaders == null)
-                            { 
-                                VarHeaders = Header.GetVarHeaders(_encoding);
-                            }
                             DataChanged?.Invoke(this, EventArgs.Empty);
                         }
                         else
@@ -175,7 +172,7 @@ namespace irsdkSharp
                             }
                             if (VarHeaders != null)
                             {
-                                VarHeaders = null;
+                                _varHeaders = null;
                             }
                         }
                     }
