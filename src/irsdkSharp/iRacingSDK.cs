@@ -16,25 +16,43 @@ namespace irsdkSharp
 {
     public class IRacingSDK
     {
-        private readonly Encoding _encoding;
-        private readonly char[] trimChars = { '\0' };
-        private bool IsStarted = false;
-
-        //VarHeader offsets
+        #region Constants
+        private const char TrimChar = '\0';
+        
         public const int VarOffsetOffset = 4;
         public const int VarCountOffset = 8;
         public const int VarNameOffset = 16;
         public const int VarDescOffset = 48;
         public const int VarUnitOffset = 112;
+        #endregion
+
+        #region Fields
+        private readonly Encoding _encoding;
+
+        private bool IsStarted = false;
 
         MemoryMappedFile iRacingFile;
+        
         protected MemoryMappedViewAccessor FileMapView;
         protected Dictionary<string, VarHeader> VarHeaders;
+        
+        public IRacingSdkHeader Header = null;
 
-        //events
+        private AutoResetEvent _gameLoopEvent;
+        private IntPtr _hEvent;
+        private readonly ILogger<IRacingSDK> _logger;
+        private readonly CancellationTokenSource _waitValidDataLoopCancellation;
+        private readonly CancellationToken _waitValidDataLoopCancellationToken;
+        
+        private readonly CancellationTokenSource _connectionLoopCancellation;
+        private readonly CancellationToken _connectionLoopCancellationToken;
+        #endregion
+
+        #region Events
         public event Action OnDataChanged;
         public event Action OnConnected;
         public event Action OnDisconnected;
+        #endregion
 
         public static MemoryMappedViewAccessor GetFileMapView(IRacingSDK racingSDK)
         {
@@ -45,18 +63,6 @@ namespace irsdkSharp
         {
             return racingSDK.VarHeaders;
         }
-
-        public IRacingSdkHeader Header = null;
-
-        private AutoResetEvent _gameLoopEvent;
-        private IntPtr _hEvent;
-        private readonly ILogger<IRacingSDK> _logger;
-        private readonly CancellationTokenSource _waitValidDataLoopCancellation;
-        private readonly CancellationToken _waitValidDataLoopCancellationToken;
-
-
-        private readonly CancellationTokenSource _connectionLoopCancellation;
-        private readonly CancellationToken _connectionLoopCancellationToken;
 
         public IRacingSDK()
         {
@@ -192,9 +198,9 @@ namespace irsdkSharp
                 FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarNameOffset), name, 0, Constants.MaxString);
                 FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarDescOffset), desc, 0, Constants.MaxDesc);
                 FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarUnitOffset), unit, 0, Constants.MaxString);
-                string nameStr = _encoding.GetString(name).TrimEnd(trimChars);
-                string descStr = _encoding.GetString(desc).TrimEnd(trimChars);
-                string unitStr = _encoding.GetString(unit).TrimEnd(trimChars);
+                string nameStr = _encoding.GetString(name).TrimEnd(TrimChar);
+                string descStr = _encoding.GetString(desc).TrimEnd(TrimChar);
+                string unitStr = _encoding.GetString(unit).TrimEnd(TrimChar);
                 var header = new VarHeader(type, offset, count, nameStr, descStr, unitStr);
                 VarHeaders[header.Name] = header;  
             }
@@ -214,7 +220,7 @@ namespace irsdkSharp
                     {
                         byte[] data = new byte[count];
                         FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                        return _encoding.GetString(data).TrimEnd(trimChars);
+                        return _encoding.GetString(data).TrimEnd(TrimChar);
                     }
                 case VarType.irBool:
                     {
