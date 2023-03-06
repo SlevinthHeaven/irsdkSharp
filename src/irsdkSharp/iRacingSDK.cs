@@ -299,26 +299,25 @@ namespace irsdkSharp
 
             int varOffset = requestedHeader.Offset;
             int count = requestedHeader.Count;
+            int position = Header.Offset + varOffset;
 
             switch (requestedHeader.Type)
             {
                 case VarType.irChar:
                     {
                         byte[] data = new byte[count];
-                        FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
+                        FileMapView.ReadArray(position, data, 0, count);
                         return _encoding.GetString(data).TrimEnd(Constants.EndChar);
                     }
                 case VarType.irBool:
                     {
                         if (count > 1)
                         {
-                            bool[] data = new bool[count];
-                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                            return data;
+                            return FileMapView.ReadArray<bool>(position, count);
                         }
                         else
                         {
-                            return FileMapView.ReadBoolean(Header.Offset + varOffset);
+                            return FileMapView.ReadBoolean(position);
                         }
                     }
                 case VarType.irInt:
@@ -326,39 +325,33 @@ namespace irsdkSharp
                     {
                         if (count > 1)
                         {
-                            int[] data = new int[count];
-                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                            return data;
+                            return FileMapView.ReadArray<int>(position, count);
                         }
                         else
                         {
-                            return FileMapView.ReadInt32(Header.Offset + varOffset);
+                            return FileMapView.ReadInt32(position);
                         }
                     }
                 case VarType.irFloat:
                     {
                         if (count > 1)
                         {
-                            float[] data = new float[count];
-                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                            return data;
+                            return FileMapView.ReadArray<float>(position, count);
                         }
                         else
                         {
-                            return FileMapView.ReadSingle(Header.Offset + varOffset);
+                            return FileMapView.ReadSingle(position);
                         }
                     }
                 case VarType.irDouble:
                     {
                         if (count > 1)
                         {
-                            double[] data = new double[count];
-                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                            return data;
+                            return FileMapView.ReadArray<double>(position, count);
                         }
                         else
                         {
-                            return FileMapView.ReadDouble(Header.Offset + varOffset);
+                            return FileMapView.ReadDouble(position);
                         }
                     }
                 default: return null;
