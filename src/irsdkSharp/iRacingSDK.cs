@@ -24,7 +24,6 @@ namespace irsdkSharp
         private readonly Encoding _encoding;
         private readonly ILogger<IRacingSDK>? _logger;
         
-        private MemoryMappedFile? _iRacingFile;
         private Dictionary<string, VarHeader>? _varHeaders;
         private bool _disposed;
         
@@ -215,9 +214,6 @@ namespace irsdkSharp
             FileMapView?.Dispose();
             FileMapView = null;
             
-            _iRacingFile?.Dispose();
-            _iRacingFile = null;
-            
             Header = null;
             
             _varHeaders = null;
@@ -231,12 +227,12 @@ namespace irsdkSharp
         {
             while (!token.IsCancellationRequested)
             {
-                if (!IsConnected() && _iRacingFile == null)
+                if (!IsConnected() && FileMapView == null)
                 {
                     try
                     {
-                        _iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
-                        FileMapView = _iRacingFile.CreateViewAccessor();
+                        using var iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName, MemoryMappedFileRights.Read);
+                        FileMapView = iRacingFile.CreateViewAccessor(0, 0, MemoryMappedFileAccess.Read);
                     }
                     catch (FileNotFoundException ex)
                     {
@@ -267,15 +263,22 @@ namespace irsdkSharp
                     }
                 }
                 
-                if (Header == null)
-                {
-                    Header = new IRacingSdkHeader(FileMapView);
-                    Connected?.Invoke(this, EventArgs.Empty);
-                    _logger?.LogInformation("Connected to iRacing.");
-                }
+                bool headerWasNull = Header == null;
                 
-                DataChanged?.Invoke(this, EventArgs.Empty);
-                _logger?.LogDebug("Data changed.");
+                if (headerWasNull)
+                    Header = new IRacingSdkHeader(FileMapView);
+
+                if (IsConnected())
+                {
+                    if (headerWasNull)
+                    {
+                        Connected?.Invoke(this, EventArgs.Empty);
+                        _logger?.LogInformation("Connected to iRacing.");
+                    }
+                    
+                    DataChanged?.Invoke(this, EventArgs.Empty);
+                    _logger?.LogDebug("Data changed.");
+                }
                 
                 try
                 {
