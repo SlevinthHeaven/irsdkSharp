@@ -16,7 +16,7 @@ using System.Runtime.Versioning;
 namespace irsdkSharp
 {
     [SupportedOSPlatform("windows")]
-    public class IRacingSDK
+    public class IRacingSDK : IDisposable
     {
         #region Fields
         private readonly Encoding _encoding;
@@ -24,6 +24,7 @@ namespace irsdkSharp
         
         private MemoryMappedFile? _iRacingFile;
         private Dictionary<string, VarHeader>? _varHeaders;
+        private bool _disposed = false;
         
         private CancellationTokenSource? _loopCancellationSource;
         #endregion
@@ -37,7 +38,10 @@ namespace irsdkSharp
         /// <summary>
         /// If the data loop has been started.
         /// </summary>
-        public bool IsStarted => _loopCancellationSource != null && !_loopCancellationSource.IsCancellationRequested;
+        /// <exception cref="ObjectDisposedException"/>
+        public bool IsStarted => (_disposed) 
+            ? throw new ObjectDisposedException(nameof(IRacingSDK)) 
+            : _loopCancellationSource != null && !_loopCancellationSource.IsCancellationRequested;
 
         public IRacingSdkHeader? Header { get; private set; }
         public MemoryMappedViewAccessor? FileMapView { get; protected set; }
@@ -119,6 +123,9 @@ namespace irsdkSharp
         
         public void Start()
         {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(IRacingSDK));
+            
             if (IsStarted) 
                 return;
             
@@ -130,9 +137,31 @@ namespace irsdkSharp
         
         public void Stop()
         {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(IRacingSDK));
+            
             _loopCancellationSource?.Cancel();
             _loopCancellationSource?.Dispose();
             _loopCancellationSource = null;
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            
+            Stop();
+            
+            FileMapView?.Dispose();
+            FileMapView = null;
+            
+            _iRacingFile?.Dispose();
+            _iRacingFile = null;
+            
+            Header = null;
+            
+            _varHeaders = null;
+            
+            _disposed = true;
         }
         
         private async void Loop(CancellationToken token)
@@ -266,9 +295,13 @@ namespace irsdkSharp
         /// <summary>
         /// If the sim is connected.
         /// </summary>
+        /// <exception cref="ObjectDisposedException"/>
         // Should be a property but for compatibility we keep it as a method.
         public bool IsConnected()
         {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(IRacingSDK));
+            
             if (Header != null)
                 return (Header.Status & 1) > 0;
 
