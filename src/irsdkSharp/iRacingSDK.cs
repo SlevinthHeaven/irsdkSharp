@@ -18,21 +18,11 @@ namespace irsdkSharp
     [SupportedOSPlatform("windows")]
     public class IRacingSDK
     {
-        #region Constants
-        private const char TrimChar = '\0';
-        
-        public const int VarOffsetOffset = 4;
-        public const int VarCountOffset = 8;
-        public const int VarNameOffset = 16;
-        public const int VarDescOffset = 48;
-        public const int VarUnitOffset = 112;
-        #endregion
-
         #region Fields
         private readonly Encoding _encoding;
         private readonly ILogger<IRacingSDK>? _logger;
         
-        private MemoryMappedFile _iRacingFile;
+        private MemoryMappedFile? _iRacingFile;
         private bool _isStarted = false;
 
         // TODO: Change to only use one CTS
@@ -45,10 +35,9 @@ namespace irsdkSharp
         #endregion
 
         #region Properties
-        public IRacingSdkHeader? Header { get; private set; } = null;
-        
-        public MemoryMappedViewAccessor FileMapView { get; protected set; }
-        public Dictionary<string, VarHeader> VarHeaders { get; protected set; }
+        public IRacingSdkHeader? Header { get; private set; }
+        public MemoryMappedViewAccessor? FileMapView { get; protected set; }
+        public Dictionary<string, VarHeader>? VarHeaders { get; protected set; }
         #endregion
 
         #region Events
@@ -110,7 +99,7 @@ namespace irsdkSharp
             FileMapView = accessor;
 
             Header = new IRacingSdkHeader(FileMapView);
-            GetVarHeaders();
+            VarHeaders = Header.GetVarHeaders(_encoding);
             _isStarted = true;
         }
 
@@ -173,7 +162,7 @@ namespace irsdkSharp
                             }
                             if (VarHeaders == null)
                             { 
-                                GetVarHeaders();
+                                VarHeaders = Header.GetVarHeaders(_encoding);
                             }
                             DataChanged?.Invoke(this, EventArgs.Empty);
                         }
@@ -201,28 +190,6 @@ namespace irsdkSharp
             }
         }
 
-        private void GetVarHeaders()
-        {
-            VarHeaders = new Dictionary<string, VarHeader>(Header.VarCount);
-            for (int i = 0; i < Header.VarCount; i++)
-            {
-                int type = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size)));
-                int offset = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarOffsetOffset));
-                int count = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarCountOffset));
-                byte[] name = new byte[Constants.MaxString];
-                byte[] desc = new byte[Constants.MaxDesc];
-                byte[] unit = new byte[Constants.MaxString];
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarNameOffset), name, 0, Constants.MaxString);
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarDescOffset), desc, 0, Constants.MaxDesc);
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarUnitOffset), unit, 0, Constants.MaxString);
-                string nameStr = _encoding.GetString(name).TrimEnd(TrimChar);
-                string descStr = _encoding.GetString(desc).TrimEnd(TrimChar);
-                string unitStr = _encoding.GetString(unit).TrimEnd(TrimChar);
-                var header = new VarHeader(type, offset, count, nameStr, descStr, unitStr);
-                VarHeaders[header.Name] = header;  
-            }
-        }
-
         public object GetData(string name)
         {
             if (!_isStarted || Header == null) return null;
@@ -237,7 +204,7 @@ namespace irsdkSharp
                     {
                         byte[] data = new byte[count];
                         FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                        return _encoding.GetString(data).TrimEnd(TrimChar);
+                        return _encoding.GetString(data).TrimEnd(Constants.EndChar);
                     }
                 case VarType.irBool:
                     {

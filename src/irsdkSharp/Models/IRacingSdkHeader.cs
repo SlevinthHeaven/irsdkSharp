@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
+using System.Text;
 
 namespace irsdkSharp.Models
 {
@@ -53,6 +54,37 @@ namespace irsdkSharp.Models
                 }
                 return curOffset;
             }
+        }
+        
+        public Dictionary<string, VarHeader> GetVarHeaders(Encoding encoding)
+        {
+            var varHeaders = new Dictionary<string, VarHeader>(VarCount);
+            
+            for (int i = 0; i < VarCount; i++)
+            {
+                int positionOffset = VarHeaderOffset + (i * VarHeader.Size);
+                
+                int type = _mapView.ReadInt32(positionOffset);
+                int offset = _mapView.ReadInt32(positionOffset + Constants.VarOffsetOffset);
+                int count = _mapView.ReadInt32(positionOffset + Constants.VarCountOffset);
+                
+                string name = ReadVarHeaderString(positionOffset + Constants.VarNameOffset, Constants.MaxString, encoding);
+                string desc = ReadVarHeaderString(positionOffset + Constants.VarDescOffset, Constants.MaxDesc, encoding);
+                string unit = ReadVarHeaderString(positionOffset + Constants.VarUnitOffset, Constants.MaxString, encoding);
+
+                varHeaders[name] = new VarHeader(type, offset, count, name, desc, unit);  
+            }
+            
+            return varHeaders;
+        }
+        
+        private string ReadVarHeaderString(int position, int count, Encoding encoding)
+        {
+            var bytes = new byte[count];
+            
+            _mapView.ReadArray(position, bytes, 0, count);
+            
+            return encoding.GetString(bytes).TrimEnd(Constants.EndChar);
         }
     }
 }
