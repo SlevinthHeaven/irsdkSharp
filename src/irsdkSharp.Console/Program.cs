@@ -17,6 +17,15 @@ namespace irsdkSharp.ConsoleTest
             sdk.DataChanged += Sdk_OnDataChanged;
             sdk.Disconnected += Sdk_OnDisconnected;
             sdk.Connected += Sdk_OnConnected;
+            
+            sdk.Start();
+            Console.WriteLine("Started...");
+            
+            Console.ReadLine();
+            
+            sdk.Stop();
+            Console.WriteLine("Stopped...");
+            
             Console.ReadLine();
         }
 
