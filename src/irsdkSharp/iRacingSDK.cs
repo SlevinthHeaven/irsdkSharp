@@ -6,227 +6,321 @@ using irsdkSharp.Enums;
 using irsdkSharp.Models;
 using System.Threading;
 using System.Text;
-using Microsoft.Win32.SafeHandles;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using irsdkSharp.Extensions;
 using System.IO;
+using System.Runtime.Versioning;
 
 namespace irsdkSharp
 {
-    public class IRacingSDK
+    /// <summary>
+    /// Connects to the iRacing SDK.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    public class IRacingSDK : IDisposable
     {
+        #region Fields
         private readonly Encoding _encoding;
-        private readonly char[] trimChars = { '\0' };
-        private bool IsStarted = false;
+        private readonly ILogger<IRacingSDK>? _logger;
+        
+        private Dictionary<string, VarHeader>? _varHeaders;
+        private bool _disposed;
+        
+        private CancellationTokenSource? _loopCancellationSource;
+        #endregion
 
-        //VarHeader offsets
-        public const int VarOffsetOffset = 4;
-        public const int VarCountOffset = 8;
-        public const int VarNameOffset = 16;
-        public const int VarDescOffset = 48;
-        public const int VarUnitOffset = 112;
+        #region Properties
+        /// <summary>
+        /// Options for the SDK.
+        /// </summary>
+        public IRacingSdkOptions Options { get; }
+        
+        /// <summary>
+        /// If the data loop has been started.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException"/>
+        public bool IsStarted => (_disposed) 
+            ? throw new ObjectDisposedException(nameof(IRacingSDK)) 
+            : _loopCancellationSource != null && !_loopCancellationSource.IsCancellationRequested;
 
-        MemoryMappedFile iRacingFile;
-        protected MemoryMappedViewAccessor FileMapView;
-        protected Dictionary<string, VarHeader> VarHeaders;
+        public IRacingSdkHeader? Header { get; private set; }
+        public MemoryMappedViewAccessor? FileMapView { get; protected set; }
+        public Dictionary<string, VarHeader>? VarHeaders => _varHeaders ??= Header?.GetVarHeaders(_encoding);
+        #endregion
 
-        //events
-        public event Action OnDataChanged;
-        public event Action OnConnected;
-        public event Action OnDisconnected;
+        #region Events
+#pragma warning disable CS0067
+        /// <summary>
+        /// Not used anymore. Use the DataChanged event instead.
+        /// </summary>
+        [Obsolete("Use the DataChanged event instead.", true)]
+        public event Action OnDataChanged = null!;
+        
+        /// <summary>
+        /// Not used anymore. Use the DataChanged event instead.
+        /// </summary>
+        [Obsolete("Use the Connected event instead.", true)]
+        public event Action OnConnected = null!;
+        
+        /// <summary>
+        /// Not used anymore. Use the DataChanged event instead.
+        /// </summary>
+        [Obsolete("Use the Disconnected event instead.", true)]
+        public event Action OnDisconnected = null!;
+#pragma warning restore CS0067
 
-        public static MemoryMappedViewAccessor GetFileMapView(IRacingSDK racingSDK)
-        {
-            return racingSDK.FileMapView;
-        }
+        /// <summary>
+        /// Invoked every time the SDK reads the data from iRacing. Not necessarily new data.
+        /// </summary>
+        public event EventHandler? DataChanged;
+        
+        /// <summary>
+        /// Invoked when the SDK starts receiving data from iRacing.
+        /// </summary>
+        public event EventHandler? Connected;
+        
+        /// <summary>
+        /// Invoked when the SDK stops receiving data from iRacing.
+        /// </summary>
+        public event EventHandler? Disconnected;
+        #endregion
 
-        public static Dictionary<string, VarHeader> GetVarHeaders(IRacingSDK racingSDK)
-        {
-            return racingSDK.VarHeaders;
-        }
+        /// <summary>
+        /// Not used anymore. Use the getter of FileMapView instead.
+        /// </summary>
+        /// <param name="racingSdk">The Sdk.</param>
+        /// <returns>The FileMapView property of the <paramref name="racingSdk"/>.</returns>
+        [Obsolete("Use the getter of FileMapView instead.")]
+        public static MemoryMappedViewAccessor? GetFileMapView(IRacingSDK racingSdk) 
+            => racingSdk.FileMapView;
 
-        public IRacingSdkHeader Header = null;
+        /// <summary>
+        /// Not used anymore. Use the getter of VarHeaders instead.
+        /// </summary>
+        /// <param name="racingSdk">The Sdk.</param>
+        /// <returns>The VarHeaders property of the <paramref name="racingSdk"/>.</returns>
+        [Obsolete("Use the getter of VarHeaders instead.")]
+        public static Dictionary<string, VarHeader>? GetVarHeaders(IRacingSDK racingSdk)
+            => racingSdk.VarHeaders;
 
-        private AutoResetEvent _gameLoopEvent;
-        private IntPtr _hEvent;
-        private readonly ILogger<IRacingSDK> _logger;
-        private readonly CancellationTokenSource _waitValidDataLoopCancellation;
-        private readonly CancellationToken _waitValidDataLoopCancellationToken;
-
-
-        private readonly CancellationTokenSource _connectionLoopCancellation;
-        private readonly CancellationToken _connectionLoopCancellationToken;
-
-        public IRacingSDK()
+        /// <summary>
+        /// Creates a new instance of the SDK.
+        /// </summary>
+        /// <param name="options">The options used when the Sdk is started.</param>
+        /// <param name="autoStart">Whether or not the Sdk should be auto started on initialization.</param>
+        public IRacingSDK(IRacingSdkOptions? options, ILogger<IRacingSDK>? logger, bool autoStart = true)
         {
             // Register CP1252 encoding
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding(1252);
-
-            _waitValidDataLoopCancellation = new CancellationTokenSource();
-            _waitValidDataLoopCancellationToken = _waitValidDataLoopCancellation.Token;
-            Task.Run(WaitValidDataLoop, _waitValidDataLoopCancellationToken);
-
-            _connectionLoopCancellation = new CancellationTokenSource();
-            _connectionLoopCancellationToken = _connectionLoopCancellation.Token;
-            Task.Run(ConnectionLoop, _waitValidDataLoopCancellationToken);
-        }
-
-        public IRacingSDK(ILogger<IRacingSDK> logger) : this()
-        {
+            
+            Options = options ?? IRacingSdkOptions.Default;
+            
             _logger = logger;
+            
+            if (autoStart)
+                Start();
+        }
+        
+        /// <summary>
+        /// Creates a new instance of the SDK.
+        /// </summary>
+        /// <param name="autoStart">Whether or not the Sdk should be auto started on initialization.</param>
+        public IRacingSDK(bool autoStart = true) : this(null, null, autoStart)
+        {
+        }
+        
+        /// <summary>
+        /// Creates a new instance of the SDK.
+        /// </summary>
+        /// <param name="options">The options used when the Sdk is started.</param>
+        /// <param name="autoStart">Whether or not the Sdk should be auto started on initialization.</param>
+        public IRacingSDK(IRacingSdkOptions? options, bool autoStart = true) : this(options, null, autoStart)
+        {
         }
 
-        public IRacingSDK(MemoryMappedViewAccessor accessor)
+        /// <summary>
+        /// Creates a new instance of the SDK.
+        /// </summary>
+        /// <param name="autoStart">Whether or not the Sdk should be auto started on initialization.</param>
+        public IRacingSDK(ILogger<IRacingSDK> logger, bool autoStart = true) : this(null, logger, autoStart)
         {
-            // Register CP1252 encoding
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            _encoding = Encoding.GetEncoding(1252);
+        }
 
+        public IRacingSDK(MemoryMappedViewAccessor accessor) : this(null, null, false)
+        {
             FileMapView = accessor;
 
             Header = new IRacingSdkHeader(FileMapView);
-            GetVarHeaders();
-            IsStarted = true;
+        }
+        
+        /// <summary>
+        /// Start listening for data from iRacing.
+        /// </summary>
+        /// <param name="updateFrequency">Set the update per second (1-60).</param>
+        /// <exception cref="ObjectDisposedException"/>
+        public void Start(int updateFrequency)
+        {
+            Options.UpdateFrequency = updateFrequency;
+            Start();
+        }
+        
+        /// <summary>
+        /// Start listening for data from iRacing.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException"/>
+        public void Start()
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(IRacingSDK));
+            
+            if (IsStarted) 
+                return;
+            
+            _loopCancellationSource = new();
+            
+            Task.Factory.StartNew(() => 
+                Loop(_loopCancellationSource.Token), _loopCancellationSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            
+            _logger?.LogInformation("Started the Sdk.");
+        }
+        
+        /// <summary>
+        /// Stop listening for data from iRacing.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException"/>
+        public void Stop()
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(IRacingSDK));
+            
+            _loopCancellationSource?.Cancel();
+            _loopCancellationSource?.Dispose();
+            _loopCancellationSource = null;
+            
+            _logger?.LogInformation("Stopped the Sdk.");
         }
 
-        private void ConnectionLoop()
+        /// <summary>
+        /// Dispose the Sdk.
+        /// </summary>
+        public void Dispose()
         {
-            while (true)
-            {
-                if (_connectionLoopCancellationToken.IsCancellationRequested) break;
-                try
-                {
-                    if (!IsConnected() && !IsStarted && Header == null)
-                    {
-                        if (iRacingFile == null)
-                        {
-                            iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
-                            FileMapView = iRacingFile.CreateViewAccessor();
+            if (_disposed) return;
 
-                            _hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
-                            _gameLoopEvent = new AutoResetEvent(false)
-                            {
-                                SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
-                            };
-
-                            IsStarted = true;
-                        }
-                    }
-                }
-                catch (FileNotFoundException ex)
-                {
-                    IsStarted = false;
-                    Header = null;
-                    VarHeaders = null;
-                    _logger?.LogDebug($"Not Connected {ex.Message}");
-                }
-                finally
-                {
-                    Thread.Sleep(1000);
-                }
-
-            }
+            Stop();
+            
+            FileMapView?.Dispose();
+            FileMapView = null;
+            
+            Header = null;
+            
+            _varHeaders = null;
+            
+            _disposed = true;
+            
+            GC.SuppressFinalize(this);
         }
-
-        private void WaitValidDataLoop()
+        
+        private async void Loop(CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
-                if (_waitValidDataLoopCancellationToken.IsCancellationRequested) break;
-                if (IsStarted)
+                if (!IsConnected() && FileMapView == null)
                 {
                     try
                     {
-                        var valid = _gameLoopEvent.WaitOne(1000);
-
-                        if (valid)
+                        using var iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName, MemoryMappedFileRights.Read);
+                        FileMapView = iRacingFile.CreateViewAccessor(0, 0, MemoryMappedFileAccess.Read);
+                    }
+                    catch (FileNotFoundException ex)
+                    {
+                        if (Header != null)
                         {
-                            if (Header == null)
-                            {
-                                Header = new IRacingSdkHeader(FileMapView);
-                                OnConnected?.Invoke();
-                            }
-                            if (VarHeaders == null)
-                            { 
-                                GetVarHeaders();
-                            }
-                            OnDataChanged?.Invoke();
+                            Disconnected?.Invoke(this, EventArgs.Empty);
+                            _logger?.LogWarning($"Disconnected from iRacing ({ex.Message})");
                         }
                         else
                         {
-                            if (Header != null)
-                            {
-                                Header = null;
-                                OnDisconnected?.Invoke();
-                            }
-                            if (VarHeaders != null)
-                            {
-                                VarHeaders = null;
-                            }
+                            _logger?.LogWarning($"Not connected to iRacing ({ex.Message})");
                         }
+                        
+                        Header = null;
+                        _varHeaders = null;
+
+                        try
+                        {
+                            _logger?.LogInformation($"Waiting {Options.CheckConnectionDelay} ms before retrying to connect to iRacing.");
+                            await Task.Delay(Options.CheckConnectionDelay, token);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            _logger?.LogTrace("The CancellationToken was cancelled while waiting for next connect retry to iRacing.");
+                            break;
+                        }
+                        continue;
                     }
-                    catch
-                    {
-                    }
-                } 
-                else
+                }
+                
+                bool headerWasNull = Header == null;
+                
+                if (headerWasNull)
+                    Header = new IRacingSdkHeader(FileMapView);
+
+                if (IsConnected())
                 {
-                    Thread.Sleep(1000);
+                    if (headerWasNull)
+                    {
+                        Connected?.Invoke(this, EventArgs.Empty);
+                        _logger?.LogInformation("Connected to iRacing.");
+                    }
+                    
+                    DataChanged?.Invoke(this, EventArgs.Empty);
+                    _logger?.LogDebug("Data changed.");
+                }
+                
+                try
+                {
+                    _logger?.LogTrace($"Waiting {Options.UpdateDelay} ms before next update.");
+                    await Task.Delay(Options.UpdateDelay, token);
+                }
+                catch (OperationCanceledException)
+                {
+                    _logger?.LogTrace("The CancellationToken was cancelled while waiting for next update.");
+                    break;
                 }
             }
+            
+            _logger?.LogDebug("Exited the Sdk loop.");
         }
 
-        private void GetVarHeaders()
+        public object? GetData(string name)
         {
-            VarHeaders = new Dictionary<string, VarHeader>(Header.VarCount);
-            for (int i = 0; i < Header.VarCount; i++)
-            {
-                int type = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size)));
-                int offset = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarOffsetOffset));
-                int count = FileMapView.ReadInt32(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarCountOffset));
-                byte[] name = new byte[Constants.MaxString];
-                byte[] desc = new byte[Constants.MaxDesc];
-                byte[] unit = new byte[Constants.MaxString];
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarNameOffset), name, 0, Constants.MaxString);
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarDescOffset), desc, 0, Constants.MaxDesc);
-                FileMapView.ReadArray<byte>(Header.VarHeaderOffset + ((i * VarHeader.Size) + VarUnitOffset), unit, 0, Constants.MaxString);
-                string nameStr = _encoding.GetString(name).TrimEnd(trimChars);
-                string descStr = _encoding.GetString(desc).TrimEnd(trimChars);
-                string unitStr = _encoding.GetString(unit).TrimEnd(trimChars);
-                var header = new VarHeader(type, offset, count, nameStr, descStr, unitStr);
-                VarHeaders[header.Name] = header;  
-            }
-        }
-
-        public object GetData(string name)
-        {
-            if (!IsStarted || Header == null) return null;
-            if (!VarHeaders.TryGetValue(name, out var requestedHeader)) return null;
+            if (!IsConnected()) return null;
+            if (VarHeaders == null || !VarHeaders.TryGetValue(name, out var requestedHeader)) return null;
 
             int varOffset = requestedHeader.Offset;
             int count = requestedHeader.Count;
+            int position = Header.Offset + varOffset;
 
             switch (requestedHeader.Type)
             {
                 case VarType.irChar:
                     {
                         byte[] data = new byte[count];
-                        FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                        return _encoding.GetString(data).TrimEnd(trimChars);
+                        FileMapView.ReadArray(position, data, 0, count);
+                        return _encoding.GetString(data).TrimEnd(Constants.EndChar);
                     }
                 case VarType.irBool:
                     {
                         if (count > 1)
                         {
-                            bool[] data = new bool[count];
-                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                            return data;
+                            return FileMapView.ReadArray<bool>(position, count);
                         }
                         else
                         {
-                            return FileMapView.ReadBoolean(Header.Offset + varOffset);
+                            return FileMapView.ReadBoolean(position);
                         }
                     }
                 case VarType.irInt:
@@ -234,58 +328,55 @@ namespace irsdkSharp
                     {
                         if (count > 1)
                         {
-                            int[] data = new int[count];
-                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                            return data;
+                            return FileMapView.ReadArray<int>(position, count);
                         }
                         else
                         {
-                            return FileMapView.ReadInt32(Header.Offset + varOffset);
+                            return FileMapView.ReadInt32(position);
                         }
                     }
                 case VarType.irFloat:
                     {
                         if (count > 1)
                         {
-                            float[] data = new float[count];
-                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                            return data;
+                            return FileMapView.ReadArray<float>(position, count);
                         }
                         else
                         {
-                            return FileMapView.ReadSingle(Header.Offset + varOffset);
+                            return FileMapView.ReadSingle(position);
                         }
                     }
                 case VarType.irDouble:
                     {
                         if (count > 1)
                         {
-                            double[] data = new double[count];
-                            FileMapView.ReadArray(Header.Offset + varOffset, data, 0, count);
-                            return data;
+                            return FileMapView.ReadArray<double>(position, count);
                         }
                         else
                         {
-                            return FileMapView.ReadDouble(Header.Offset + varOffset);
+                            return FileMapView.ReadDouble(position);
                         }
                     }
                 default: return null;
             }
         }
 
-        public string GetSessionInfo() =>
-            (IsStarted && Header != null) switch
-            {
-                true => FileMapView.ReadString(Header.SessionInfoOffset, Header.SessionInfoLength),
-                _ => null
-            };
-
+        public string? GetSessionInfo()
+            => (Header == null) ? null : FileMapView?.ReadString(Header.SessionInfoOffset, Header.SessionInfoLength);
+        
+        /// <summary>
+        /// If the sim is connected.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException"/>
+        // Should be a property but for compatibility we keep it as a method.
         public bool IsConnected()
         {
-            if (IsStarted && Header != null)
-            {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(IRacingSDK));
+            
+            if (Header != null)
                 return (Header.Status & 1) > 0;
-            }
+
             return false;
         }
 

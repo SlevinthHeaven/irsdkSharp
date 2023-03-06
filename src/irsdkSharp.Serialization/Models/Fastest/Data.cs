@@ -24,8 +24,8 @@ namespace irsdkSharp.Serialization.Models.Fastest
         public Data(IRacingSDK sdk)
         {
             _sdk = sdk;
-            _fileView = IRacingSDK.GetFileMapView(sdk);
-            _headers = IRacingSDK.GetVarHeaders(sdk);
+            _fileView = sdk.FileMapView;
+            _headers = sdk.VarHeaders;
         }
 
         //private IRacingSessionModel _session;

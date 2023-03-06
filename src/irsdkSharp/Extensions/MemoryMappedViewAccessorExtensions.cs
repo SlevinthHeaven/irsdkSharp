@@ -1,4 +1,5 @@
-﻿using System.IO.MemoryMappedFiles;
+﻿using System;
+using System.IO.MemoryMappedFiles;
 using System.Text;
 
 namespace irsdkSharp.Extensions
@@ -27,6 +28,14 @@ namespace irsdkSharp.Extensions
                 sb.Append(c);
             }
             return sb.ToString();
+        }
+        
+        public static T[] ReadArray<T>(this MemoryMappedViewAccessor accessor, int position, int count) 
+            where T : struct
+        {
+            var value = new T[count];
+            accessor.ReadArray(position, value, 0, count);
+            return value;
         }
     }
 }

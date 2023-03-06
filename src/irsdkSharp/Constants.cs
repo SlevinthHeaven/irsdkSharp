@@ -13,5 +13,13 @@
         public const int MaxBufs = 4;
         public const int StatusConnected = 1;
         public const int SessionStringLength = 0x20000; // 128k
+        
+        public const int VarOffsetOffset = 4;
+        public const int VarCountOffset = 8;
+        public const int VarNameOffset = 16;
+        public const int VarDescOffset = 48;
+        public const int VarUnitOffset = 112;
+        
+        public const char EndChar = '\0';
     }
 }

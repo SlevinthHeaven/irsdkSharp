@@ -14,23 +14,32 @@ namespace irsdkSharp.ConsoleTest
         static void Main(string[] args)
         {
             sdk = new IRacingSDK();
-            sdk.OnDataChanged += Sdk_OnDataChanged;
-            sdk.OnDisconnected += Sdk_OnDisconnected;
-            sdk.OnConnected += Sdk_OnConnected;
+            sdk.DataChanged += Sdk_OnDataChanged;
+            sdk.Disconnected += Sdk_OnDisconnected;
+            sdk.Connected += Sdk_OnConnected;
+            
+            sdk.Start();
+            Console.WriteLine("Started...");
+            
+            Console.ReadLine();
+            
+            sdk.Stop();
+            Console.WriteLine("Stopped...");
+            
             Console.ReadLine();
         }
 
-        private static void Sdk_OnConnected()
+        private static void Sdk_OnConnected(object sender, EventArgs eventArgs)
         {
             Console.WriteLine("Connected");
         }
 
-        private static void Sdk_OnDisconnected()
+        private static void Sdk_OnDisconnected(object sender, EventArgs eventArgs)
         {
             Console.WriteLine("Disconnected");
         }
 
-        private static void Sdk_OnDataChanged()
+        private static void Sdk_OnDataChanged(object sender, EventArgs eventArgs)
         {
             var currentlyConnected = sdk.IsConnected();
 
