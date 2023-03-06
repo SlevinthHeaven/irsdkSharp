@@ -29,10 +29,9 @@ namespace irsdkSharp
         #region Fields
         private readonly Encoding _encoding;
         private readonly ILogger<IRacingSDK>? _logger;
-
-        private bool IsStarted = false;
-
-        MemoryMappedFile iRacingFile;
+        
+        private MemoryMappedFile _iRacingFile;
+        private bool _isStarted = false;
 
         // TODO: Change to only use one CTS
         private AutoResetEvent _gameLoopEvent;
@@ -51,9 +50,18 @@ namespace irsdkSharp
         #endregion
 
         #region Events
+        [Obsolete("Use the DataChanged event instead.", true)]
         public event Action OnDataChanged;
+        
+        [Obsolete("Use the Connected event instead.", true)]
         public event Action OnConnected;
+        
+        [Obsolete("Use the Disconnected event instead.", true)]
         public event Action OnDisconnected;
+
+        public event EventHandler? DataChanged;
+        public event EventHandler? Connected;
+        public event EventHandler? Disconnected;
         #endregion
 
         [Obsolete("Use the getter of FileMapView instead.")]
@@ -94,7 +102,7 @@ namespace irsdkSharp
 
             Header = new IRacingSdkHeader(FileMapView);
             GetVarHeaders();
-            IsStarted = true;
+            _isStarted = true;
         }
 
         private void ConnectionLoop()
@@ -104,12 +112,12 @@ namespace irsdkSharp
                 if (_connectionLoopCancellationToken.IsCancellationRequested) break;
                 try
                 {
-                    if (!IsConnected() && !IsStarted && Header == null)
+                    if (!IsConnected() && !_isStarted && Header == null)
                     {
-                        if (iRacingFile == null)
+                        if (_iRacingFile == null)
                         {
-                            iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
-                            FileMapView = iRacingFile.CreateViewAccessor();
+                            _iRacingFile = MemoryMappedFile.OpenExisting(Constants.MemMapFileName);
+                            FileMapView = _iRacingFile.CreateViewAccessor();
 
                             _hEvent = OpenEvent(Constants.DesiredAccess, false, Constants.DataValidEventName);
                             _gameLoopEvent = new AutoResetEvent(false)
@@ -117,13 +125,13 @@ namespace irsdkSharp
                                 SafeWaitHandle = new SafeWaitHandle(_hEvent, true)
                             };
 
-                            IsStarted = true;
+                            _isStarted = true;
                         }
                     }
                 }
                 catch (FileNotFoundException ex)
                 {
-                    IsStarted = false;
+                    _isStarted = false;
                     Header = null;
                     VarHeaders = null;
                     _logger?.LogDebug($"Not Connected {ex.Message}");
@@ -141,7 +149,7 @@ namespace irsdkSharp
             while (true)
             {
                 if (_waitValidDataLoopCancellationToken.IsCancellationRequested) break;
-                if (IsStarted)
+                if (_isStarted)
                 {
                     try
                     {
@@ -152,20 +160,20 @@ namespace irsdkSharp
                             if (Header == null)
                             {
                                 Header = new IRacingSdkHeader(FileMapView);
-                                OnConnected?.Invoke();
+                                Connected?.Invoke(this, EventArgs.Empty);
                             }
                             if (VarHeaders == null)
                             { 
                                 GetVarHeaders();
                             }
-                            OnDataChanged?.Invoke();
+                            DataChanged?.Invoke(this, EventArgs.Empty);
                         }
                         else
                         {
                             if (Header != null)
                             {
                                 Header = null;
-                                OnDisconnected?.Invoke();
+                                Disconnected?.Invoke(this, EventArgs.Empty);
                             }
                             if (VarHeaders != null)
                             {
@@ -208,7 +216,7 @@ namespace irsdkSharp
 
         public object GetData(string name)
         {
-            if (!IsStarted || Header == null) return null;
+            if (!_isStarted || Header == null) return null;
             if (!VarHeaders.TryGetValue(name, out var requestedHeader)) return null;
 
             int varOffset = requestedHeader.Offset;
@@ -280,7 +288,7 @@ namespace irsdkSharp
         }
 
         public string GetSessionInfo() =>
-            (IsStarted && Header != null) switch
+            (_isStarted && Header != null) switch
             {
                 true => FileMapView.ReadString(Header.SessionInfoOffset, Header.SessionInfoLength),
                 _ => null
@@ -288,7 +296,7 @@ namespace irsdkSharp
 
         public bool IsConnected()
         {
-            if (IsStarted && Header != null)
+            if (_isStarted && Header != null)
             {
                 return (Header.Status & 1) > 0;
             }
