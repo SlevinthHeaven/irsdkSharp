@@ -2496,6 +2496,15 @@ namespace irsdkSharp.Serialization.Models.Data
                 return _dcBrakeBias.Value;
             }
         }
+		private bool? _pushToTalk;
+		public bool PushToTalk
+		{
+			get
+			{
+				if ( !_pushToTalk.HasValue ) _pushToTalk = ValueSerializer.GetBoolValue( nameof( PushToTalk ), _data, _headers );
+				return _pushToTalk.Value;
+			}
+		}
 
-    }
+	}
 }
