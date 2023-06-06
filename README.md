@@ -5,7 +5,7 @@ This project was forked from SlevinthHeaven/irsdkSharp however that repo seems t
 2. Added SessionState enum (iRacing always had this - not sure why this wasn't in here already).
 3. Added DriverCarIsElectric to DriverInfoModel and CarIsElectric to DriverModel.
 4. Changed CarIsPaceCar and CarIsAI to integers - they were strings.
-5. Added BodyType, FaceType, and HelmetType to DriverModel.
+5. Added BodyType, FaceType, and HelmetType to DriverModel (iRacing added this in season 3 of 2023).
 6. Added TrackLengthOfficial to WeekendInfoModel.
 7. Removed some non-existent YAML model properties and fixed incorrect ones.
 8. Added FFBCommand, ReplaySearchSessionTime, and VideoCapture broadcast message types.
