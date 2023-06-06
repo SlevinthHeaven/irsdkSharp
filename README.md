@@ -3,6 +3,15 @@
 This project was forked from SlevinthHeaven/irsdkSharp however that repo seems to be dead and I needed to update this stuff to support the latest iRacing updates.  These are the updates that I have made so far in this fork -
 1. Added PushToTalk telemetry value (iRacing added this in season 2 of 2023).
 2. Added SessionState enum (iRacing always had this - not sure why this wasn't in here already).
+3. Added DriverCarIsElectric to DriverInfoModel and CarIsElectric to DriverModel.
+4. Changed CarIsPaceCar and CarIsAI to integers - they were strings.
+5. Added BodyType, FaceType, and HelmetType to DriverModel.
+6. Added TrackLengthOfficial to WeekendInfoModel.
+7. Removed some non-existent YAML model properties and fixed incorrect ones.
+8. Added FFBCommand, ReplaySearchSessionTime, and VideoCapture broadcast message types.
+9. Added FFBCommandModeTypes.
+10. Added VideoCaptureModeTypes.
+11. Removed dependency on Microsoft.Exceptions.Logging (Unity does not like it).
 
 Below is the original readme -
 
