@@ -1,6 +1,6 @@
 # IMPORTANT NOTE
 
-This project was forked from SlevinthHeaven/irsdkSharp however that repo seems to be dead and I needed to update this stuff to support the latest iRacing updates.  These are the updates that I have made so far -
+This project was forked from SlevinthHeaven/irsdkSharp however that repo seems to be dead and I needed to update this stuff to support the latest iRacing updates.  These are the updates that I have made so far in this fork -
 1. Added PushToTalk telemetry value (iRacing added this in season 2 of 2023).
 2. Added SessionState enum (iRacing always had this - not sure why this wasn't in here already).
 
