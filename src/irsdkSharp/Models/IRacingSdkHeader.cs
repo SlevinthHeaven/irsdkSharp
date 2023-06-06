@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.MemoryMappedFiles;
-using System.Linq;
+﻿using System.IO.MemoryMappedFiles;
 
 namespace irsdkSharp.Models
 {
     public class IRacingSdkHeader
     {
         private readonly MemoryMappedViewAccessor _mapView;
-        private byte[] latestBufferArray = new byte[16];
-        private byte[] bufferArray = new byte[16];
 
         public IRacingSdkHeader(MemoryMappedViewAccessor mapView)
         {

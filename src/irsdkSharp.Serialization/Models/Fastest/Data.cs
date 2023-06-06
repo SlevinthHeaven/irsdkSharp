@@ -1,13 +1,11 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
+
 using irsdkSharp.Enums;
 using irsdkSharp.Models;
 using irsdkSharp.Serialization.Enums.Fastest;
-using irsdkSharp.Serialization.Models.Session;
-using YamlDotNet.Serialization;
 
 namespace irsdkSharp.Serialization.Models.Fastest
 {

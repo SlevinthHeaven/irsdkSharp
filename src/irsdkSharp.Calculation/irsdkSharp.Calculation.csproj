@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-	<TargetFrameworks>net6.0</TargetFrameworks>
+	<TargetFrameworks>netstandard2.1</TargetFrameworks>
     <PackageId>irsdkSharp.Calculation</PackageId>
 	  <VersionPrefix>0.9.0</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>

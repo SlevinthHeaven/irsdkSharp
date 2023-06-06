@@ -7,11 +7,11 @@ namespace irsdkSharp.Serialization.Models.Session.SessionInfo
         public int SessionNum { get; set; }// %d
         public string SessionLaps { get; set; }// %d
         public string SessionTime { get; set; }// %0.2f sec
-        public string SessionName { get; set; }// %0.2f sec
-        public int SessionNumLapsToAvg { get; set; }// %d
-        public string SessionType { get; set; }// %s
+		public int SessionNumLapsToAvg { get; set; }// %d
+		public string SessionType { get; set; }// %s
+		public string SessionTrackRubberState { get; set; }// %s
+		public string SessionName { get; set; }// %0.2f sec
         public string SessionSubType { get; set; }// %s
-        public string SessionTrackRubberState { get; set; }// %s
         public string SessionSkipped { get; set; }// %s
         public string SessionRunGroupsUsed { get; set; }// %s
         public List<PositionModel> ResultsPositions { get; set; }

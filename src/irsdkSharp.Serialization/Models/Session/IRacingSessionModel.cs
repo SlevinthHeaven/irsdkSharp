@@ -31,11 +31,10 @@ namespace irsdkSharp.Serialization.Models.Session
 
         public WeekendInfoModel WeekendInfo { get; set; }
         public SessionInfoModel SessionInfo { get; set; }
-        public QualifyResultsInfoModel QualifyResultsInfo { get; set; }
+        // public QualifyResultsInfoModel QualifyResultsInfo { get; set; }
         public CameraInfoModel CameraInfo { get; set; }
         public RadioInfoModel RadioInfo { get; set; }
         public DriverInfoModel DriverInfo { get; set; }
         public SplitTimeInfoModel SplitTimeInfo { get; set; }
-
     }
 }

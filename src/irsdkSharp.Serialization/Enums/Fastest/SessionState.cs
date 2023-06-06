@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace irsdkSharp.Serialization.Enums.Fastest
+﻿namespace irsdkSharp.Serialization.Enums.Fastest
 {
 	public enum SessionState
 	{
