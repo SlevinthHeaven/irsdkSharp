@@ -6,6 +6,7 @@ using irsdkSharp.Serialization.Models.Session.SessionInfo;
 using irsdkSharp.Serialization.Models.Session.SplitTimeInfo;
 using irsdkSharp.Serialization.Models.Session.WeekendInfo;
 using System;
+using System.Diagnostics;
 using System.IO;
 using YamlDotNet.Serialization;
 
@@ -23,8 +24,8 @@ namespace irsdkSharp.Serialization.Models.Session
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine(ex.StackTrace);
+                Debug.WriteLine(ex.Message);
+                Debug.WriteLine(ex.StackTrace);
                 return null;
             }
         }
