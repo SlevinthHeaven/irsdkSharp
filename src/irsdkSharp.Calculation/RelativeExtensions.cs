@@ -30,7 +30,7 @@ namespace irsdkSharp.Calculation
             }
             if (currentCar == null || currentCar.IsSpectator != 0)
             {
-                currentCar = sessionModel.DriverInfo.Drivers.FirstOrDefault(x => x.CarIsPaceCar == "0" && x.CarIsAI == "0");
+                currentCar = sessionModel.DriverInfo.Drivers.FirstOrDefault(x => x.CarIsPaceCar == 0 && x.CarIsAI == 0);
             }
             var currentCarData = dataModel.Data.Cars.FirstOrDefault(x => x.CarIdx == currentCar.CarIdx);
 

@@ -63,8 +63,8 @@ namespace irsdkSharp.Calculation
 
             var drivers = sessionModel.DriverInfo.Drivers
                     .Where(x => x.IsSpectator == 0)
-                    .Where(x => x.CarIsPaceCar == "0")
-                    .Where(x => x.CarIsAI == "0")
+                    .Where(x => x.CarIsPaceCar == 0)
+                    .Where(x => x.CarIsAI == 0)
                     .ToList();
 
             //get the classes

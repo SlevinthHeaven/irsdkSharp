@@ -29,8 +29,8 @@ namespace irsdkSharp.Calculation
             var result = new Dictionary<int, double>();
             var classes = drivers
                 .Where(x => x.IsSpectator == 0)
-                .Where(x => x.CarIsPaceCar == "0")
-                .Where(x => x.CarIsAI == "0")
+                .Where(x => x.CarIsPaceCar == 0)
+                .Where(x => x.CarIsAI == 0)
                 .Select(x => x.CarClassID)
                 .GroupBy(x => x)
                 .Select(x => x.Key)
@@ -41,8 +41,8 @@ namespace irsdkSharp.Calculation
 
                 var driversInClass = drivers
                     .Where(x => x.IsSpectator == 0)
-                    .Where(x => x.CarIsPaceCar == "0")
-                    .Where(x => x.CarIsAI == "0")
+                    .Where(x => x.CarIsPaceCar == 0)
+                    .Where(x => x.CarIsAI == 0)
                     .Where(x => x.CarClassID == carClass).ToList();
 
                 var fieldSize = driversInClass.Count();
@@ -168,8 +168,8 @@ namespace irsdkSharp.Calculation
             var result = new Dictionary<int, int>();
             var classes = drivers
                 .Where(x => x.IsSpectator == 0)
-                .Where(x => x.CarIsPaceCar == "0")
-                .Where(x => x.CarIsAI == "0")
+                .Where(x => x.CarIsPaceCar == 0)
+                .Where(x => x.CarIsAI == 0)
                 .Select(x => x.CarClassID)
                 .GroupBy(x => x)
                 .Select(x => x.Key)
@@ -179,8 +179,8 @@ namespace irsdkSharp.Calculation
             {
                 var driversInClass = drivers
                     .Where(x => x.IsSpectator == 0)
-                    .Where(x => x.CarIsPaceCar == "0")
-                    .Where(x => x.CarIsAI == "0")
+                    .Where(x => x.CarIsPaceCar == 0)
+                    .Where(x => x.CarIsAI == 0)
                     .Where(x => x.CarClassID == carClass).ToList();
 
                 var fieldSize = driversInClass.Count();
