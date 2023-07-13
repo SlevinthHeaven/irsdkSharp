@@ -1,14 +1,11 @@
 ﻿using irsdkSharp.Serialization.Models.Session.CameraInfo;
 using irsdkSharp.Serialization.Models.Session.DriverInfo;
-using irsdkSharp.Serialization.Models.Session.QualifyResultsInfo;
 using irsdkSharp.Serialization.Models.Session.RadioInfo;
 using irsdkSharp.Serialization.Models.Session.SessionInfo;
 using irsdkSharp.Serialization.Models.Session.SplitTimeInfo;
 using irsdkSharp.Serialization.Models.Session.WeekendInfo;
 using System;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 using YamlDotNet.Serialization;
 
@@ -70,58 +67,85 @@ namespace irsdkSharp.Serialization.Models.Session
 				};
 			}
 
+			var keyTrackersIgnoringUntilNextLine = 0;
+
 			var stringBuilder = new StringBuilder( yaml.Length + keysToFix.Length * MaxNumAdditionalCharactersPerFixedKey * MaxNumDrivers );
 
 			foreach ( var c in yaml )
 			{
-				foreach ( var keyTracker in keyTrackers )
+				if ( keyTrackersIgnoringUntilNextLine == keyTrackers.Length )
 				{
-					if ( keyTracker.ignoreUntilNextLine )
+					if ( c == '\n' )
 					{
-						if ( c == '\n' )
+						keyTrackersIgnoringUntilNextLine = 0;
+
+						foreach ( var keyTracker in keyTrackers )
 						{
 							keyTracker.counter = 0;
 							keyTracker.ignoreUntilNextLine = false;
 						}
 					}
-					else if ( keyTracker.addFirstQuote )
+				}
+				else
+				{
+					foreach ( var keyTracker in keyTrackers )
 					{
-						if ( c != ' ' )
+						if ( keyTracker.ignoreUntilNextLine )
 						{
-							stringBuilder.Append( '\'' );
-
-							keyTracker.addFirstQuote = false;
-							keyTracker.addSecondQuote = true;
-						}
-					}
-					else if ( keyTracker.addSecondQuote )
-					{
-						if ( c == '\n' )
-						{
-							stringBuilder.Append( '\'' );
-
-							keyTracker.counter = 0;
-							keyTracker.addSecondQuote = false;
-						}
-						else if ( c == '\'' )
-						{
-							stringBuilder.Append( '\'' );
-						}
-					}
-					else
-					{
-						if ( c == keyTracker.keyToFix[ keyTracker.counter ] )
-						{
-							keyTracker.counter++;
-
-							if ( keyTracker.counter == keyTracker.keyToFix.Length )
+							if ( c == '\n' )
 							{
-								keyTracker.addFirstQuote = true;
+								keyTracker.counter = 0;
+								keyTracker.ignoreUntilNextLine = false;
+
+								keyTrackersIgnoringUntilNextLine--;
 							}
 						}
-						else if ( c != ' ' )
+						else if ( keyTracker.addFirstQuote )
 						{
-							keyTracker.ignoreUntilNextLine = true;
+							if ( c == '\n' )
+							{
+								keyTracker.counter = 0;
+								keyTracker.addFirstQuote = false;
+							}
+							else if ( c != ' ' )
+							{
+								stringBuilder.Append( '\'' );
+
+								keyTracker.addFirstQuote = false;
+								keyTracker.addSecondQuote = true;
+							}
+						}
+						else if ( keyTracker.addSecondQuote )
+						{
+							if ( c == '\n' )
+							{
+								stringBuilder.Append( '\'' );
+
+								keyTracker.counter = 0;
+								keyTracker.addSecondQuote = false;
+							}
+							else if ( c == '\'' )
+							{
+								stringBuilder.Append( '\'' );
+							}
+						}
+						else
+						{
+							if ( c == keyTracker.keyToFix[ keyTracker.counter ] )
+							{
+								keyTracker.counter++;
+
+								if ( keyTracker.counter == keyTracker.keyToFix.Length )
+								{
+									keyTracker.addFirstQuote = true;
+								}
+							}
+							else if ( c != ' ' )
+							{
+								keyTracker.ignoreUntilNextLine = true;
+
+								keyTrackersIgnoringUntilNextLine++;
+							}
 						}
 					}
 				}
