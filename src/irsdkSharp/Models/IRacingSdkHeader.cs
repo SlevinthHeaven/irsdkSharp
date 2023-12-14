@@ -6,6 +6,8 @@ namespace irsdkSharp.Models
     {
         private readonly MemoryMappedViewAccessor _mapView;
 
+        public static int CurrentTick = 0;
+
         public IRacingSdkHeader(MemoryMappedViewAccessor mapView)
         {
             _mapView = mapView;
@@ -46,6 +48,7 @@ namespace irsdkSharp.Models
                         curOffset = _mapView.ReadInt32(48 + (i * 16) + 4);
                     }
                 }
+                CurrentTick = maxTickCount;
                 return curOffset;
             }
         }

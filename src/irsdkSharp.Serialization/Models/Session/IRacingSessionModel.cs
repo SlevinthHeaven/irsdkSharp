@@ -1,5 +1,6 @@
 ﻿using irsdkSharp.Serialization.Models.Session.CameraInfo;
 using irsdkSharp.Serialization.Models.Session.DriverInfo;
+using irsdkSharp.Serialization.Models.Session.QualifyResultsInfo;
 using irsdkSharp.Serialization.Models.Session.RadioInfo;
 using irsdkSharp.Serialization.Models.Session.SessionInfo;
 using irsdkSharp.Serialization.Models.Session.SplitTimeInfo;
@@ -32,7 +33,7 @@ namespace irsdkSharp.Serialization.Models.Session
 
 		public WeekendInfoModel WeekendInfo { get; set; }
 		public SessionInfoModel SessionInfo { get; set; }
-		// public QualifyResultsInfoModel QualifyResultsInfo { get; set; }
+		public QualifyResultsInfoModel QualifyResultsInfo { get; set; }
 		public CameraInfoModel CameraInfo { get; set; }
 		public RadioInfoModel RadioInfo { get; set; }
 		public DriverInfoModel DriverInfo { get; set; }
