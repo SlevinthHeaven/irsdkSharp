@@ -22,5 +22,6 @@ namespace irsdkSharp.Serialization.Models.Session.SessionInfo
         public int ResultsNumLeadChanges { get; set; }// %d
         public int ResultsLapsComplete { get; set; }// %d
         public int ResultsOfficial { get; set; }// %d
+        public List<QualifyPositionModel> QualifyPositions { get; set; }
     }
 }
