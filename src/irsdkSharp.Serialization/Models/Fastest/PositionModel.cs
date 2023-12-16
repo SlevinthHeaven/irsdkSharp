@@ -1,7 +1,4 @@
 ﻿using irsdkSharp.Serialization.Enums.Fastest;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace irsdkSharp.Serialization.Models.Fastest
 {

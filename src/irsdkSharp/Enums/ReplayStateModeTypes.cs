@@ -2,6 +2,6 @@
 {
     public enum ReplayStateModeTypes 
     { 
-        Erasetape = 0 
+        EraseTape = 0 
     }
 }

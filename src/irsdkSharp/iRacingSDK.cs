@@ -1,16 +1,18 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.IO.MemoryMappedFiles;
-using irsdkSharp.Enums;
-using irsdkSharp.Models;
-using System.Threading;
-using System.Text;
-using Microsoft.Win32.SafeHandles;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using irsdkSharp.Extensions;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Threading;
+
+using Microsoft.Win32.SafeHandles;
+
+using irsdkSharp.Enums;
+using irsdkSharp.Extensions;
+using irsdkSharp.Models;
 
 namespace irsdkSharp
 {
@@ -50,7 +52,6 @@ namespace irsdkSharp
 
         private AutoResetEvent _gameLoopEvent;
         private IntPtr _hEvent;
-        private readonly ILogger<IRacingSDK> _logger;
         private readonly CancellationTokenSource _waitValidDataLoopCancellation;
         private readonly CancellationToken _waitValidDataLoopCancellationToken;
 
@@ -71,11 +72,6 @@ namespace irsdkSharp
             _connectionLoopCancellation = new CancellationTokenSource();
             _connectionLoopCancellationToken = _connectionLoopCancellation.Token;
             Task.Run(ConnectionLoop, _waitValidDataLoopCancellationToken);
-        }
-
-        public IRacingSDK(ILogger<IRacingSDK> logger) : this()
-        {
-            _logger = logger;
         }
 
         public IRacingSDK(MemoryMappedViewAccessor accessor)
@@ -115,12 +111,11 @@ namespace irsdkSharp
                         }
                     }
                 }
-                catch (FileNotFoundException ex)
+                catch (FileNotFoundException)
                 {
                     IsStarted = false;
                     Header = null;
                     VarHeaders = null;
-                    _logger?.LogDebug($"Not Connected {ex.Message}");
                 }
                 finally
                 {

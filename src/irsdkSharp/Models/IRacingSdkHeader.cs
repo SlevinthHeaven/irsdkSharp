@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.MemoryMappedFiles;
-using System.Linq;
+﻿using System.IO.MemoryMappedFiles;
 
 namespace irsdkSharp.Models
 {
     public class IRacingSdkHeader
     {
         private readonly MemoryMappedViewAccessor _mapView;
-        private byte[] latestBufferArray = new byte[16];
-        private byte[] bufferArray = new byte[16];
+
+        public static int CurrentTick = 0;
 
         public IRacingSdkHeader(MemoryMappedViewAccessor mapView)
         {
@@ -51,6 +48,7 @@ namespace irsdkSharp.Models
                         curOffset = _mapView.ReadInt32(48 + (i * 16) + 4);
                     }
                 }
+                CurrentTick = maxTickCount;
                 return curOffset;
             }
         }
